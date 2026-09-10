@@ -1,0 +1,558 @@
+import { useMemo, useState } from 'react'
+import { TEXTE, TITRE } from '../theme'
+import {
+  bricks,
+  choicesRequired,
+  hasPlayed,
+  legalCards,
+  playersToAct,
+  possibleTargets,
+  readyCount,
+} from '../game/engine'
+import {
+  CARD_KEYS,
+  CARD_LABEL,
+  type CardKey,
+  type Choice,
+  type GameState,
+  type Player,
+  type PlayerId,
+} from '../game/types'
+import { Etiquette, Panneau, Texte } from '../ui/atoms'
+import { BandeauCible, BandeauManche, LigneJoueur, Main, type EtatCarte } from '../ui/jeu'
+import { Pictogramme } from '../ui/Pictogramme'
+import { CompteurManche, Corps, Ecran, EnTete, Jauge } from '../ui/shell'
+import { useTheme } from '../ui/theme'
+import { FeuilleDeconnexion } from './Deconnexion'
+
+/**
+ * 05–07, 09, 10, 12 · Le tour de jeu.
+ *
+ * Un seul écran pour toute la manche : le plateau ne change pas de forme d'un
+ * état à l'autre. Le joueur lit quatre murs et quatre cartes en trois secondes,
+ * donc rien n'entre ici qui ne soit un état de jeu — aucun gribouillage, aucun
+ * décor.
+ *
+ * L'écran est empilé par question posée : où j'en suis (l'en-tête) → ce que je
+ * sais d'eux (les murs et leurs verrous) → ce que je peux faire (ma main).
+ */
+export function Jeu({
+  state,
+  moi,
+  joues,
+  absentsDepuis,
+  carteInitiale,
+  onJouer,
+  onSuite,
+  onQuitter,
+}: {
+  state: GameState
+  moi: PlayerId
+  /**
+   * Qui a déjà joué cette manche.
+   *
+   * Il vient du réseau et non de `state.choices` : les choix des autres ne
+   * sortent jamais de chez l'arbitre avant la révélation, donc un invité n'a
+   * dans son état que le sien. Sans cette liste, le « 3 / 4 ont joué » de la
+   * planche afficherait toujours « 1 / 4 ».
+   */
+  joues: PlayerId[]
+  /** Depuis quand chaque absent l'est, pour le compte à rebours de l'écran 12. */
+  absentsDepuis: ReadonlyMap<string, number>
+  /**
+   * Ouvre l'écran directement sur le choix de la cible (écran 06 de la
+   * planche). Sert à la galerie de contrôle, qui rend un écran figé et ne peut
+   * pas cliquer une carte pour l'atteindre.
+   */
+  carteInitiale?: CardKey
+  onJouer: (choix: Choice[]) => void
+  /** Accuse réception du bandeau de carte de manche. */
+  onSuite: () => void
+  onQuitter: () => void
+}) {
+  const t = useTheme()
+  const [brouillon, setBrouillon] = useState<Choice[]>([])
+  const [carteEnCours, setCarteEnCours] = useState<CardKey | null>(carteInitiale ?? null)
+
+  const me = state.players.find((p) => p.id === moi)
+  const requis = choicesRequired(state, moi)
+  const aJoue = (id: PlayerId) => joues.includes(id)
+  const envoye = hasPlayed(state, moi) || aJoue(moi)
+  const total = readyCount(state).total
+  const played = playersToAct(state).filter((p) => aJoue(p.id)).length
+  const equipes = state.config.format === 'equipes'
+  const jeJoue = playersToAct(state).some((p) => p.id === moi)
+
+  /** Les choix qui font foi : ceux déjà partis, sinon le brouillon en cours. */
+  const choix = envoye ? (state.choices[moi] ?? []) : brouillon
+
+  const cibles = useMemo(
+    () => (carteEnCours ? possibleTargets(state, moi, carteEnCours) : []),
+    [state, moi, carteEnCours],
+  )
+
+  if (!me) return null
+
+  const etatCarte = (c: CardKey): EtatCarte => {
+    if (carteEnCours === c) return 'choisie'
+    if (choix.some((x) => x.card === c)) return 'choisie'
+    if (!legalCards(state, moi).includes(c)) return 'interdite'
+    return 'jouable'
+  }
+
+  const valider = (suite: Choice[]) => {
+    setBrouillon(suite)
+    setCarteEnCours(null)
+    if (suite.length === requis) onJouer(suite)
+  }
+
+  const choisirCarte = (c: CardKey) => {
+    if (!legalCards(state, moi).includes(c)) return
+    // Le choix reste modifiable jusqu'à la révélation : toucher une carte
+    // recommence la sélection.
+    const base = envoye || choix.length >= requis ? [] : choix.filter((x) => x.card !== c)
+    const options = possibleTargets(state, moi, c)
+    if (options.length > 1) {
+      setBrouillon(base)
+      setCarteEnCours(c)
+      return
+    }
+    valider([...base, { card: c, target: options[0] }])
+  }
+
+  const choisirCible = (id: PlayerId) => {
+    if (!carteEnCours || !cibles.includes(id)) return
+    valider([...brouillon, { card: carteEnCours, target: id }])
+  }
+
+  /* ------------------------------------------------------- en-tête */
+
+  const enPause = state.players.some((p) => !p.connected)
+
+  const droite = enPause ? (
+    <Etiquette size={11} style={{ letterSpacing: '0.06em' }}>
+      en pause
+    </Etiquette>
+  ) : carteEnCours ? (
+    <span
+      style={{
+        background: t.clayText,
+        borderRadius: 999,
+        padding: '7px 12px',
+        font: `600 11px/1 ${TEXTE}`,
+        letterSpacing: '0.06em',
+        color: t.panel,
+        textTransform: 'uppercase',
+        whiteSpace: 'nowrap',
+      }}
+    >
+      {CARD_LABEL[carteEnCours]} · choisis une cible
+    </span>
+  ) : envoye ? (
+    <>
+      <span
+        style={{
+          width: 74,
+          height: 8,
+          borderRadius: 4,
+          background: t.off,
+          overflow: 'hidden',
+          display: 'flex',
+        }}
+      >
+        <span style={{ width: `${(played / Math.max(1, total)) * 100}%`, background: t.wood }} />
+      </span>
+      <span style={{ font: `600 11px/1 ${TEXTE}`, color: t.ink2, whiteSpace: 'nowrap' }}>
+        {played} / {total} ont joué
+      </span>
+    </>
+  ) : equipes ? (
+    <Etiquette size={11} style={{ letterSpacing: '0.06em' }}>
+      Équipes · score commun
+    </Etiquette>
+  ) : (
+    <Jauge round={state.round} />
+  )
+
+  /* --------------------------------------------------- lignes de mur */
+
+  const monEquipe = me.team
+  const tagDe = (p: Player): { tag?: string; couleur?: string } => {
+    if (!p.connected) return { tag: 'absent' }
+    if (carteEnCours && cibles.includes(p.id) && p.id !== moi)
+      return { tag: 'cibler', couleur: t.clayText }
+    if (p.id === moi) return { tag: 'toi' }
+    if (envoye) return { tag: aJoue(p.id) ? 'a joué' : 'choisit…' }
+    // En équipes, savoir qui est de son côté vaut d'être dit en permanence :
+    // c'est ce qui distingue un mur qu'on répare d'un mur qu'on casse.
+    if (monEquipe !== null && p.team === monEquipe) return { tag: 'coéquipier' }
+    return {}
+  }
+
+  const bandeauDe = (p: Player) => {
+    // Le mur visé porte un bandeau qui nomme l'action : sans lui, on ne sait
+    // pas si la ligne mise en avant est la cible ou soi-même.
+    const c = choix.find((x) => x.target === p.id && x.card === 'frapper')
+    if (!c || p.id === moi || !envoye) return undefined
+    return <BandeauCible card="frapper" texte="Ta frappe part sur ce mur" />
+  }
+
+  // Les murs se resserrent quand une autre information partage l'écran : le
+  // bandeau ocre d'une carte de manche, ou le bandeau de cible une fois joué.
+  const hauteurMur = equipes ? 34 : state.activeRoundCard || envoye ? 36 : 42
+
+  const ligne = (p: Player, nu = false) => {
+    const { tag, couleur } = tagDe(p)
+    const ciblable = !!carteEnCours && cibles.includes(p.id)
+    return (
+      <LigneJoueur
+        key={p.id}
+        player={p}
+        moi={p.id === moi}
+        nu={nu}
+        tag={tag}
+        tagColor={couleur}
+        hauteurMur={nu ? 34 : hauteurMur}
+        bandeau={bandeauDe(p)}
+        onClick={ciblable ? () => choisirCible(p.id) : undefined}
+        ariaLabel={
+          ciblable ? `Viser le mur de ${p.name} — ${bricks(p)} briques debout` : undefined
+        }
+      />
+    )
+  }
+
+  /* ----------------------------------------------------- pied d'écran */
+
+  const attendus = playersToAct(state).filter((p) => !aJoue(p.id))
+
+  const pied = carteEnCours ? (
+    <BarrePied ton="ink">Touche un mur pour cibler</BarrePied>
+  ) : envoye ? (
+    <BarrePied ton="creux" point>
+      {attendus.length === 0
+        ? 'Tout le monde a joué'
+        : attendus.length === 1
+          ? `On attend ${attendus[0].name}…`
+          : `On attend ${attendus.length} joueurs…`}
+    </BarrePied>
+  ) : (
+    <BarrePied ton="creux">Touche une carte pour continuer</BarrePied>
+  )
+
+  // En temps normal la carte interdite se lit sur la carte elle-même, donc le
+  // libellé reste court. Sur une manche à carte commune, le joueur a une règle
+  // de plus à tenir en tête : on lui rappelle son verrou en toutes lettres.
+  const libelleMain = envoye
+    ? phraseChoix(state, choix, moi)
+    : state.activeRoundCard && me.locked.length > 0
+      ? `Ta main — ${me.locked.map((k) => CARD_LABEL[k]).join(' et ')} ${me.locked.length > 1 ? 'sont interdites' : 'est interdite'} depuis la manche passée`
+      : 'Ta main — choisis une carte'
+
+  /* ------------------------------------------------- carte de manche */
+
+  if (state.phase === 'carte-manche' && state.activeRoundCard) {
+    return (
+      <FicheCarteManche
+        state={state}
+        onCompris={() => {
+          setBrouillon([])
+          setCarteEnCours(null)
+          onSuite()
+        }}
+      />
+    )
+  }
+
+  const deconnecte = state.players.find((p) => !p.connected)
+
+  return (
+    <Ecran>
+      <EnTete
+        gauche={
+          state.phase === 'mort-subite' ? (
+            <div style={{ font: `700 22px/1 ${TITRE}`, color: t.ink }}>Mort subite</div>
+          ) : (
+            <CompteurManche round={state.round} />
+          )
+        }
+        droite={droite}
+        hauteur={state.activeRoundCard ? 98 : 104}
+        pad={18}
+      />
+      <Corps pad={14} gap={state.activeRoundCard ? 8 : 11}>
+        {state.activeRoundCard && (
+          <BandeauManche nom={state.activeRoundCard.n} detail={state.activeRoundCard.d} />
+        )}
+
+        <div
+          style={{
+            flex: 1,
+            minHeight: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: state.activeRoundCard ? 8 : 11,
+            overflowY: 'auto',
+          }}
+        >
+          {equipes ? (
+            <Equipes state={state} moi={moi} ligne={ligne} />
+          ) : (
+            state.players.map((p) => ligne(p))
+          )}
+
+          {carteEnCours === 'frapper' && (
+            <Panneau bg={t.panel2} edge={null} radius={16} pad="12px 14px">
+              <Texte size={13} color={t.ink}>
+                {cibles.length === 1
+                  ? 'Une seule cible possible.'
+                  : `${cibles.length} cibles possibles.`}{' '}
+                {conseilCible(state, cibles)}
+              </Texte>
+            </Panneau>
+          )}
+
+          {equipes && !carteEnCours && (
+            <Panneau bg={t.panel2} edge={null} radius={16} pad="12px 14px">
+              <Texte size={13} color={t.ink}>
+                En équipes, Bloquer et Réparer peuvent viser ton coéquipier. Frapper ne vise que
+                l’équipe d’en face.
+              </Texte>
+            </Panneau>
+          )}
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {jeJoue ? (
+            <>
+              {!carteEnCours && (
+                <Texte size={12} weight={500} style={{ lineHeight: 1.3 }}>
+                  {libelleMain}
+                </Texte>
+              )}
+              <Main
+                cards={CARD_KEYS}
+                etat={etatCarte}
+                onPick={choisirCarte}
+                height={state.activeRoundCard ? 120 : equipes ? 118 : 126}
+              />
+              {pied}
+            </>
+          ) : (
+            <BarrePied ton="creux" point>
+              Tu regardes cette manche de mort subite.
+            </BarrePied>
+          )}
+        </div>
+      </Corps>
+
+      {deconnecte && (
+        <FeuilleDeconnexion
+          joueur={deconnecte}
+          depuis={absentsDepuis.get(deconnecte.id)}
+          hautDuVoile={state.activeRoundCard ? 98 : 104}
+          onContinuer={onSuite}
+          onQuitter={onQuitter}
+        />
+      )}
+    </Ecran>
+  )
+}
+
+/** La phrase au-dessus de la main, une fois le choix parti. */
+function phraseChoix(state: GameState, choix: Choice[], moi: PlayerId): string {
+  const nom = (id?: PlayerId) => state.players.find((p) => p.id === id)?.name ?? ''
+  const parts = choix.map((c) => {
+    if (c.card === 'frapper') return `Tu frappes ${nom(c.target)}`
+    if (c.target && c.target !== moi) return `Tu ${CARD_LABEL[c.card].toLowerCase()}s pour ${nom(c.target)}`
+    return `Tu ${CARD_LABEL[c.card].toLowerCase()}s`
+  })
+  return `${parts.join(', ')} — touche une autre carte ou un autre mur pour changer`
+}
+
+/** Une ligne de conseil qui s'appuie sur les verrous visibles à l'écran. */
+function conseilCible(state: GameState, cibles: PlayerId[]): string {
+  const bloqueurs = state.players.filter(
+    (p) => cibles.includes(p.id) && p.locked.includes('bloquer'),
+  )
+  if (bloqueurs.length === 1) {
+    return `${bloqueurs[0].name} vient de bloquer : il ne peut pas bloquer deux fois de suite.`
+  }
+  const bas = [...state.players.filter((p) => cibles.includes(p.id))].sort(
+    (a, b) => bricks(a) - bricks(b),
+  )[0]
+  return bas ? `Le mur le plus bas est celui de ${bas.name}.` : ''
+}
+
+function BarrePied({
+  children,
+  ton,
+  point,
+}: {
+  children: React.ReactNode
+  ton: 'ink' | 'creux'
+  point?: boolean
+}) {
+  const t = useTheme()
+  const ink = ton === 'ink'
+  return (
+    <div
+      style={{
+        height: 56,
+        flex: '0 0 56px',
+        borderRadius: 16,
+        background: ink ? t.selBg : t.cardOff,
+        boxShadow: ink ? `0 4px 0 ${t.selEdge}` : undefined,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 10,
+        font: ink ? `700 16px/1 ${TITRE}` : `500 13px/1 ${TEXTE}`,
+        color: ink ? t.selFg : t.ink2,
+      }}
+    >
+      {point && <span style={{ width: 9, height: 9, borderRadius: '50%', background: t.wood }} />}
+      {children}
+    </div>
+  )
+}
+
+/** 10 · Les deux équipes, chacune avec son score commun. */
+function Equipes({
+  state,
+  moi,
+  ligne,
+}: {
+  state: GameState
+  moi: PlayerId
+  ligne: (p: Player, nu?: boolean) => JSX.Element
+}) {
+  const t = useTheme()
+  const monEquipe = state.players.find((p) => p.id === moi)?.team ?? 0
+  const equipes: (0 | 1)[] = monEquipe === 0 ? [0, 1] : [1, 0]
+
+  return (
+    <>
+      {equipes.map((eq) => {
+        const membres = state.players.filter((p) => p.team === eq)
+        const briques = membres.reduce((n, p) => n + bricks(p), 0)
+        return (
+          <Panneau key={eq} radius={18} pad={13} gap={11}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
+              <span style={{ font: `700 18px/1 ${TITRE}`, color: t.ink }}>
+                {eq === monEquipe ? 'Vous' : 'Eux'}
+              </span>
+              <span style={{ font: `600 13px/1 ${TEXTE}`, color: t.clayText }}>
+                {briques} brique{briques > 1 ? 's' : ''}
+              </span>
+              {eq === monEquipe && (
+                <Etiquette size={10} style={{ letterSpacing: '0.08em', marginLeft: 'auto' }}>
+                  ton équipe
+                </Etiquette>
+              )}
+            </div>
+            {membres.map((p) => ligne(p, true))}
+          </Panneau>
+        )
+      })}
+    </>
+  )
+}
+
+/**
+ * C2 · La fiche d'une carte de manche telle qu'elle tombe en jeu.
+ * Elle est annoncée AVANT les choix : tout le monde la lit, puis on joue.
+ */
+export function FicheCarteManche({
+  state,
+  onCompris,
+}: {
+  state: GameState
+  onCompris: () => void
+}) {
+  const t = useTheme()
+  const carte = state.activeRoundCard
+  if (!carte) return null
+
+  return (
+    <Ecran>
+      <EnTete
+        gauche={<CompteurManche round={state.round} />}
+        droite={
+          <Etiquette size={11} style={{ letterSpacing: '0.06em' }}>
+            carte commune
+          </Etiquette>
+        }
+        hauteur={98}
+      />
+      <Corps pad={20} gap={16} scroll>
+        <div
+          style={{
+            background: t.ochre,
+            borderRadius: 20,
+            boxShadow: `0 5px 0 ${t.ochreEdge}`,
+            padding: 20,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 10,
+          }}
+        >
+          <Etiquette size={11} color={t.ochreInk} style={{ letterSpacing: '0.12em' }}>
+            Pour tout le monde · cette manche seulement
+          </Etiquette>
+          <div style={{ font: `700 38px/1.05 ${TITRE}`, color: '#2E2418' }}>{carte.n}</div>
+          <div style={{ font: `600 17px/1.35 ${TEXTE}`, color: '#2E2418', textWrap: 'pretty' }}>
+            {carte.d}
+          </div>
+        </div>
+
+        <Panneau radius={16} pad={15}>
+          <Texte size={14} color={t.ink}>
+            {carte.why}
+          </Texte>
+        </Panneau>
+
+        <Panneau radius={16} pad={15}>
+          <Texte size={13} weight={600}>
+            À la manche {state.round + 1}, on revient aux règles de base, verrous compris.
+          </Texte>
+        </Panneau>
+
+        <button
+          type="button"
+          onClick={onCompris}
+          style={{
+            marginTop: 'auto',
+            height: 62,
+            borderRadius: 18,
+            background: t.selBg,
+            boxShadow: `0 5px 0 ${t.selEdge}`,
+            border: 'none',
+            font: `700 19px/1 ${TITRE}`,
+            color: t.selFg,
+            cursor: 'pointer',
+          }}
+        >
+          Compris, je joue
+        </button>
+      </Corps>
+    </Ecran>
+  )
+}
+
+/** Les quatre pictogrammes, pour rappel dans les écrans de lecture. */
+export function RappelCartes() {
+  return (
+    <div style={{ display: 'flex', gap: 10 }}>
+      {CARD_KEYS.map((k) => (
+        <div
+          key={k}
+          style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}
+        >
+          <Pictogramme card={k} size={38} />
+          <span style={{ font: `700 12px/1 ${TITRE}` }}>{CARD_LABEL[k]}</span>
+        </div>
+      ))}
+    </div>
+  )
+}

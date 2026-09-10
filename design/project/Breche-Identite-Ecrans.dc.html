@@ -1,0 +1,2285 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700&family=Archivo+Black&family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Outfit:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #DCD6C7; font-family: Archivo, Helvetica, sans-serif; }
+  a { color: #B8391F; text-decoration: none; }
+  a:hover { color: #16140F; }
+</style>
+</helmet>
+
+<section style="padding:56px 56px 40px; display:flex; flex-direction:column; gap:36px; max-width:1780px">
+
+  <div style="display:flex; align-items:flex-end; gap:24px; flex-wrap:wrap; border-bottom:4px solid #16140F; padding-bottom:18px">
+    <div style="font:400 44px/0.95 'Archivo Black', Helvetica, sans-serif; color:#16140F; text-transform:uppercase; letter-spacing:-0.02em">Trois peaux possibles</div>
+    <div style="font:700 12px/1.6 'Space Mono', monospace; letter-spacing:0.12em; color:#5C574A; padding-bottom:6px; max-width:520px">TOUR 2 · MÊME ARCHITECTURE D’ÉCRAN, MÊMES RÈGLES DE LISIBILITÉ.<br>SEULE LA PEAU CHANGE. LA PLANCHE NÉO-BRUTALISTE RESTE EN DESSOUS, INCHANGÉE.</div>
+    <div style="margin-left:auto; font:600 13px/1.5 Archivo, sans-serif; color:#16140F; max-width:420px; text-wrap:pretty; padding-bottom:4px">Chaque variante est montrée sur les deux écrans qui décident tout : le tour de jeu et la révélation. Réponds avec un code (<a href="#2a">2a</a>, <a href="#2b">2b</a>, <a href="#2c">2c</a>) et je décline les 16 écrans.</div>
+  </div>
+
+  <div id="2a" style="display:flex; flex-direction:column; gap:16px">
+    <div style="display:flex; align-items:baseline; gap:14px; flex-wrap:wrap">
+      <div style="font:700 12px/1 'Space Mono', monospace; letter-spacing:0.12em; color:#F2EEE4; background:#16140F; padding:7px 9px">2A</div>
+      <div style="font:400 30px/1 'Archivo Black', Helvetica, sans-serif; color:#16140F; text-transform:uppercase">Établi</div>
+      <div style="font:600 14px/1.4 Archivo, sans-serif; color:#5C574A; max-width:640px; text-wrap:pretty">Le jeu de société posé sur la table : plus de contours à l’encre, mais de la <strong>matière et de l’épaisseur</strong>. Les briques sont des pièces qu’on pourrait prendre en main.</div>
+    </div>
+
+    <div style="display:flex; gap:22px; flex-wrap:wrap; align-items:flex-start">
+
+      <div style="flex:0 0 390px">
+        <div style="font:700 10px/1 'Space Mono', monospace; letter-spacing:0.12em; color:#5C574A; margin-bottom:8px">TOUR DE JEU</div>
+        <div style="width:390px; height:844px; border-radius:30px; background:#E4D7BE; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 6px 0 #C6B08A">
+          <div style="height:56px; flex:0 0 56px; display:flex; align-items:flex-end; justify-content:space-between; padding:0 20px 7px; font:600 11px/1 Outfit, sans-serif; color:#7A6B55">
+            <span>9:41</span>
+            <div style="display:flex; gap:5px; align-items:center"><div style="width:16px; height:7px; background:#7A6B55; border-radius:3px"></div><div style="width:8px; height:8px; border-radius:50%; background:#7A6B55"></div></div>
+          </div>
+          <div style="height:60px; flex:0 0 60px; background:#FCF7EC; display:flex; align-items:center; gap:10px; padding:0 18px">
+            <div style="font:700 23px/1 'Bricolage Grotesque', Helvetica, sans-serif; color:#2E2418">Manche 4<span style="color:#A08B6C">/10</span></div>
+            <div style="display:flex; gap:5px; margin-left:auto">
+              <div style="width:9px; height:9px; border-radius:50%; background:#A9713C"></div><div style="width:9px; height:9px; border-radius:50%; background:#A9713C"></div><div style="width:9px; height:9px; border-radius:50%; background:#A9713C"></div><div style="width:9px; height:9px; border-radius:50%; background:#A9713C"></div><div style="width:9px; height:9px; border-radius:50%; background:#E0CEAD"></div><div style="width:9px; height:9px; border-radius:50%; background:#E0CEAD"></div><div style="width:9px; height:9px; border-radius:50%; background:#E0CEAD"></div><div style="width:9px; height:9px; border-radius:50%; background:#E0CEAD"></div><div style="width:9px; height:9px; border-radius:50%; background:#E0CEAD"></div><div style="width:9px; height:9px; border-radius:50%; background:#E0CEAD"></div>
+            </div>
+          </div>
+          <div style="flex:1; padding:14px; display:flex; flex-direction:column; gap:11px">
+            <sc-for list="{{ va.players }}" as="p" hint-placeholder-count="4">
+              <div style="background:#FCF7EC; border-radius:18px; padding:13px; display:flex; flex-direction:column; gap:10px; box-shadow:0 3px 0 #DCC9A6; outline:{{ p.ring }}; outline-offset:3px">
+                <div style="display:flex; align-items:center; gap:9px">
+                  <div style="width:20px; height:20px; flex:0 0 20px; background:{{ p.color }}; border-radius:{{ p.radius }}; clip-path:{{ p.clip }}"></div>
+                  <div style="font:700 17px/1 'Bricolage Grotesque', Helvetica, sans-serif; color:#2E2418">{{ p.name }}</div>
+                  <div style="display:flex; align-items:center; gap:6px; background:#F1E5CE; border-radius:999px; padding:4px 9px">
+                    {{ p.lastPicto }}
+                    <div style="font:600 10px/1 Outfit, sans-serif; color:#7A6B55">{{ p.lastName }} · indispo</div>
+                  </div>
+                  <div style="font:600 11px/1 Outfit, sans-serif; color:#A08B6C; margin-left:auto">{{ p.tag }}</div>
+                </div>
+                <div style="display:flex; gap:6px; height:42px">
+                  <sc-for list="{{ p.bricks }}" as="b" hint-placeholder-count="5">
+                    <div style="flex:1; border-radius:7px; background:{{ b.fill }}; box-shadow:inset 0 -5px 0 {{ b.edge }}; position:relative; display:flex; align-items:center; justify-content:center">
+                      <sc-if value="{{ b.broken }}" hint-placeholder-val="{{ false }}">
+                        <div style="width:16px; height:3px; border-radius:2px; background:#C6AF88; transform:rotate(-24deg)"></div>
+                      </sc-if>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-for>
+            <div style="margin-top:auto; display:flex; flex-direction:column; gap:10px">
+              <div style="font:600 12px/1 Outfit, sans-serif; color:#7A6B55">Ta main — choisis une carte</div>
+              <div style="display:flex; gap:9px">
+                <sc-for list="{{ va.hand }}" as="c" hint-placeholder-count="4">
+                  <div style="flex:1; height:126px; border-radius:15px; background:{{ c.bg }}; box-shadow:0 4px 0 {{ c.edge }}; padding:14px 6px; display:flex; flex-direction:column; align-items:center; justify-content:space-between; opacity:{{ c.dim }}">
+                    {{ c.picto }}
+                    <div style="font:700 13px/1 'Bricolage Grotesque', Helvetica, sans-serif; color:{{ c.fg }}">{{ c.label }}</div>
+                    <div style="font:600 9px/1.2 Outfit, sans-serif; color:{{ c.fg2 }}; text-align:center">{{ c.note }}</div>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="height:56px; border-radius:16px; background:#EDE0C6; display:flex; align-items:center; justify-content:center; font:600 13px/1 Outfit, sans-serif; color:#7A6B55">Touche une carte pour continuer</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="flex:0 0 390px">
+        <div style="font:700 10px/1 'Space Mono', monospace; letter-spacing:0.12em; color:#5C574A; margin-bottom:8px">RÉVÉLATION</div>
+        <div style="width:390px; height:844px; border-radius:30px; background:#E4D7BE; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 6px 0 #C6B08A">
+          <div style="height:56px; flex:0 0 56px; display:flex; align-items:flex-end; justify-content:space-between; padding:0 20px 7px; font:600 11px/1 Outfit, sans-serif; color:#7A6B55">
+            <span>9:41</span>
+            <div style="display:flex; gap:5px; align-items:center"><div style="width:16px; height:7px; background:#7A6B55; border-radius:3px"></div><div style="width:8px; height:8px; border-radius:50%; background:#7A6B55"></div></div>
+          </div>
+          <div style="height:60px; flex:0 0 60px; background:#2E2418; display:flex; align-items:center; gap:10px; padding:0 18px">
+            <div style="font:700 23px/1 'Bricolage Grotesque', Helvetica, sans-serif; color:#FCF7EC">Révélation</div>
+            <div style="font:600 11px/1 Outfit, sans-serif; color:#C6AF88; margin-left:auto">manche 4 · tout le monde a joué</div>
+          </div>
+          <div style="flex:1; padding:14px 14px 8px 14px; display:flex; flex-direction:column; gap:9px">
+            <sc-for list="{{ va.reveal }}" as="p" hint-placeholder-count="4">
+              <div style="background:#FCF7EC; border-radius:18px; padding:10px 12px; display:flex; flex-direction:column; gap:7px; box-shadow:0 3px 0 #DCC9A6; outline:{{ p.ring }}; outline-offset:3px">
+                <div style="display:flex; align-items:center; gap:9px">
+                  <div style="width:20px; height:20px; flex:0 0 20px; background:{{ p.color }}; border-radius:{{ p.radius }}; clip-path:{{ p.clip }}"></div>
+                  <div style="font:700 17px/1 'Bricolage Grotesque', Helvetica, sans-serif; color:#2E2418">{{ p.name }}</div>
+                  <div style="font:600 11px/1 Outfit, sans-serif; color:#A08B6C; margin-left:auto">{{ p.tag }}</div>
+                </div>
+                <div style="display:flex; align-items:center; gap:8px; background:#F1E5CE; border-radius:12px; padding:8px 10px">
+                  {{ p.ovPicto }}
+                  <div style="font:700 13px/1 Outfit, sans-serif; color:#2E2418">{{ p.ovLabel }}</div>
+                  <div style="margin-left:auto; background:{{ p.ovBg }}; color:{{ p.ovFg }}; border-radius:999px; padding:4px 9px; font:600 10px/1 Outfit, sans-serif">{{ p.ovTag }}</div>
+                </div>
+                <div style="display:flex; gap:6px; height:30px">
+                  <sc-for list="{{ p.bricks }}" as="b" hint-placeholder-count="5">
+                    <div style="flex:1; border-radius:7px; background:{{ b.fill }}; box-shadow:inset 0 -5px 0 {{ b.edge }}; position:relative; display:flex; align-items:center; justify-content:center">
+                      <sc-if value="{{ b.broken }}" hint-placeholder-val="{{ false }}">
+                        <div style="width:16px; height:3px; border-radius:2px; background:#C6AF88; transform:rotate(-24deg)"></div>
+                      </sc-if>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-for>
+            <div style="margin-top:auto; background:#C0562F; border-radius:18px; padding:16px; box-shadow:0 4px 0 #8E3A1C; display:flex; flex-direction:column; gap:6px">
+              <div style="font:700 20px/1.1 'Bricolage Grotesque', Helvetica, sans-serif; color:#FCF7EC; text-wrap:pretty">Le piège de Nour a retourné ta frappe.</div>
+              <div style="font:500 13px/1.4 Outfit, sans-serif; color:#F6DED2">Tu perds une brique. Nour n’a rien perdu — et tu ne pourras pas rejouer Frapper la manche prochaine.</div>
+            </div>
+            <div style="height:56px; border-radius:16px; background:#2E2418; display:flex; align-items:center; justify-content:center; font:700 15px/1 'Bricolage Grotesque', Helvetica, sans-serif; color:#FCF7EC">Manche suivante</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="flex:1 1 280px; min-width:250px; border:3px solid #16140F; background:#F2EEE4; padding:20px; display:flex; flex-direction:column; gap:14px">
+        <div style="display:flex; gap:0">
+          <div style="flex:1; height:52px; background:#E4D7BE"></div>
+          <div style="flex:1; height:52px; background:#FCF7EC"></div>
+          <div style="flex:1; height:52px; background:#C0562F"></div>
+          <div style="flex:1; height:52px; background:#A9713C"></div>
+          <div style="flex:1; height:52px; background:#2E2418"></div>
+        </div>
+        <div style="font:700 10px/1.5 'Space Mono', monospace; letter-spacing:0.1em; color:#5C574A">KRAFT #E4D7BE · CARTON #FCF7EC · TERRE CUITE #C0562F · BOIS #A9713C · ENCRE #2E2418</div>
+        <div style="border-top:2px solid #E5DFD1; padding-top:12px">
+          <div style="font:700 26px/1 'Bricolage Grotesque', Helvetica, sans-serif; color:#16140F">Bricolage Grotesque</div>
+          <div style="font:500 15px/1.4 Outfit, sans-serif; color:#5C574A">Outfit pour l’interface et les états. Aucune capitale mono : le ton devient parlé, pas signalétique.</div>
+        </div>
+        <div style="border-top:2px solid #E5DFD1; padding-top:12px; display:flex; flex-direction:column; gap:8px">
+          <div style="font:700 10px/1 'Space Mono', monospace; letter-spacing:0.12em; color:#5C574A">CE QUE ÇA CHANGE</div>
+          <div style="font:400 13px/1.5 Archivo, sans-serif; color:#16140F; text-wrap:pretty">Les traits d’encre deviennent des <strong>chants</strong> : chaque brique a une tranche sombre, chaque carte une épaisseur. Coins à 15–18 px, ombres dures sans flou — donc encore imprimable, jamais « app ».</div>
+        </div>
+        <div style="border-top:2px solid #E5DFD1; padding-top:12px; display:flex; flex-direction:column; gap:8px">
+          <div style="font:700 10px/1 'Space Mono', monospace; letter-spacing:0.12em; color:#5C574A">GAGNE / RISQUE</div>
+          <div style="font:400 13px/1.5 Archivo, sans-serif; color:#16140F; text-wrap:pretty">Gagne : chaleur, sensation d’objet, ça se pose entre amis sur une table.<br>Risque : plus doux, donc la tension du bluff repose entièrement sur l’animation de la révélation.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="2b" style="display:flex; flex-direction:column; gap:16px">
+    <div style="display:flex; align-items:baseline; gap:14px; flex-wrap:wrap">
+      <div style="font:700 12px/1 'Space Mono', monospace; letter-spacing:0.12em; color:#F2EEE4; background:#16140F; padding:7px 9px">2B</div>
+      <div style="font:400 30px/1 'Archivo Black', Helvetica, sans-serif; color:#16140F; text-transform:uppercase">Planche</div>
+      <div style="font:600 14px/1.4 Archivo, sans-serif; color:#5C574A; max-width:640px; text-wrap:pretty">Une case de bande dessinée : encres risographiques, décalages d’impression assumés, une <strong>révélation qui claque</strong> comme une onomatopée.</div>
+    </div>
+
+    <div style="display:flex; gap:22px; flex-wrap:wrap; align-items:flex-start">
+
+      <div style="flex:0 0 390px">
+        <div style="font:700 10px/1 'Space Mono', monospace; letter-spacing:0.12em; color:#5C574A; margin-bottom:8px">TOUR DE JEU</div>
+        <div style="width:390px; height:844px; border:3px solid #171B3D; border-radius:8px; background:#F8F0DE; overflow:hidden; display:flex; flex-direction:column; box-shadow:8px 8px 0 #2039C4">
+          <div style="height:54px; flex:0 0 54px; display:flex; align-items:flex-end; justify-content:space-between; padding:0 16px 7px; font:600 10px/1 'Work Sans', sans-serif; letter-spacing:0.08em; color:#171B3D; border-bottom:2px solid #171B3D">
+            <span>9:41</span>
+            <div style="display:flex; gap:4px; align-items:center"><div style="width:16px; height:7px; background:#171B3D"></div><div style="width:8px; height:8px; background:#171B3D"></div></div>
+          </div>
+          <div style="height:58px; flex:0 0 58px; border-bottom:3px solid #171B3D; display:flex; align-items:center; padding:0 16px; gap:10px; background:#FFC53D">
+            <div style="font:400 26px/1 Anton, Helvetica, sans-serif; letter-spacing:0.01em; color:#171B3D; text-transform:uppercase; text-shadow:2px 2px 0 #FF3E63">Manche 4/10</div>
+            <div style="display:flex; gap:3px; margin-left:auto">
+              <div style="width:8px; height:18px; background:#171B3D"></div><div style="width:8px; height:18px; background:#171B3D"></div><div style="width:8px; height:18px; background:#171B3D"></div><div style="width:8px; height:18px; background:#171B3D"></div><div style="width:8px; height:18px; border:2px solid #171B3D"></div><div style="width:8px; height:18px; border:2px solid #171B3D"></div><div style="width:8px; height:18px; border:2px solid #171B3D"></div><div style="width:8px; height:18px; border:2px solid #171B3D"></div><div style="width:8px; height:18px; border:2px solid #171B3D"></div><div style="width:8px; height:18px; border:2px solid #171B3D"></div>
+            </div>
+          </div>
+          <div style="flex:1; padding:14px; display:flex; flex-direction:column; gap:12px">
+            <sc-for list="{{ vb.players }}" as="p" hint-placeholder-count="4">
+              <div style="background:#FFFDF6; border:3px solid #171B3D; border-radius:4px; padding:11px 12px; display:flex; flex-direction:column; gap:9px; box-shadow:4px 4px 0 #171B3D; outline:{{ p.ring }}; outline-offset:4px">
+                <div style="display:flex; align-items:center; gap:9px">
+                  <div style="width:20px; height:20px; flex:0 0 20px; background:{{ p.color }}; border-radius:{{ p.radius }}; clip-path:{{ p.clip }}"></div>
+                  <div style="font:400 20px/1 Anton, Helvetica, sans-serif; color:#171B3D; text-transform:uppercase">{{ p.name }}</div>
+                  <div style="display:flex; align-items:center; gap:6px; border:2px solid #171B3D; background:#EDE5CE; padding:2px 6px">
+                    {{ p.lastPicto }}
+                    <div style="font:600 9px/1 'Work Sans', sans-serif; letter-spacing:0.06em; color:#5A5F80; text-transform:uppercase">{{ p.lastName }} · indispo</div>
+                  </div>
+                  <div style="font:600 10px/1 'Work Sans', sans-serif; letter-spacing:0.08em; color:#171B3D; margin-left:auto; text-transform:uppercase">{{ p.tag }}</div>
+                </div>
+                <div style="display:flex; gap:5px; height:40px">
+                  <sc-for list="{{ p.bricks }}" as="b" hint-placeholder-count="5">
+                    <div style="flex:1; border:2px solid {{ b.edge }}; background:{{ b.fill }}; border-radius:2px; position:relative; display:flex; align-items:center; justify-content:center">
+                      <sc-if value="{{ b.broken }}" hint-placeholder-val="{{ false }}">
+                        <div style="width:20px; height:3px; background:#FF3E63; transform:rotate(-28deg)"></div>
+                      </sc-if>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-for>
+            <div style="margin-top:auto; display:flex; flex-direction:column; gap:10px">
+              <div style="font:600 10px/1 'Work Sans', sans-serif; letter-spacing:0.14em; color:#5A5F80; text-transform:uppercase">Ta main · choisis une carte</div>
+              <div style="display:flex; gap:8px">
+                <sc-for list="{{ vb.hand }}" as="c" hint-placeholder-count="4">
+                  <div style="flex:1; height:126px; border:3px solid #171B3D; background:{{ c.bg }}; box-shadow:4px 4px 0 #171B3D; padding:12px 6px; display:flex; flex-direction:column; align-items:center; justify-content:space-between; opacity:{{ c.dim }}">
+                    {{ c.picto }}
+                    <div style="font:400 15px/1 Anton, Helvetica, sans-serif; color:{{ c.fg }}; text-transform:uppercase">{{ c.label }}</div>
+                    <div style="font:600 8px/1.2 'Work Sans', sans-serif; letter-spacing:0.06em; color:{{ c.fg2 }}; text-align:center; text-transform:uppercase">{{ c.note }}</div>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="height:56px; border:3px dashed #171B3D; display:flex; align-items:center; justify-content:center; font:600 11px/1 'Work Sans', sans-serif; letter-spacing:0.12em; color:#5A5F80; text-transform:uppercase">Choisis une carte pour continuer</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="flex:0 0 390px">
+        <div style="font:700 10px/1 'Space Mono', monospace; letter-spacing:0.12em; color:#5C574A; margin-bottom:8px">RÉVÉLATION</div>
+        <div style="width:390px; height:844px; border:3px solid #171B3D; border-radius:8px; background:#F8F0DE; overflow:hidden; display:flex; flex-direction:column; box-shadow:8px 8px 0 #FF3E63">
+          <div style="height:54px; flex:0 0 54px; display:flex; align-items:flex-end; justify-content:space-between; padding:0 16px 7px; font:600 10px/1 'Work Sans', sans-serif; letter-spacing:0.08em; color:#171B3D; border-bottom:2px solid #171B3D">
+            <span>9:41</span>
+            <div style="display:flex; gap:4px; align-items:center"><div style="width:16px; height:7px; background:#171B3D"></div><div style="width:8px; height:8px; background:#171B3D"></div></div>
+          </div>
+          <div style="background:#FF3E63; border-bottom:3px solid #171B3D; padding:14px 16px; display:flex; flex-direction:column; gap:2px">
+            <div style="font:400 40px/0.95 Anton, Helvetica, sans-serif; color:#FFFDF6; text-transform:uppercase; text-shadow:3px 3px 0 #171B3D">Piège retourné</div>
+            <div style="font:600 11px/1 'Work Sans', sans-serif; letter-spacing:0.12em; color:#FFFDF6; text-transform:uppercase">Manche 4 · tout le monde a joué</div>
+          </div>
+          <div style="flex:1; padding:14px 14px 8px 14px; display:flex; flex-direction:column; gap:9px">
+            <sc-for list="{{ vb.reveal }}" as="p" hint-placeholder-count="4">
+              <div style="background:#FFFDF6; border:3px solid #171B3D; border-radius:4px; padding:9px 11px; display:flex; flex-direction:column; gap:7px; box-shadow:4px 4px 0 #171B3D; outline:{{ p.ring }}; outline-offset:4px">
+                <div style="display:flex; align-items:center; gap:9px">
+                  <div style="width:20px; height:20px; flex:0 0 20px; background:{{ p.color }}; border-radius:{{ p.radius }}; clip-path:{{ p.clip }}"></div>
+                  <div style="font:400 20px/1 Anton, Helvetica, sans-serif; color:#171B3D; text-transform:uppercase">{{ p.name }}</div>
+                  <div style="font:600 10px/1 'Work Sans', sans-serif; letter-spacing:0.08em; color:#171B3D; margin-left:auto; text-transform:uppercase">{{ p.tag }}</div>
+                </div>
+                <div style="display:flex; align-items:center; gap:8px; border-top:2px solid #EDE5CE; border-bottom:2px solid #EDE5CE; padding:7px 0">
+                  {{ p.ovPicto }}
+                  <div style="font:600 13px/1 'Work Sans', sans-serif; color:#171B3D">{{ p.ovLabel }}</div>
+                  <div style="margin-left:auto; background:{{ p.ovBg }}; color:{{ p.ovFg }}; padding:4px 7px; font:600 9px/1 'Work Sans', sans-serif; letter-spacing:0.08em; text-transform:uppercase">{{ p.ovTag }}</div>
+                </div>
+                <div style="display:flex; gap:5px; height:30px">
+                  <sc-for list="{{ p.bricks }}" as="b" hint-placeholder-count="5">
+                    <div style="flex:1; border:2px solid {{ b.edge }}; background:{{ b.fill }}; border-radius:2px; position:relative; display:flex; align-items:center; justify-content:center">
+                      <sc-if value="{{ b.broken }}" hint-placeholder-val="{{ false }}">
+                        <div style="width:20px; height:3px; background:#FF3E63; transform:rotate(-28deg)"></div>
+                      </sc-if>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-for>
+            <div style="margin-top:auto; background:#FFC53D; border:3px solid #171B3D; padding:14px; box-shadow:4px 4px 0 #171B3D">
+              <div style="font:600 14px/1.4 'Work Sans', sans-serif; color:#171B3D; text-wrap:pretty">Tu as frappé Nour, Nour avait posé un piège : <strong>tu prends le coup à sa place</strong>. Frapper t’est interdit la manche prochaine.</div>
+            </div>
+            <div style="height:56px; background:#2039C4; border:3px solid #171B3D; box-shadow:4px 4px 0 #171B3D; display:flex; align-items:center; justify-content:center; font:400 19px/1 Anton, Helvetica, sans-serif; color:#FFFDF6; text-transform:uppercase">Manche suivante</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="flex:1 1 280px; min-width:250px; border:3px solid #16140F; background:#F2EEE4; padding:20px; display:flex; flex-direction:column; gap:14px">
+        <div style="display:flex; gap:0">
+          <div style="flex:1; height:52px; background:#F8F0DE"></div>
+          <div style="flex:1; height:52px; background:#2039C4"></div>
+          <div style="flex:1; height:52px; background:#FF3E63"></div>
+          <div style="flex:1; height:52px; background:#FFC53D"></div>
+          <div style="flex:1; height:52px; background:#171B3D"></div>
+        </div>
+        <div style="font:700 10px/1.5 'Space Mono', monospace; letter-spacing:0.1em; color:#5C574A">PAPIER #F8F0DE · BLEU #2039C4 · ROSE #FF3E63 · JAUNE #FFC53D · ENCRE #171B3D</div>
+        <div style="border-top:2px solid #E5DFD1; padding-top:12px">
+          <div style="font:400 30px/1 Anton, Helvetica, sans-serif; color:#16140F; text-transform:uppercase">Anton</div>
+          <div style="font:500 15px/1.4 'Work Sans', sans-serif; color:#5C574A">Work Sans pour l’interface. Les titres crient, le reste chuchote — comme dans un album.</div>
+        </div>
+        <div style="border-top:2px solid #E5DFD1; padding-top:12px; display:flex; flex-direction:column; gap:8px">
+          <div style="font:700 10px/1 'Space Mono', monospace; letter-spacing:0.12em; color:#5C574A">CE QUE ÇA CHANGE</div>
+          <div style="font:400 13px/1.5 Archivo, sans-serif; color:#16140F; text-wrap:pretty">Le noir reste, mais il n’est plus seul : <strong>trois encres franches</strong> et un décalage d’impression de 4 px donnent du relief et du bruit. La révélation devient une case pleine page.</div>
+        </div>
+        <div style="border-top:2px solid #E5DFD1; padding-top:12px; display:flex; flex-direction:column; gap:8px">
+          <div style="font:700 10px/1 'Space Mono', monospace; letter-spacing:0.12em; color:#5C574A">GAGNE / RISQUE</div>
+          <div style="font:400 13px/1.5 Archivo, sans-serif; color:#16140F; text-wrap:pretty">Gagne : c’est le plus « jeu » des trois, immédiatement mémorable, et l’humour du bluff passe.<br>Risque : très bavard visuellement — il faut réserver le rose et le jaune aux seuls moments de résolution, sinon l’écran hurle tout le temps.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="2c" style="display:flex; flex-direction:column; gap:16px">
+    <div style="display:flex; align-items:baseline; gap:14px; flex-wrap:wrap">
+      <div style="font:700 12px/1 'Space Mono', monospace; letter-spacing:0.12em; color:#F2EEE4; background:#16140F; padding:7px 9px">2C</div>
+      <div style="font:400 30px/1 'Archivo Black', Helvetica, sans-serif; color:#16140F; text-transform:uppercase">Veillée</div>
+      <div style="font:600 14px/1.4 Archivo, sans-serif; color:#5C574A; max-width:640px; text-wrap:pretty">Fond nuit, murs qui s’allument : la <strong>lumière porte l’information</strong>. Mur allumé = debout, mur éteint = tombé. Le plus proche d’un jeu mobile contemporain.</div>
+    </div>
+
+    <div style="display:flex; gap:22px; flex-wrap:wrap; align-items:flex-start">
+
+      <div style="flex:0 0 390px">
+        <div style="font:700 10px/1 'Space Mono', monospace; letter-spacing:0.12em; color:#5C574A; margin-bottom:8px">TOUR DE JEU</div>
+        <div style="width:390px; height:844px; border-radius:32px; background:#0E1016; border:1px solid #262B38; overflow:hidden; display:flex; flex-direction:column">
+          <div style="height:56px; flex:0 0 56px; display:flex; align-items:flex-end; justify-content:space-between; padding:0 20px 7px; font:500 11px/1 'Space Grotesk', sans-serif; color:#8A93A6">
+            <span>9:41</span>
+            <div style="display:flex; gap:5px; align-items:center"><div style="width:16px; height:7px; background:#8A93A6; border-radius:3px"></div><div style="width:8px; height:8px; border-radius:50%; background:#8A93A6"></div></div>
+          </div>
+          <div style="height:62px; flex:0 0 62px; display:flex; align-items:center; gap:12px; padding:0 18px">
+            <div style="font:700 21px/1 'Space Grotesk', sans-serif; color:#EDF1F7">Manche 4<span style="color:#6B7488">/10</span></div>
+            <div style="flex:1; height:6px; border-radius:3px; background:#242938; overflow:hidden; display:flex">
+              <div style="width:40%; background:#A9EE5E"></div>
+            </div>
+            <div style="font:400 11px/1 'Space Mono', monospace; color:#8A93A6">7K2P</div>
+          </div>
+          <div style="flex:1; padding:12px 14px 14px; display:flex; flex-direction:column; gap:11px">
+            <sc-for list="{{ vc.players }}" as="p" hint-placeholder-count="4">
+              <div style="background:#191D27; border-radius:20px; padding:13px; display:flex; flex-direction:column; gap:10px; border:1px solid #262B38; outline:{{ p.ring }}; outline-offset:2px">
+                <div style="display:flex; align-items:center; gap:9px">
+                  <div style="width:18px; height:18px; flex:0 0 18px; background:{{ p.color }}; border-radius:{{ p.radius }}; clip-path:{{ p.clip }}"></div>
+                  <div style="font:700 16px/1 'Space Grotesk', sans-serif; color:#EDF1F7">{{ p.name }}</div>
+                  <div style="display:flex; align-items:center; gap:6px; background:#242938; border-radius:999px; padding:4px 9px">
+                    {{ p.lastPicto }}
+                    <div style="font:500 10px/1 'Space Grotesk', sans-serif; color:#8A93A6">{{ p.lastName }} · verrouillé</div>
+                  </div>
+                  <div style="font:500 10px/1 'Space Mono', monospace; letter-spacing:0.06em; color:#6B7488; margin-left:auto; text-transform:uppercase">{{ p.tag }}</div>
+                </div>
+                <div style="display:flex; gap:6px; height:40px">
+                  <sc-for list="{{ p.bricks }}" as="b" hint-placeholder-count="5">
+                    <div style="flex:1; border-radius:9px; background:{{ b.fill }}; box-shadow:inset 0 1px 0 rgba(255,255,255,0.22); position:relative; display:flex; align-items:center; justify-content:center">
+                      <sc-if value="{{ b.broken }}" hint-placeholder-val="{{ false }}">
+                        <div style="width:16px; height:2px; border-radius:2px; background:#4A5163; transform:rotate(-24deg)"></div>
+                      </sc-if>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-for>
+            <div style="margin-top:auto; display:flex; flex-direction:column; gap:10px">
+              <div style="font:500 12px/1 'Space Grotesk', sans-serif; color:#8A93A6">Ta main — choisis une carte</div>
+              <div style="display:flex; gap:9px">
+                <sc-for list="{{ vc.hand }}" as="c" hint-placeholder-count="4">
+                  <div style="flex:1; height:126px; border-radius:18px; background:{{ c.bg }}; border:1px solid #2C3242; padding:14px 6px; display:flex; flex-direction:column; align-items:center; justify-content:space-between; opacity:{{ c.dim }}">
+                    {{ c.picto }}
+                    <div style="font:700 13px/1 'Space Grotesk', sans-serif; color:{{ c.fg }}">{{ c.label }}</div>
+                    <div style="font:500 9px/1.2 'Space Grotesk', sans-serif; color:{{ c.fg2 }}; text-align:center">{{ c.note }}</div>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="height:56px; border-radius:18px; background:#191D27; border:1px solid #262B38; display:flex; align-items:center; justify-content:center; font:500 13px/1 'Space Grotesk', sans-serif; color:#8A93A6">Touche une carte pour continuer</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="flex:0 0 390px">
+        <div style="font:700 10px/1 'Space Mono', monospace; letter-spacing:0.12em; color:#5C574A; margin-bottom:8px">RÉVÉLATION</div>
+        <div style="width:390px; height:844px; border-radius:32px; background:#0E1016; border:1px solid #262B38; overflow:hidden; display:flex; flex-direction:column">
+          <div style="height:56px; flex:0 0 56px; display:flex; align-items:flex-end; justify-content:space-between; padding:0 20px 7px; font:500 11px/1 'Space Grotesk', sans-serif; color:#8A93A6">
+            <span>9:41</span>
+            <div style="display:flex; gap:5px; align-items:center"><div style="width:16px; height:7px; background:#8A93A6; border-radius:3px"></div><div style="width:8px; height:8px; border-radius:50%; background:#8A93A6"></div></div>
+          </div>
+          <div style="padding:16px 18px 14px; display:flex; flex-direction:column; gap:4px">
+            <div style="font:500 11px/1 'Space Mono', monospace; letter-spacing:0.14em; color:#A9EE5E">RÉVÉLATION · MANCHE 4</div>
+            <div style="font:700 30px/1.05 'Space Grotesk', sans-serif; color:#EDF1F7; text-wrap:pretty">Nour t’attendait.</div>
+          </div>
+          <div style="flex:1; padding:0 14px 8px 14px; display:flex; flex-direction:column; gap:9px">
+            <sc-for list="{{ vc.reveal }}" as="p" hint-placeholder-count="4">
+              <div style="background:#191D27; border-radius:20px; padding:10px 12px; display:flex; flex-direction:column; gap:7px; border:1px solid #262B38; outline:{{ p.ring }}; outline-offset:2px">
+                <div style="display:flex; align-items:center; gap:9px">
+                  <div style="width:18px; height:18px; flex:0 0 18px; background:{{ p.color }}; border-radius:{{ p.radius }}; clip-path:{{ p.clip }}"></div>
+                  <div style="font:700 16px/1 'Space Grotesk', sans-serif; color:#EDF1F7">{{ p.name }}</div>
+                  <div style="font:500 10px/1 'Space Mono', monospace; letter-spacing:0.06em; color:#6B7488; margin-left:auto; text-transform:uppercase">{{ p.tag }}</div>
+                </div>
+                <div style="display:flex; align-items:center; gap:8px; background:#242938; border-radius:14px; padding:9px 11px">
+                  {{ p.ovPicto }}
+                  <div style="font:600 13px/1 'Space Grotesk', sans-serif; color:#EDF1F7">{{ p.ovLabel }}</div>
+                  <div style="margin-left:auto; background:{{ p.ovBg }}; color:{{ p.ovFg }}; border-radius:999px; padding:4px 10px; font:600 10px/1 'Space Grotesk', sans-serif">{{ p.ovTag }}</div>
+                </div>
+                <div style="display:flex; gap:6px; height:30px">
+                  <sc-for list="{{ p.bricks }}" as="b" hint-placeholder-count="5">
+                    <div style="flex:1; border-radius:9px; background:{{ b.fill }}; box-shadow:inset 0 1px 0 rgba(255,255,255,0.22); position:relative; display:flex; align-items:center; justify-content:center">
+                      <sc-if value="{{ b.broken }}" hint-placeholder-val="{{ false }}">
+                        <div style="width:16px; height:2px; border-radius:2px; background:#4A5163; transform:rotate(-24deg)"></div>
+                      </sc-if>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-for>
+            <div style="margin-top:auto; background:#191D27; border:1px solid #3A4256; border-radius:20px; padding:16px; display:flex; flex-direction:column; gap:6px">
+              <div style="font:700 18px/1.2 'Space Grotesk', sans-serif; color:#EDF1F7; text-wrap:pretty">Ta frappe t’est revenue dessus.</div>
+              <div style="font:400 13px/1.45 'Space Grotesk', sans-serif; color:#A6AFC0">−1 brique pour toi, aucune pour Nour. Frapper reste verrouillé la manche prochaine.</div>
+            </div>
+            <div style="height:56px; border-radius:18px; background:#A9EE5E; display:flex; align-items:center; justify-content:center; font:700 16px/1 'Space Grotesk', sans-serif; color:#101319">Manche suivante</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="flex:1 1 280px; min-width:250px; border:3px solid #16140F; background:#F2EEE4; padding:20px; display:flex; flex-direction:column; gap:14px">
+        <div style="display:flex; gap:0">
+          <div style="flex:1; height:52px; background:#0E1016"></div>
+          <div style="flex:1; height:52px; background:#191D27"></div>
+          <div style="flex:1; height:52px; background:#A9EE5E"></div>
+          <div style="flex:1; height:52px; background:#6FB3FF"></div>
+          <div style="flex:1; height:52px; background:#FF8A7A"></div>
+        </div>
+        <div style="font:700 10px/1.5 'Space Mono', monospace; letter-spacing:0.1em; color:#5C574A">NUIT #0E1016 · PANNEAU #191D27 · SIGNAL #A9EE5E · JOUEURS CLAIRS ET DÉSATURÉS D’UN CRAN</div>
+        <div style="border-top:2px solid #E5DFD1; padding-top:12px">
+          <div style="font:700 26px/1 'Space Grotesk', sans-serif; color:#16140F">Space Grotesk</div>
+          <div style="font:400 15px/1.4 'Space Grotesk', sans-serif; color:#5C574A">Une seule famille, trois graisses. Space Mono garde les codes et les états techniques.</div>
+        </div>
+        <div style="border-top:2px solid #E5DFD1; padding-top:12px; display:flex; flex-direction:column; gap:8px">
+          <div style="font:700 10px/1 'Space Mono', monospace; letter-spacing:0.12em; color:#5C574A">CE QUE ÇA CHANGE</div>
+          <div style="font:400 13px/1.5 Archivo, sans-serif; color:#16140F; text-wrap:pretty">Plus de hachures : l’<strong>éteint remplace l’indisponible</strong>. Une brique cassée ne s’écroule pas, elle s’éteint — lisible à 40 cm dans un salon sombre, et la couleur reste réservée aux quatre joueurs.</div>
+        </div>
+        <div style="border-top:2px solid #E5DFD1; padding-top:12px; display:flex; flex-direction:column; gap:8px">
+          <div style="font:700 10px/1 'Space Mono', monospace; letter-spacing:0.12em; color:#5C574A">GAGNE / RISQUE</div>
+          <div style="font:400 13px/1.5 Archivo, sans-serif; color:#16140F; text-wrap:pretty">Gagne : moderne, calme, la tension monte par la lumière ; excellent en soirée, batterie comprise.<br>Risque : c’est aussi la peau la plus banale — sans un geste de forme fort (le biseau, une texture), ça ressemble à n’importe quelle app.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="padding:56px 56px 24px; display:flex; flex-direction:column; gap:28px; max-width:1720px">
+
+  <div style="display:flex; align-items:flex-end; gap:24px; flex-wrap:wrap; border-bottom:4px solid #16140F; padding-bottom:20px">
+    <div style="font:400 64px/0.9 'Archivo Black', Helvetica, sans-serif; letter-spacing:-0.02em; color:#16140F; text-transform:uppercase">Brèche</div>
+    <div style="font:700 12px/1.5 'Space Mono', monospace; letter-spacing:0.14em; color:#5C574A; padding-bottom:8px">PWA · 2–4 JOUEURS · 4 MINUTES · HORS LIGNE<br>PLANCHE D’IDENTITÉ + 14 ÉCRANS CLAIRS + 4 SOMBRES</div>
+    <div style="margin-left:auto; display:flex; gap:6px; align-items:flex-end; padding-bottom:6px">
+      <div style="width:26px; height:34px; background:#16140F; clip-path:polygon(0 0, calc(100% - 7px) 0, 100% 7px, 100% 100%, 0 100%)"></div>
+      <div style="width:26px; height:34px; background:#16140F; clip-path:polygon(0 0, calc(100% - 7px) 0, 100% 7px, 100% 100%, 0 100%)"></div>
+      <div style="width:26px; height:34px; border:3px solid #16140F; clip-path:polygon(0 0, calc(100% - 7px) 0, 100% 7px, 100% 100%, 0 100%)"></div>
+      <div style="width:26px; height:34px; background:#16140F; clip-path:polygon(0 0, calc(100% - 7px) 0, 100% 7px, 100% 100%, 0 100%)"></div>
+      <div style="width:26px; height:34px; background:#16140F; clip-path:polygon(0 0, calc(100% - 7px) 0, 100% 7px, 100% 100%, 0 100%)"></div>
+    </div>
+  </div>
+
+  <div style="display:flex; gap:20px; flex-wrap:wrap; align-items:stretch">
+
+    <div style="flex:1 1 480px; min-width:0; border:3px solid #16140F; background:#F2EEE4; padding:24px; display:flex; flex-direction:column; gap:14px">
+      <div style="font:700 11px/1 'Space Mono', monospace; letter-spacing:0.16em; color:#5C574A">01 · CONTRAINTE N°1 — TOUT VOIR EN UN COUP D’ŒIL</div>
+      <div style="font:400 26px/1.15 'Archivo Black', Helvetica, sans-serif; color:#16140F; text-wrap:pretty">Cinq informations, un écran de 390 px, zéro tableau de bord.</div>
+      <div style="font:400 14px/1.5 Archivo, sans-serif; color:#16140F; text-wrap:pretty">Le raisonnement : ne pas répartir l’information en widgets, mais l’<strong>empiler par question posée</strong>. Chaque bande de l’écran répond à une seule question, dans l’ordre où le joueur se la pose.</div>
+      <div style="display:flex; flex-direction:column; gap:8px">
+        <div style="border:2px solid #16140F; background:#E5DFD1; padding:10px 12px; display:flex; gap:12px; align-items:baseline">
+          <div style="font:700 11px/1 'Space Mono', monospace; color:#5C574A; flex:0 0 18px">A</div>
+          <div style="font:600 13px/1.35 Archivo, sans-serif; color:#16140F"><strong>Où j’en suis ?</strong> — 4 murs empilés pleine largeur, un par joueur. Le mur EST la jauge : 5 briques, on compte à l’œil, jamais un chiffre seul.</div>
+        </div>
+        <div style="border:2px solid #16140F; background:#E5DFD1; padding:10px 12px; display:flex; gap:12px; align-items:baseline">
+          <div style="font:700 11px/1 'Space Mono', monospace; color:#5C574A; flex:0 0 18px">B</div>
+          <div style="font:600 13px/1.35 Archivo, sans-serif; color:#16140F"><strong>Que sais-je d’eux ?</strong> — sur la ligne d’identité de chaque mur, une pastille hachurée : la carte jouée la manche passée, donc celle qu’il ne peut pas rejouer. Hachure = indisponible, partout, sans exception.</div>
+        </div>
+        <div style="border:2px solid #16140F; background:#E5DFD1; padding:10px 12px; display:flex; gap:12px; align-items:baseline">
+          <div style="font:700 11px/1 'Space Mono', monospace; color:#5C574A; flex:0 0 18px">C</div>
+          <div style="font:600 13px/1.35 Archivo, sans-serif; color:#16140F"><strong>Que puis-je faire ?</strong> — ma main de 4 cartes en bas, toujours au même endroit, au pouce. Même grammaire visuelle que la bande B.</div>
+        </div>
+        <div style="border:2px solid #16140F; background:#E5DFD1; padding:10px 12px; display:flex; gap:12px; align-items:baseline">
+          <div style="font:700 11px/1 'Space Mono', monospace; color:#5C574A; flex:0 0 18px">D</div>
+          <div style="font:600 13px/1.35 Archivo, sans-serif; color:#16140F"><strong>Règle du moment ?</strong> — la carte de manche s’insère en bandeau ocre pleine largeur, au-dessus des murs, uniquement les manches 3/6/9. Absente le reste du temps : zéro place perdue.</div>
+        </div>
+      </div>
+      <div style="font:400 13px/1.5 Archivo, sans-serif; color:#5C574A; text-wrap:pretty">Ce qui rend l’ensemble lisible : une seule densité par bande, aucune bordure décorative, et un seul geste possible à la fois (choisir une carte, puis une cible). L’écran ne montre jamais deux hiérarchies concurrentes.</div>
+    </div>
+
+    <div style="flex:1 1 480px; min-width:0; border:3px solid #16140F; background:#16140F; padding:24px; display:flex; flex-direction:column; gap:14px">
+      <div style="font:700 11px/1 'Space Mono', monospace; letter-spacing:0.16em; color:#ADA695">02 · DIRECTION ARTISTIQUE</div>
+      <div style="font:400 34px/1.05 'Archivo Black', Helvetica, sans-serif; color:#F2EEE4; text-transform:uppercase; letter-spacing:-0.01em">Chantier<br>de papier</div>
+      <div style="font:400 14px/1.5 Archivo, sans-serif; color:#F2EEE4; text-wrap:pretty">Sérigraphie de chantier : encre noire épaisse sur papier kraft clair, quatre aplats de couleur tirés séparément, hachures à la place des ombres.<br>Le jeu parle de matière et de dégâts — la DA est donc <em>imprimée</em>, pas éclairée : aucun volume, aucune lueur, tout est découpé au cutter.<br>Le biseau de la brique est l’unique geste de forme du système : il se retrouve dans les cartes, les boutons et l’icône.</div>
+      <div style="display:flex; flex-direction:column; gap:8px; margin-top:4px">
+        <div style="font:700 10px/1 'Space Mono', monospace; letter-spacing:0.14em; color:#ADA695">RÈGLES DE FABRICATION</div>
+        <div style="font:600 13px/1.6 Archivo, sans-serif; color:#F2EEE4">Aplats seuls · contours encre 2–3 px · angles francs (biseau 6 px, jamais de rayon) · hachure 45° pour tout état « inactif » · pictogrammes tracés au trait constant · forme + nom + position pour identifier un joueur, jamais la couleur seule.</div>
+      </div>
+      <div style="margin-top:auto; display:flex; gap:14px; align-items:center; flex-wrap:wrap">
+        <div style="font:700 10px/1 'Space Mono', monospace; letter-spacing:0.14em; color:#ADA695">CE QU’ON ÉVITE</div>
+        <div style="font:600 12px/1.5 Archivo, sans-serif; color:#F2EEE4">dégradés violets · coins très arrondis · ombres douces · créneaux et pierres dessinées · gris d’application bancaire</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex; gap:20px; flex-wrap:wrap">
+    <div style="flex:1 1 520px; min-width:0; border:3px solid #16140F; background:#F2EEE4; padding:24px; display:flex; flex-direction:column; gap:16px">
+      <div style="font:700 11px/1 'Space Mono', monospace; letter-spacing:0.16em; color:#5C574A">03 · NOM — 5 ALTERNATIVES</div>
+      <div style="display:flex; flex-direction:column; gap:10px">
+        <sc-for list="{{ names }}" as="n" hint-placeholder-count="5">
+          <div style="display:flex; gap:14px; align-items:baseline; border-bottom:2px solid #E5DFD1; padding-bottom:9px">
+            <div style="font:400 20px/1 'Archivo Black', Helvetica, sans-serif; color:#16140F; flex:0 0 132px; text-transform:uppercase">{{ n.n }}</div>
+            <div style="font:400 13px/1.45 Archivo, sans-serif; color:#5C574A; flex:1; text-wrap:pretty">{{ n.why }}</div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="border:3px solid #16140F; background:#C98A16; padding:14px 16px; display:flex; gap:14px; align-items:baseline">
+        <div style="font:700 10px/1 'Space Mono', monospace; letter-spacing:0.14em; color:#16140F; flex:0 0 auto">RECOMMANDÉ</div>
+        <div style="font:600 14px/1.45 Archivo, sans-serif; color:#16140F; text-wrap:pretty"><strong>Fissure.</strong> Il nomme la mécanique (le mur qui cède) ET la psychologie (la faille qu’on cherche chez l’autre), tient sur une icône, s’écrit sans accent au clavier et se conjugue en jeu. « Brèche » reste un très bon second choix, mais désigne le trou déjà fait plutôt que la tension qui monte.</div>
+      </div>
+      <div style="display:flex; gap:16px; align-items:center; margin-top:2px">
+        <div style="font:700 10px/1 'Space Mono', monospace; letter-spacing:0.14em; color:#5C574A">RÈGLE EN UNE PHRASE</div>
+        <div style="font:400 17px/1.3 'Archivo Black', Helvetica, sans-serif; color:#16140F; text-wrap:pretty">Chacun choisit en secret une carte parmi 4 — la carte jouée est interdite à la manche suivante.</div>
+      </div>
+    </div>
+
+    <div style="flex:0 1 360px; min-width:280px; border:3px solid #16140F; background:#F2EEE4; padding:24px; display:flex; flex-direction:column; gap:16px">
+      <div style="font:700 11px/1 'Space Mono', monospace; letter-spacing:0.16em; color:#5C574A">04 · TYPOGRAPHIE</div>
+      <div>
+        <div style="font:400 40px/1 'Archivo Black', Helvetica, sans-serif; color:#16140F; text-transform:uppercase">Brèche</div>
+        <div style="font:700 10px/1.6 'Space Mono', monospace; color:#5C574A; letter-spacing:0.1em">ARCHIVO BLACK · titres, scores, révélation · 20–64 px</div>
+      </div>
+      <div style="border-top:2px solid #E5DFD1; padding-top:12px">
+        <div style="font:600 22px/1.2 Archivo, sans-serif; color:#16140F">Léa a bloqué. Elle est à découvert.</div>
+        <div style="font:700 10px/1.6 'Space Mono', monospace; color:#5C574A; letter-spacing:0.1em">ARCHIVO 400/600/700 · interface et texte · 13–26 px</div>
+      </div>
+      <div style="border-top:2px solid #E5DFD1; padding-top:12px">
+        <div style="font:700 18px/1.2 'Space Mono', monospace; color:#16140F; letter-spacing:0.08em">MANCHE 4/10 · CODE 7K2P</div>
+        <div style="font:700 10px/1.6 'Space Mono', monospace; color:#5C574A; letter-spacing:0.1em">SPACE MONO · codes, états, étiquettes · 9–18 px</div>
+      </div>
+      <div style="font:400 12px/1.5 Archivo, sans-serif; color:#5C574A; text-wrap:pretty; margin-top:auto">Trois graisses, trois usages, aucun autre. Les étiquettes d’état sont toujours en mono capitales espacées : on les reconnaît sans les lire.</div>
+    </div>
+  </div>
+
+  <div style="display:flex; gap:20px; flex-wrap:wrap">
+    <div style="flex:1 1 620px; min-width:0; border:3px solid #16140F; background:#F2EEE4; padding:24px; display:flex; flex-direction:column; gap:14px">
+      <div style="font:700 11px/1 'Space Mono', monospace; letter-spacing:0.16em; color:#5C574A">05 · PALETTE — THÈME CLAIR</div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap">
+        <div style="flex:1 1 120px; border:2px solid #16140F; background:#F2EEE4; padding:10px; min-height:96px; display:flex; flex-direction:column; justify-content:space-between">
+          <div style="font:700 10px/1.4 'Space Mono', monospace; color:#16140F">#F2EEE4</div>
+          <div style="font:600 11px/1.3 Archivo, sans-serif; color:#5C574A">PAPIER — fond</div>
+        </div>
+        <div style="flex:1 1 120px; border:2px solid #16140F; background:#E5DFD1; padding:10px; min-height:96px; display:flex; flex-direction:column; justify-content:space-between">
+          <div style="font:700 10px/1.4 'Space Mono', monospace; color:#16140F">#E5DFD1</div>
+          <div style="font:600 11px/1.3 Archivo, sans-serif; color:#5C574A">PAPIER 2 — bandes</div>
+        </div>
+        <div style="flex:1 1 120px; border:2px solid #16140F; background:#16140F; padding:10px; min-height:96px; display:flex; flex-direction:column; justify-content:space-between">
+          <div style="font:700 10px/1.4 'Space Mono', monospace; color:#F2EEE4">#16140F</div>
+          <div style="font:600 11px/1.3 Archivo, sans-serif; color:#F2EEE4">ENCRE — texte, traits<br>15.6:1 sur papier</div>
+        </div>
+        <div style="flex:1 1 120px; border:2px solid #16140F; background:#C98A16; padding:10px; min-height:96px; display:flex; flex-direction:column; justify-content:space-between">
+          <div style="font:700 10px/1.4 'Space Mono', monospace; color:#16140F">#C98A16</div>
+          <div style="font:600 11px/1.3 Archivo, sans-serif; color:#16140F">OCRE — carte de manche<br>encre dessus : 7.4:1</div>
+        </div>
+        <div style="flex:1 1 120px; border:2px solid #16140F; background:#F2EEE4; padding:10px; min-height:96px; display:flex; flex-direction:column; justify-content:space-between; background-image:repeating-linear-gradient(45deg, #16140F 0 2px, transparent 2px 11px)">
+          <div style="font:700 10px/1.4 'Space Mono', monospace; color:#16140F">HACHURE 45°</div>
+          <div style="font:600 11px/1.3 Archivo, sans-serif; color:#16140F">INDISPONIBLE</div>
+        </div>
+      </div>
+      <div style="font:700 11px/1 'Space Mono', monospace; letter-spacing:0.16em; color:#5C574A; margin-top:6px">PALETTE — THÈME SOMBRE</div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap">
+        <div style="flex:1 1 120px; border:2px solid #16140F; background:#15140E; padding:10px; min-height:96px; display:flex; flex-direction:column; justify-content:space-between">
+          <div style="font:700 10px/1.4 'Space Mono', monospace; color:#F2EEE4">#15140E</div>
+          <div style="font:600 11px/1.3 Archivo, sans-serif; color:#ADA695">NUIT — fond</div>
+        </div>
+        <div style="flex:1 1 120px; border:2px solid #16140F; background:#221F16; padding:10px; min-height:96px; display:flex; flex-direction:column; justify-content:space-between">
+          <div style="font:700 10px/1.4 'Space Mono', monospace; color:#F2EEE4">#221F16</div>
+          <div style="font:600 11px/1.3 Archivo, sans-serif; color:#ADA695">NUIT 2 — bandes</div>
+        </div>
+        <div style="flex:1 1 120px; border:2px solid #16140F; background:#F2EEE4; padding:10px; min-height:96px; display:flex; flex-direction:column; justify-content:space-between">
+          <div style="font:700 10px/1.4 'Space Mono', monospace; color:#16140F">#F2EEE4</div>
+          <div style="font:600 11px/1.3 Archivo, sans-serif; color:#5C574A">CRAIE — texte<br>15.1:1 sur nuit</div>
+        </div>
+        <div style="flex:1 1 120px; border:2px solid #16140F; background:#ADA695; padding:10px; min-height:96px; display:flex; flex-direction:column; justify-content:space-between">
+          <div style="font:700 10px/1.4 'Space Mono', monospace; color:#16140F">#ADA695</div>
+          <div style="font:600 11px/1.3 Archivo, sans-serif; color:#16140F">CRAIE 60 — libellés<br>7.9:1 sur nuit</div>
+        </div>
+        <div style="flex:1 1 120px; border:2px solid #16140F; background:#E0A62E; padding:10px; min-height:96px; display:flex; flex-direction:column; justify-content:space-between">
+          <div style="font:700 10px/1.4 'Space Mono', monospace; color:#16140F">#E0A62E</div>
+          <div style="font:600 11px/1.3 Archivo, sans-serif; color:#16140F">OCRE NUIT</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="flex:1 1 400px; min-width:0; border:3px solid #16140F; background:#F2EEE4; padding:24px; display:flex; flex-direction:column; gap:14px">
+      <div style="font:700 11px/1 'Space Mono', monospace; letter-spacing:0.16em; color:#5C574A">06 · LES 4 IDENTITÉS JOUEUR</div>
+      <div style="font:400 13px/1.45 Archivo, sans-serif; color:#5C574A; text-wrap:pretty">Forme + nom + position dans la grille. La couleur ne fait que confirmer.</div>
+      <sc-for list="{{ idPlayers }}" as="p" hint-placeholder-count="4">
+        <div style="display:flex; gap:14px; align-items:center; border:2px solid #16140F; background:#F2EEE4; padding:12px">
+          <div style="width:38px; height:38px; flex:0 0 38px; background:{{ p.hex }}; border-radius:{{ p.radius }}; clip-path:{{ p.clip }}"></div>
+          <div style="width:26px; height:26px; flex:0 0 26px; background:{{ p.hex }}; border-radius:{{ p.radius }}; clip-path:{{ p.clip }}"></div>
+          <div style="width:14px; height:14px; flex:0 0 14px; background:{{ p.hex }}; border-radius:{{ p.radius }}; clip-path:{{ p.clip }}"></div>
+          <div style="display:flex; flex-direction:column; gap:2px; margin-left:6px">
+            <div style="font:700 15px/1 Archivo, sans-serif; color:#16140F">{{ p.name }}</div>
+            <div style="font:700 9px/1.3 'Space Mono', monospace; letter-spacing:0.1em; color:#5C574A">{{ p.form }} · {{ p.hex }} / {{ p.dhex }}</div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="display:flex; gap:20px; flex-wrap:wrap">
+    <div style="flex:1 1 460px; min-width:0; border:3px solid #16140F; background:#F2EEE4; padding:24px; display:flex; flex-direction:column; gap:16px">
+      <div style="font:700 11px/1 'Space Mono', monospace; letter-spacing:0.16em; color:#5C574A">07 · LES 4 PICTOGRAMMES D’ACTION</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px">
+        <div style="border:2px solid #16140F; padding:14px; display:flex; flex-direction:column; gap:10px; align-items:flex-start">
+          {{ pk.frapper.big }}
+          <div style="font:700 12px/1 'Space Mono', monospace; letter-spacing:0.1em; color:#16140F">FRAPPER</div>
+          <div style="display:flex; gap:8px; align-items:center">{{ pk.frapper.md }}{{ pk.frapper.sm }}<span style="font:400 11px/1.3 Archivo, sans-serif; color:#5C574A">impact + éclats</span></div>
+        </div>
+        <div style="border:2px solid #16140F; padding:14px; display:flex; flex-direction:column; gap:10px; align-items:flex-start">
+          {{ pk.bloquer.big }}
+          <div style="font:700 12px/1 'Space Mono', monospace; letter-spacing:0.1em; color:#16140F">BLOQUER</div>
+          <div style="display:flex; gap:8px; align-items:center">{{ pk.bloquer.md }}{{ pk.bloquer.sm }}<span style="font:400 11px/1.3 Archivo, sans-serif; color:#5C574A">coup dévié par le linteau</span></div>
+        </div>
+        <div style="border:2px solid #16140F; padding:14px; display:flex; flex-direction:column; gap:10px; align-items:flex-start">
+          {{ pk.reparer.big }}
+          <div style="font:700 12px/1 'Space Mono', monospace; letter-spacing:0.1em; color:#16140F">RÉPARER</div>
+          <div style="display:flex; gap:8px; align-items:center">{{ pk.reparer.md }}{{ pk.reparer.sm }}<span style="font:400 11px/1.3 Archivo, sans-serif; color:#5C574A">brique ajoutée</span></div>
+        </div>
+        <div style="border:2px solid #16140F; padding:14px; display:flex; flex-direction:column; gap:10px; align-items:flex-start">
+          {{ pk.pieger.big }}
+          <div style="font:700 12px/1 'Space Mono', monospace; letter-spacing:0.1em; color:#16140F">PIÉGER</div>
+          <div style="display:flex; gap:8px; align-items:center">{{ pk.pieger.md }}{{ pk.pieger.sm }}<span style="font:400 11px/1.3 Archivo, sans-serif; color:#5C574A">mâchoires qui se ferment</span></div>
+        </div>
+      </div>
+      <div style="font:400 12px/1.5 Archivo, sans-serif; color:#5C574A; text-wrap:pretty">Trait constant, aucune courbe libre, aucun remplissage sauf pour PIÉGER (deux triangles pleins) — c’est ce qui le distingue instantanément des trois autres au trait.</div>
+    </div>
+
+    <div style="flex:1 1 460px; min-width:0; border:3px solid #16140F; background:#F2EEE4; padding:24px; display:flex; flex-direction:column; gap:16px">
+      <div style="font:700 11px/1 'Space Mono', monospace; letter-spacing:0.16em; color:#5C574A">08 · ANATOMIE D’UNE CARTE + ÉTAT INDISPONIBLE</div>
+      <div style="display:flex; gap:16px; align-items:flex-start; flex-wrap:wrap">
+        <div style="width:118px; height:164px; border:3px solid #16140F; background:#F2EEE4; padding:12px; display:flex; flex-direction:column; justify-content:space-between; align-items:center; clip-path:polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%)">
+          <div style="width:100%; height:4px; background:#16140F"></div>
+          {{ pk.frapper.big }}
+          <div style="font:700 11px/1 'Space Mono', monospace; letter-spacing:0.08em; color:#16140F">FRAPPER</div>
+          <div style="font:400 9px/1.2 'Space Mono', monospace; color:#5C574A">DISPONIBLE</div>
+        </div>
+        <div style="width:118px; height:164px; border:3px solid #16140F; background:#E5DFD1; background-image:repeating-linear-gradient(45deg, #16140F 0 2px, transparent 2px 11px); padding:12px; display:flex; flex-direction:column; justify-content:space-between; align-items:center; clip-path:polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%)">
+          <div style="width:100%; height:4px; background:#16140F"></div>
+          {{ pk.bloquer.big }}
+          <div style="font:700 11px/1 'Space Mono', monospace; letter-spacing:0.08em; color:#16140F; background:#E5DFD1; padding:2px 4px">BLOQUER</div>
+          <div style="font:700 9px/1.2 'Space Mono', monospace; color:#16140F; background:#E5DFD1; padding:2px 4px">JOUÉE · INDISPO</div>
+        </div>
+        <div style="width:118px; height:164px; border:3px solid #16140F; background:#16140F; padding:12px; display:flex; flex-direction:column; justify-content:space-between; align-items:center; clip-path:polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%)">
+          <div style="width:100%; height:4px; background:#F2EEE4"></div>
+          {{ pk.pieger.inv }}
+          <div style="font:700 11px/1 'Space Mono', monospace; letter-spacing:0.08em; color:#F2EEE4">PIÉGER</div>
+          <div style="font:400 9px/1.2 'Space Mono', monospace; color:#F2EEE4">CHOISIE</div>
+        </div>
+        <div style="flex:1 1 150px; display:flex; flex-direction:column; gap:8px; font:400 12px/1.4 Archivo, sans-serif; color:#16140F">
+          <div><strong>1.</strong> Coin biseauté 14 px — le geste de la brique.</div>
+          <div><strong>2.</strong> Filet d’en-tête 4 px : ancre la carte, remplace toute ombre.</div>
+          <div><strong>3.</strong> Pictogramme 46 px centré, libellé mono en bas.</div>
+          <div><strong>4.</strong> Ligne d’état : DISPONIBLE / CHOISIE / JOUÉE · INDISPO — jamais un simple grisé.</div>
+          <div><strong>5.</strong> Indisponible = hachure 45° + libellé, contraste maintenu (encre sur papier 2).</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex; gap:20px; flex-wrap:wrap">
+    <div style="flex:1 1 560px; min-width:0; border:3px solid #16140F; background:#F2EEE4; padding:24px; display:flex; flex-direction:column; gap:14px">
+      <div style="font:700 11px/1 'Space Mono', monospace; letter-spacing:0.16em; color:#5C574A">09 · LA BRIQUE ET LES ÉTATS DU MUR</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px">
+        <sc-for list="{{ wallStates }}" as="w" hint-placeholder-count="4">
+          <div style="border:2px solid #16140F; padding:14px; display:flex; flex-direction:column; gap:10px">
+            <div style="display:flex; gap:4px; align-items:flex-end">
+              <sc-for list="{{ w.bricks }}" as="b" hint-placeholder-count="5">
+                <div style="flex:1; height:38px; background:#16140F; clip-path:polygon(0 0, calc(100% - 7px) 0, 100% 7px, 100% 100%, 0 100%); position:relative">
+                  <div style="position:absolute; inset:2px; background:{{ b.fill }}; clip-path:polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 0 100%)"></div>
+                  <sc-if value="{{ b.broken }}" hint-placeholder-val="{{ false }}">
+                    <div style="position:absolute; left:2px; right:2px; top:18px; height:2px; background:#16140F; transform:rotate(-24deg)"></div>
+                  </sc-if>
+                  <sc-if value="{{ b.plus }}" hint-placeholder-val="{{ false }}">
+                    <div style="position:absolute; left:50%; top:50%; width:14px; height:3px; background:#16140F; transform:translate(-50%,-50%)"></div>
+                    <div style="position:absolute; left:50%; top:50%; width:3px; height:14px; background:#16140F; transform:translate(-50%,-50%)"></div>
+                  </sc-if>
+                </div>
+              </sc-for>
+            </div>
+            <div style="height:3px; background:#16140F"></div>
+            <div style="font:700 11px/1 'Space Mono', monospace; letter-spacing:0.1em; color:#16140F">{{ w.title }}</div>
+            <div style="font:400 11px/1.3 'Space Mono', monospace; color:#5C574A">{{ w.sub }}</div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="font:400 12px/1.5 Archivo, sans-serif; color:#5C574A; text-wrap:pretty">La brique : rectangle à coin biseauté, contour encre 2 px, aplat de la couleur du joueur. Cassée = emplacement vide + trait de fracture (la place reste, donc le mur reste comptable). Réparée ce tour = croix encre au centre. Aucun état n’est signalé par la couleur seule.</div>
+    </div>
+
+    <div style="flex:0 1 360px; min-width:300px; border:3px solid #16140F; background:#F2EEE4; padding:24px; display:flex; flex-direction:column; gap:16px">
+      <div style="font:700 11px/1 'Space Mono', monospace; letter-spacing:0.16em; color:#5C574A">10 · ICÔNE D’APP</div>
+      <div style="display:flex; gap:16px; align-items:flex-end; flex-wrap:wrap">
+        <div style="width:128px; height:128px; background:#16140F; padding:20px; display:flex; gap:5px; align-items:center">
+          <sc-for list="{{ iconBricks }}" as="b" hint-placeholder-count="5">
+            <div style="flex:1; height:64px; background:{{ b.fill }}; clip-path:polygon(0 0, calc(100% - 5px) 0, 100% 5px, 100% 100%, 0 100%); border:2px solid #F2EEE4; box-sizing:border-box"></div>
+          </sc-for>
+        </div>
+        <div style="width:64px; height:64px; background:#16140F; padding:10px; display:flex; gap:3px; align-items:center">
+          <sc-for list="{{ iconBricks }}" as="b" hint-placeholder-count="5">
+            <div style="flex:1; height:32px; background:{{ b.fill }}; clip-path:polygon(0 0, calc(100% - 3px) 0, 100% 3px, 100% 100%, 0 100%); border:1.5px solid #F2EEE4; box-sizing:border-box"></div>
+          </sc-for>
+        </div>
+        <div style="width:32px; height:32px; background:#16140F; padding:5px; display:flex; gap:2px; align-items:center">
+          <sc-for list="{{ iconBricks }}" as="b" hint-placeholder-count="5">
+            <div style="flex:1; height:16px; background:{{ b.fill }}; clip-path:polygon(0 0, calc(100% - 2px) 0, 100% 2px, 100% 100%, 0 100%); border:1px solid #F2EEE4; box-sizing:border-box"></div>
+          </sc-for>
+        </div>
+      </div>
+      <div style="font:400 12px/1.5 Archivo, sans-serif; color:#5C574A; text-wrap:pretty">Cinq briques, la troisième manquante : la brèche. Lisible à 32 px, monochrome, sans texte, identique en clair et en sombre.</div>
+    </div>
+  </div>
+
+</section>
+
+<section style="padding:24px 56px 56px; display:flex; flex-direction:column; gap:24px">
+  <div style="font:400 30px/1 'Archivo Black', Helvetica, sans-serif; color:#16140F; text-transform:uppercase; border-bottom:4px solid #16140F; padding-bottom:14px">Les 12 écrans · thème clair</div>
+
+  <div style="display:flex; gap:28px; flex-wrap:wrap; align-items:flex-start">
+
+    <div style="flex:0 0 390px">
+      <div style="font:700 11px/1 'Space Mono', monospace; letter-spacing:0.12em; color:#5C574A; margin-bottom:8px">01 · ACCUEIL</div>
+      <div style="width:390px; height:844px; border:3px solid #16140F; background:#F2EEE4; display:flex; flex-direction:column; overflow:hidden">
+        <div style="height:52px; flex:0 0 52px; display:flex; align-items:flex-end; justify-content:space-between; padding:0 14px 7px; font:700 10px/1 'Space Mono', monospace; color:#16140F; border-bottom:2px solid #16140F">
+          <span>9:41</span>
+          <div style="display:flex; gap:4px; align-items:center"><div style="width:16px; height:8px; background:#16140F"></div><div style="width:8px; height:8px; border:2px solid #16140F"></div></div>
+        </div>
+        <div style="flex:1; display:flex; flex-direction:column; padding:26px 22px; gap:22px">
+          <div style="display:flex; gap:5px; align-items:flex-end">
+            <div style="width:30px; height:42px; background:#16140F; clip-path:polygon(0 0, calc(100% - 7px) 0, 100% 7px, 100% 100%, 0 100%)"></div>
+            <div style="width:30px; height:42px; background:#16140F; clip-path:polygon(0 0, calc(100% - 7px) 0, 100% 7px, 100% 100%, 0 100%)"></div>
+            <div style="width:30px; height:42px; border:3px solid #16140F; clip-path:polygon(0 0, calc(100% - 7px) 0, 100% 7px, 100% 100%, 0 100%)"></div>
+            <div style="width:30px; height:42px; background:#16140F; clip-path:polygon(0 0, calc(100% - 7px) 0, 100% 7px, 100% 100%, 0 100%)"></div>
+            <div style="width:30px; height:42px; background:#16140F; clip-path:polygon(0 0, calc(100% - 7px) 0, 100% 7px, 100% 100%, 0 100%)"></div>
+          </div>
+          <div>
+            <div style="font:400 62px/0.88 'Archivo Black', Helvetica, sans-serif; color:#16140F; text-transform:uppercase; letter-spacing:-0.02em">Brèche</div>
+            <div style="font:600 15px/1.35 Archivo, sans-serif; color:#16140F; margin-top:12px; text-wrap:pretty">Chacun choisit en secret une carte parmi 4. La carte jouée est interdite la manche suivante.</div>
+            <div style="font:700 10px/1 'Space Mono', monospace; letter-spacing:0.12em; color:#5C574A; margin-top:10px">2–4 JOUEURS · 10 MANCHES · 4 MIN</div>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:12px; margin-top:auto">
+            <div style="border:3px solid #16140F; background:#16140F; height:64px; display:flex; align-items:center; justify-content:space-between; padding:0 18px; clip-path:polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%)">
+              <span style="font:400 22px/1 'Archivo Black', Helvetica, sans-serif; color:#F2EEE4; text-transform:uppercase">Créer une partie</span>
+              <span style="font:700 18px/1 'Space Mono', monospace; color:#F2EEE4">→</span>
+            </div>
+            <div style="border:3px solid #16140F; background:#F2EEE4; height:64px; display:flex; align-items:center; gap:12px; padding:0 18px; clip-path:polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%)">
+              <span style="font:400 22px/1 'Archivo Black', Helvetica, sans-serif; color:#16140F; text-transform:uppercase">Rejoindre</span>
+              <span style="font:700 13px/1 'Space Mono', monospace; color:#5C574A; letter-spacing:0.1em; margin-left:auto">CODE À 4</span>
+            </div>
+            <div style="display:flex; gap:10px">
+              <div style="flex:1; border:2px solid #16140F; height:52px; display:flex; align-items:center; justify-content:center; font:700 11px/1 'Space Mono', monospace; letter-spacing:0.08em; color:#16140F">RÈGLES</div>
+              <div style="flex:1; border:2px solid #16140F; height:52px; display:flex; align-items:center; justify-content:center; font:700 11px/1 'Space Mono', monospace; letter-spacing:0.08em; color:#16140F">PALMARÈS</div>
+              <div style="flex:1; border:2px solid #16140F; height:52px; display:flex; align-items:center; justify-content:center; font:700 11px/1 'Space Mono', monospace; letter-spacing:0.08em; color:#16140F">RÉGLAGES</div>
+            </div>
+            <div style="font:400 11px/1.5 'Space Mono', monospace; color:#5C574A; text-align:center; padding-top:4px">SANS COMPTE · SANS PUB · SANS TRACKING · FONCTIONNE HORS LIGNE</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="flex:0 0 390px">
+      <div style="font:700 11px/1 'Space Mono', monospace; letter-spacing:0.12em; color:#5C574A; margin-bottom:8px">02 · CRÉATION DE PARTIE</div>
+      <div style="width:390px; height:844px; border:3px solid #16140F; background:#F2EEE4; display:flex; flex-direction:column; overflow:hidden">
+        <div style="height:52px; flex:0 0 52px; display:flex; align-items:flex-end; justify-content:space-between; padding:0 14px 7px; font:700 10px/1 'Space Mono', monospace; color:#16140F; border-bottom:2px solid #16140F">
+          <span>9:41</span>
+          <div style="display:flex; gap:4px; align-items:center"><div style="width:16px; height:8px; background:#16140F"></div><div style="width:8px; height:8px; border:2px solid #16140F"></div></div>
+        </div>
+        <div style="height:54px; flex:0 0 54px; border-bottom:3px solid #16140F; display:flex; align-items:center; gap:12px; padding:0 16px">
+          <div style="font:700 15px/1 'Space Mono', monospace; color:#16140F">←</div>
+          <div style="font:400 20px/1 'Archivo Black', Helvetica, sans-serif; color:#16140F; text-transform:uppercase">Nouvelle partie</div>
+        </div>
+        <div style="flex:1; padding:22px 20px; display:flex; flex-direction:column; gap:24px">
+          <div style="display:flex; flex-direction:column; gap:10px">
+            <div style="font:700 11px/1 'Space Mono', monospace; letter-spacing:0.12em; color:#5C574A">NOMBRE DE JOUEURS</div>
+            <div style="display:flex; gap:10px">
+              <div style="flex:1; height:70px; border:2px solid #16140F; display:flex; align-items:center; justify-content:center; font:400 28px/1 'Archivo Black', Helvetica, sans-serif; color:#16140F">2</div>
+              <div style="flex:1; height:70px; border:2px solid #16140F; display:flex; align-items:center; justify-content:center; font:400 28px/1 'Archivo Black', Helvetica, sans-serif; color:#16140F">3</div>
+              <div style="flex:1; height:70px; border:3px solid #16140F; background:#16140F; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px">
+                <div style="font:400 28px/1 'Archivo Black', Helvetica, sans-serif; color:#F2EEE4">4</div>
+                <div style="font:700 8px/1 'Space Mono', monospace; letter-spacing:0.1em; color:#F2EEE4">CHOISI</div>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:10px">
+            <div style="font:700 11px/1 'Space Mono', monospace; letter-spacing:0.12em; color:#5C574A">FORMAT</div>
+            <div style="border:3px solid #16140F; background:#16140F; padding:14px 16px; display:flex; flex-direction:column; gap:6px">
+              <div style="display:flex; align-items:center; gap:10px">
+                <div style="width:14px; height:14px; background:#F2EEE4"></div>
+                <div style="font:700 16px/1 Archivo, sans-serif; color:#F2EEE4">Chacun pour soi</div>
+                <div style="font:700 8px/1 'Space Mono', monospace; letter-spacing:0.1em; color:#F2EEE4; margin-left:auto">CHOISI</div>
+              </div>
+              <div style="font:400 12px/1.4 Archivo, sans-serif; color:#F2EEE4">Quatre murs, quatre scores. Le plus de briques gagne.</div>
+            </div>
+            <div style="border:2px solid #16140F; padding:14px 16px; display:flex; flex-direction:column; gap:6px">
+              <div style="display:flex; align-items:center; gap:10px">
+                <div style="width:14px; height:14px; border:2px solid #16140F"></div>
+                <div style="font:700 16px/1 Archivo, sans-serif; color:#16140F">Équipes 2 contre 2</div>
+              </div>
+              <div style="font:400 12px/1.4 Archivo, sans-serif; color:#5C574A">Score commun. On peut bloquer ou réparer pour son coéquipier.</div>
+            </div>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:10px">
+            <div style="font:700 11px/1 'Space Mono', monospace; letter-spacing:0.12em; color:#5C574A">CARTES DE MANCHE</div>
+            <div style="border:2px solid #16140F; background:#C98A16; padding:14px 16px; display:flex; align-items:center; gap:12px">
+              <div style="font:600 14px/1.3 Archivo, sans-serif; color:#16140F; flex:1">Toutes les 3 manches, une règle tirée au sort pour tout le monde.</div>
+              <div style="width:44px; height:26px; border:2px solid #16140F; background:#16140F; display:flex; align-items:center; justify-content:flex-end; padding:2px"><div style="width:20px; height:18px; background:#F2EEE4"></div></div>
+            </div>
+          </div>
+          <div style="margin-top:auto; border:3px solid #16140F; background:#16140F; height:64px; display:flex; align-items:center; justify-content:center; clip-path:polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%)">
+            <span style="font:400 22px/1 'Archivo Black', Helvetica, sans-serif; color:#F2EEE4; text-transform:uppercase">Ouvrir le salon</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="flex:0 0 390px">
+      <div style="font:700 11px/1 'Space Mono', monospace; letter-spacing:0.12em; color:#5C574A; margin-bottom:8px">03 · SALON D’ATTENTE</div>
+      <div style="width:390px; height:844px; border:3px solid #16140F; background:#F2EEE4; display:flex; flex-direction:column; overflow:hidden">
+        <div style="height:52px; flex:0 0 52px; display:flex; align-items:flex-end; justify-content:space-between; padding:0 14px 7px; font:700 10px/1 'Space Mono', monospace; color:#16140F; border-bottom:2px solid #16140F">
+          <span>9:41</span>
+          <div style="display:flex; gap:4px; align-items:center"><div style="width:16px; height:8px; background:#16140F"></div><div style="width:8px; height:8px; border:2px solid #16140F"></div></div>
+        </div>
+        <div style="flex:1; padding:22px 20px; display:flex; flex-direction:column; gap:20px">
+          <div style="border:3px solid #16140F; background:#16140F; padding:16px; display:flex; flex-direction:column; gap:8px; align-items:center">
+            <div style="font:700 10px/1 'Space Mono', monospace; letter-spacing:0.14em; color:#F2EEE4">CODE À PARTAGER</div>
+            <div style="font:700 52px/1 'Space Mono', monospace; letter-spacing:0.14em; color:#F2EEE4">7K2P</div>
+            <div style="display:flex; gap:10px; width:100%; margin-top:4px">
+              <div style="flex:1; border:2px solid #F2EEE4; height:42px; display:flex; align-items:center; justify-content:center; font:700 11px/1 'Space Mono', monospace; letter-spacing:0.1em; color:#F2EEE4">COPIER</div>
+              <div style="flex:1; border:2px solid #F2EEE4; height:42px; display:flex; align-items:center; justify-content:center; font:700 11px/1 'Space Mono', monospace; letter-spacing:0.1em; color:#F2EEE4">PARTAGER</div>
+            </div>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:10px">
+            <div style="display:flex; justify-content:space-between; align-items:baseline">
+              <div style="font:700 11px/1 'Space Mono', monospace; letter-spacing:0.12em; color:#5C574A">JOUEURS CONNECTÉS</div>
+              <div style="font:700 11px/1 'Space Mono', monospace; color:#16140F">3 / 4</div>
+            </div>
+            <div style="border:3px solid #16140F; padding:12px 14px; display:flex; align-items:center; gap:12px">
+              <div style="width:28px; height:28px; background:#B8391F; border-radius:50%"></div>
+              <div style="font:700 16px/1 Archivo, sans-serif; color:#16140F">Léa</div>
+              <div style="font:700 9px/1 'Space Mono', monospace; letter-spacing:0.1em; color:#5C574A; margin-left:auto">TOI · HÔTE</div>
+            </div>
+            <div style="border:2px solid #16140F; padding:12px 14px; display:flex; align-items:center; gap:12px">
+              <div style="width:28px; height:28px; background:#2A4E8F"></div>
+              <div style="font:700 16px/1 Archivo, sans-serif; color:#16140F">Malo</div>
+              <div style="font:700 9px/1 'Space Mono', monospace; letter-spacing:0.1em; color:#5C574A; margin-left:auto">PRÊT</div>
+            </div>
+            <div style="border:2px solid #16140F; padding:12px 14px; display:flex; align-items:center; gap:12px">
+              <div style="width:28px; height:28px; background:#1E6A47; clip-path:polygon(50% 0, 100% 100%, 0 100%)"></div>
+              <div style="font:700 16px/1 Archivo, sans-serif; color:#16140F">Nour</div>
+              <div style="font:700 9px/1 'Space Mono', monospace; letter-spacing:0.1em; color:#5C574A; margin-left:auto">PRÊT</div>
+            </div>
+            <div style="border:2px dashed #16140F; padding:12px 14px; display:flex; align-items:center; gap:12px; background-image:repeating-linear-gradient(45deg, #16140F 0 2px, transparent 2px 11px)">
+              <div style="width:28px; height:28px; border:2px solid #16140F; clip-path:polygon(50% 0, 100% 38%, 82% 100%, 18% 100%, 0 38%)"></div>
+              <div style="font:700 11px/1 'Space Mono', monospace; letter-spacing:0.1em; color:#16140F; background:#F2EEE4; padding:3px 5px">EN ATTENTE…</div>
+            </div>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:10px">
+            <div style="font:700 11px/1 'Space Mono', monospace; letter-spacing:0.12em; color:#5C574A">MON IDENTITÉ</div>
+            <div style="display:flex; gap:10px">
+              <div style="flex:1; height:64px; border:3px solid #16140F; background:#16140F; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px">
+                <div style="width:24px; height:24px; background:#B8391F; border-radius:50%"></div>
+                <div style="font:700 8px/1 'Space Mono', monospace; color:#F2EEE4">CERCLE</div>
+              </div>
+              <div style="flex:1; height:64px; border:2px solid #16140F; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; background-image:repeating-linear-gradient(45deg, #16140F 0 2px, transparent 2px 11px)">
+                <div style="width:24px; height:24px; background:#2A4E8F"></div>
+                <div style="font:700 8px/1 'Space Mono', monospace; color:#16140F; background:#F2EEE4; padding:1px 3px">PRIS</div>
+              </div>
+              <div style="flex:1; height:64px; border:2px solid #16140F; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; background-image:repeating-linear-gradient(45deg, #16140F 0 2px, transparent 2px 11px)">
+                <div style="width:24px; height:24px; background:#1E6A47; clip-path:polygon(50% 0, 100% 100%, 0 100%)"></div>
+                <div style="font:700 8px/1 'Space Mono', monospace; color:#16140F; background:#F2EEE4; padding:1px 3px">PRIS</div>
+              </div>
+              <div style="flex:1; height:64px; border:2px solid #16140F; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px">
+                <div style="width:24px; height:24px; background:#6C3479; clip-path:polygon(50% 0, 100% 38%, 82% 100%, 18% 100%, 0 38%)"></div>
+                <div style="font:700 8px/1 'Space Mono', monospace; color:#16140F">LIBRE</div>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:auto; border:3px solid #16140F; background:#16140F; height:64px; display:flex; align-items:center; justify-content:center; gap:12px; clip-path:polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%)">
+            <span style="font:400 22px/1 'Archivo Black', Helvetica, sans-serif; color:#F2EEE4; text-transform:uppercase">Lancer</span>
+            <span style="font:700 10px/1 'Space Mono', monospace; letter-spacing:0.1em; color:#F2EEE4">3 JOUEURS SUFFISENT</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="flex:0 0 390px">
+      <div style="font:700 11px/1 'Space Mono', monospace; letter-spacing:0.12em; color:#5C574A; margin-bottom:8px">04 · RÈGLES</div>
+      <div style="width:390px; height:844px; border:3px solid #16140F; background:#F2EEE4; display:flex; flex-direction:column; overflow:hidden">
+        <div style="height:52px; flex:0 0 52px; display:flex; align-items:flex-end; justify-content:space-between; padding:0 14px 7px; font:700 10px/1 'Space Mono', monospace; color:#16140F; border-bottom:2px solid #16140F">
+          <span>9:41</span>
+          <div style="display:flex; gap:4px; align-items:center"><div style="width:16px; height:8px; background:#16140F"></div><div style="width:8px; height:8px; border:2px solid #16140F"></div></div>
+        </div>
+        <div style="height:54px; flex:0 0 54px; border-bottom:3px solid #16140F; display:flex; align-items:center; gap:12px; padding:0 16px">
+          <div style="font:700 15px/1 'Space Mono', monospace; color:#16140F">←</div>
+          <div style="font:400 20px/1 'Archivo Black', Helvetica, sans-serif; color:#16140F; text-transform:uppercase">Règles</div>
+        </div>
+        <div style="flex:1; padding:16px; display:flex; flex-direction:column; gap:12px">
+          <div style="font:400 24px/1.08 'Archivo Black', Helvetica, sans-serif; color:#16140F; text-wrap:pretty">Garde le plus de briques debout au bout de 10 manches.</div>
+          <div style="border-top:3px solid #16140F; border-bottom:3px solid #16140F; padding:10px 0; font:600 13px/1.35 Archivo, sans-serif; color:#16140F">Tout le monde choisit une carte <strong>en même temps</strong>, plus une cible. On révèle, on résout. C’est tout.</div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:9px">
+            <div style="border:2px solid #16140F; padding:9px; display:flex; flex-direction:column; gap:6px">
+              {{ pk.frapper.md }}
+              <div style="font:700 11px/1 'Space Mono', monospace; letter-spacing:0.08em; color:#16140F">FRAPPER</div>
+              <div style="font:400 12px/1.35 Archivo, sans-serif; color:#5C574A">Casse une brique chez la cible.</div>
+            </div>
+            <div style="border:2px solid #16140F; padding:9px; display:flex; flex-direction:column; gap:6px">
+              {{ pk.bloquer.md }}
+              <div style="font:700 11px/1 'Space Mono', monospace; letter-spacing:0.08em; color:#16140F">BLOQUER</div>
+              <div style="font:400 12px/1.35 Archivo, sans-serif; color:#5C574A">Annule toutes les frappes sur toi cette manche.</div>
+            </div>
+            <div style="border:2px solid #16140F; padding:9px; display:flex; flex-direction:column; gap:6px">
+              {{ pk.reparer.md }}
+              <div style="font:700 11px/1 'Space Mono', monospace; letter-spacing:0.08em; color:#16140F">RÉPARER</div>
+              <div style="font:400 12px/1.35 Archivo, sans-serif; color:#5C574A">Remets une brique. Aucune défense ce tour.</div>
+            </div>
+            <div style="border:2px solid #16140F; padding:9px; display:flex; flex-direction:column; gap:6px">
+              {{ pk.pieger.md }}
+              <div style="font:700 11px/1 'Space Mono', monospace; letter-spacing:0.08em; color:#16140F">PIÉGER</div>
+              <div style="font:400 12px/1.35 Archivo, sans-serif; color:#5C574A">Si on te frappe, l’attaquant perd une brique.</div>
+            </div>
+          </div>
+          <div style="border:3px solid #16140F; background:#16140F; padding:13px; display:flex; flex-direction:column; gap:8px">
+            <div style="font:700 10px/1 'Space Mono', monospace; letter-spacing:0.14em; color:#F2EEE4">LA RÈGLE QUI PORTE LE JEU</div>
+            <div style="font:400 18px/1.12 'Archivo Black', Helvetica, sans-serif; color:#F2EEE4">Une carte jouée est indisponible à la manche suivante.</div>
+            <div style="display:flex; gap:8px; align-items:center; border:2px solid #F2EEE4; padding:6px 8px; background-image:repeating-linear-gradient(45deg, #F2EEE4 0 2px, transparent 2px 11px)">
+              <div style="background:#16140F; padding:3px 5px; display:flex; align-items:center; gap:6px">
+                {{ pk.bloquer.sm }}
+                <span style="font:700 9px/1 'Space Mono', monospace; color:#F2EEE4">BLOQUER · INDISPO</span>
+              </div>
+            </div>
+            <div style="font:400 12px/1.4 Archivo, sans-serif; color:#F2EEE4">Quand quelqu’un vient de bloquer, tout le monde voit qu’il est à découvert — et lui sait que tout le monde le sait. La hachure signale cet état, chez toi comme chez les autres.</div>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:8px">
+            <div style="border:2px solid #16140F; background:#C98A16; padding:9px 11px; font:600 12px/1.35 Archivo, sans-serif; color:#16140F">Toutes les 3 manches : une carte de manche pour tout le monde, annoncée <strong>avant</strong> les choix.</div>
+            <div style="border:2px solid #16140F; padding:9px 11px; font:600 12px/1.35 Archivo, sans-serif; color:#16140F">Aucune élimination : à zéro brique, tu continues de jouer et tu peux réparer.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="flex:0 0 390px">
+      <div style="font:700 11px/1 'Space Mono', monospace; letter-spacing:0.12em; color:#5C574A; margin-bottom:8px">05 · JEU · ÉTAT NEUTRE</div>
+      <div style="width:390px; height:844px; border:3px solid #16140F; background:#F2EEE4; display:flex; flex-direction:column; overflow:hidden">
+        <div style="height:52px; flex:0 0 52px; display:flex; align-items:flex-end; justify-content:space-between; padding:0 14px 7px; font:700 10px/1 'Space Mono', monospace; color:#16140F; border-bottom:2px solid #16140F">
+          <span>9:41</span>
+          <div style="display:flex; gap:4px; align-items:center"><div style="width:16px; height:8px; background:#16140F"></div><div style="width:8px; height:8px; border:2px solid #16140F"></div></div>
+        </div>
+        <div style="height:52px; flex:0 0 52px; border-bottom:3px solid #16140F; display:flex; align-items:center; padding:0 16px; gap:12px">
+          <div style="font:400 19px/1 'Archivo Black', Helvetica, sans-serif; color:#16140F">MANCHE 4<span style="color:#5C574A">/10</span></div>
+          <div style="display:flex; gap:3px; margin-left:auto">
+            <div style="width:9px; height:16px; background:#16140F"></div><div style="width:9px; height:16px; background:#16140F"></div><div style="width:9px; height:16px; background:#16140F"></div><div style="width:9px; height:16px; border:2px solid #16140F"></div><div style="width:9px; height:16px; border:2px solid #16140F"></div><div style="width:9px; height:16px; border:2px solid #16140F"></div><div style="width:9px; height:16px; border:2px solid #16140F"></div><div style="width:9px; height:16px; border:2px solid #16140F"></div><div style="width:9px; height:16px; border:2px solid #16140F"></div><div style="width:9px; height:16px; border:2px solid #16140F"></div>
+          </div>
+        </div>
+        <div style="flex:1; padding:14px; display:flex; flex-direction:column; gap:14px">
+          <div style="flex:1; display:grid; grid-template-columns:1fr; grid-template-rows:repeat(4, auto); align-content:space-between; gap:10px">
+            <sc-for list="{{ s5.players }}" as="p" hint-placeholder-count="4">
+              <div style="border:2px solid #16140F; background:#F2EEE4; padding:10px 12px; display:flex; flex-direction:column; gap:8px; outline:{{ p.ring }}; outline-offset:-7px">
+                <div style="display:flex; align-items:center; gap:9px">
+                  <div style="width:18px; height:18px; flex:0 0 18px; background:{{ p.color }}; border-radius:{{ p.radius }}; clip-path:{{ p.clip }}"></div>
+                  <div style="font:700 15px/1 Archivo, sans-serif; color:#16140F">{{ p.name }}</div>
+                  <div style="border:2px solid #16140F; background:{{ p.lastBg }}; background-image:{{ p.lastHatch }}; padding:3px 4px; display:flex; align-items:center; gap:5px">
+                    <div style="background:#E5DFD1; display:flex; align-items:center; gap:5px; padding:1px 3px">
+                      {{ p.lastPicto }}
+                      <div style="font:700 8px/1 'Space Mono', monospace; letter-spacing:0.04em; color:#16140F">{{ p.lastLabel }}</div>
+                    </div>
+                  </div>
+                  <div style="font:700 8px/1 'Space Mono', monospace; letter-spacing:0.08em; color:#5C574A; margin-left:auto">{{ p.tag }}</div>
+                </div>
+                <div style="height:38px; flex:0 0 38px; display:flex; gap:5px; align-items:stretch">
+                  <sc-for list="{{ p.bricks }}" as="b" hint-placeholder-count="5">
+                    <div style="flex:1; height:100%; background:#16140F; clip-path:polygon(0 0, calc(100% - 5px) 0, 100% 5px, 100% 100%, 0 100%); position:relative">
+                      <div style="position:absolute; inset:2px; background:{{ b.fill }}; clip-path:polygon(0 0, calc(100% - 3px) 0, 100% 3px, 100% 100%, 0 100%)"></div>
+                      <sc-if value="{{ b.broken }}" hint-placeholder-val="{{ false }}">
+                        <div style="position:absolute; left:2px; right:2px; top:calc(50% - 1px); height:2px; background:#16140F; transform:rotate(-24deg)"></div>
+                      </sc-if>
+                      <sc-if value="{{ b.plus }}" hint-placeholder-val="{{ false }}">
+                        <div style="position:absolute; left:50%; top:50%; width:16px; height:3px; background:#16140F; transform:translate(-50%,-50%)"></div>
+                        <div style="position:absolute; left:50%; top:50%; width:3px; height:16px; background:#16140F; transform:translate(-50%,-50%)"></div>
+                      </sc-if>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="border-top:3px solid #16140F; padding-top:12px; display:flex; flex-direction:column; gap:10px; margin-top:auto">
+            <div style="display:flex; align-items:baseline; gap:10px">
+              <div style="font:700 11px/1 'Space Mono', monospace; letter-spacing:0.12em; color:#5C574A">MA MAIN</div>
+              <div style="font:600 12px/1 Archivo, sans-serif; color:#16140F">Choisis une carte.</div>
+            </div>
+            <div style="display:flex; gap:8px">
+              <sc-for list="{{ s5.hand }}" as="c" hint-placeholder-count="4">
+                <div style="flex:1; height:122px; border:{{ c.bd }}; background:{{ c.bg }}; background-image:{{ c.hatch }}; padding:9px 6px; display:flex; flex-direction:column; align-items:center; justify-content:space-between; clip-path:polygon(0 0, calc(100% - 11px) 0, 100% 11px, 100% 100%, 0 100%)">
+                  <div style="width:100%; height:3px; background:{{ c.fg }}"></div>
+                  {{ c.picto }}
+                  <div style="font:700 10px/1 'Space Mono', monospace; letter-spacing:0.02em; color:{{ c.fg }}; background:{{ c.bg }}; padding:1px 2px">{{ c.label }}</div>
+                  <div style="font:700 7px/1.2 'Space Mono', monospace; color:{{ c.fg }}; background:{{ c.bg }}; padding:1px 2px; text-align:center">{{ c.note }}</div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="height:56px; border:2px dashed #16140F; display:flex; align-items:center; justify-content:center; font:700 11px/1 'Space Mono', monospace; letter-spacing:0.1em; color:#5C574A">CHOISIS UNE CARTE POUR CONTINUER</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="flex:0 0 390px">
+      <div style="font:700 11px/1 'Space Mono', monospace; letter-spacing:0.12em; color:#5C574A; margin-bottom:8px">06 · JEU · CARTE SÉLECTIONNÉE, CHOIX DE LA CIBLE</div>
+      <div style="width:390px; height:844px; border:3px solid #16140F; background:#F2EEE4; display:flex; flex-direction:column; overflow:hidden">
+        <div style="height:52px; flex:0 0 52px; display:flex; align-items:flex-end; justify-content:space-between; padding:0 14px 7px; font:700 10px/1 'Space Mono', monospace; color:#16140F; border-bottom:2px solid #16140F">
+          <span>9:41</span>
+          <div style="display:flex; gap:4px; align-items:center"><div style="width:16px; height:8px; background:#16140F"></div><div style="width:8px; height:8px; border:2px solid #16140F"></div></div>
+        </div>
+        <div style="height:52px; flex:0 0 52px; border-bottom:3px solid #16140F; display:flex; align-items:center; padding:0 16px; gap:12px">
+          <div style="font:400 19px/1 'Archivo Black', Helvetica, sans-serif; color:#16140F">MANCHE 4<span style="color:#5C574A">/10</span></div>
+          <div style="font:700 10px/1 'Space Mono', monospace; letter-spacing:0.1em; color:#16140F; margin-left:auto; border:2px solid #16140F; padding:4px 6px">FRAPPER · CHOISIS UNE CIBLE</div>
+        </div>
+        <div style="flex:1; padding:14px; display:flex; flex-direction:column; gap:14px">
+          <div style="flex:1; display:grid; grid-template-columns:1fr; grid-template-rows:repeat(4, auto); align-content:space-between; gap:10px">
+            <sc-for list="{{ s6.players }}" as="p" hint-placeholder-count="4">
+              <div style="border:2px solid #16140F; background:#F2EEE4; padding:10px 12px; display:flex; flex-direction:column; gap:8px; outline:{{ p.ring }}; outline-offset:-7px">
+                <div style="display:flex; align-items:center; gap:9px">
+                  <div style="width:18px; height:18px; flex:0 0 18px; background:{{ p.color }}; border-radius:{{ p.radius }}; clip-path:{{ p.clip }}"></div>
+                  <div style="font:700 15px/1 Archivo, sans-serif; color:#16140F">{{ p.name }}</div>
+                  <div style="border:2px solid #16140F; background:{{ p.lastBg }}; background-image:{{ p.lastHatch }}; padding:3px 4px; display:flex; align-items:center; gap:5px">
+                    <div style="background:#E5DFD1; display:flex; align-items:center; gap:5px; padding:1px 3px">
+                      {{ p.lastPicto }}
+                      <div style="font:700 8px/1 'Space Mono', monospace; letter-spacing:0.04em; color:#16140F">{{ p.lastLabel }}</div>
+                    </div>
+                  </div>
+                  <div style="font:700 8px/1 'Space Mono', monospace; letter-spacing:0.08em; color:#16140F; margin-left:auto">{{ p.tag }}</div>
+                </div>
+                <div style="height:38px; flex:0 0 38px; display:flex; gap:5px; align-items:stretch">
+                  <sc-for list="{{ p.bricks }}" as="b" hint-placeholder-count="5">
+                    <div style="flex:1; height:100%; background:#16140F; clip-path:polygon(0 0, calc(100% - 5px) 0, 100% 5px, 100% 100%, 0 100%); position:relative">
+                      <div style="position:absolute; inset:2px; background:{{ b.fill }}; clip-path:polygon(0 0, calc(100% - 3px) 0, 100% 3px, 100% 100%, 0 100%)"></div>
+                      <sc-if value="{{ b.broken }}" hint-placeholder-val="{{ false }}">
+                        <div style="position:absolute; left:2px; right:2px; top:calc(50% - 1px); height:2px; background:#16140F; transform:rotate(-24deg)"></div>
+                      </sc-if>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:flex; align-items:center; border:2px solid #16140F; background:#E5DFD1; padding:12px; font:600 13px/1.4 Archivo, sans-serif; color:#16140F">Trois cibles possibles. Nour a réparé la manche passée : il n’a pas pu bloquer deux fois de suite.</div>
+          <div style="border-top:3px solid #16140F; padding-top:12px; display:flex; flex-direction:column; gap:10px; margin-top:auto">
+            <div style="display:flex; gap:8px">
+              <sc-for list="{{ s6.hand }}" as="c" hint-placeholder-count="4">
+                <div style="flex:1; height:122px; border:{{ c.bd }}; background:{{ c.bg }}; background-image:{{ c.hatch }}; padding:9px 6px; display:flex; flex-direction:column; align-items:center; justify-content:space-between; clip-path:polygon(0 0, calc(100% - 11px) 0, 100% 11px, 100% 100%, 0 100%)">
+                  <div style="width:100%; height:3px; background:{{ c.fg }}"></div>
+                  {{ c.picto }}
+                  <div style="font:700 10px/1 'Space Mono', monospace; color:{{ c.fg }}; background:{{ c.bg }}; padding:1px 2px">{{ c.label }}</div>
+                  <div style="font:700 7px/1.2 'Space Mono', monospace; color:{{ c.fg }}; background:{{ c.bg }}; padding:1px 2px; text-align:center">{{ c.note }}</div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="height:56px; border:3px solid #16140F; background:#16140F; display:flex; align-items:center; justify-content:center; gap:10px; clip-path:polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%)">
+              <span style="font:400 18px/1 'Archivo Black', Helvetica, sans-serif; color:#F2EEE4; text-transform:uppercase">Touche un mur pour cibler</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="flex:0 0 390px">
+      <div style="font:700 11px/1 'Space Mono', monospace; letter-spacing:0.12em; color:#5C574A; margin-bottom:8px">07 · JEU · EN ATTENTE DES AUTRES</div>
+      <div style="width:390px; height:844px; border:3px solid #16140F; background:#F2EEE4; display:flex; flex-direction:column; overflow:hidden">
+        <div style="height:52px; flex:0 0 52px; display:flex; align-items:flex-end; justify-content:space-between; padding:0 14px 7px; font:700 10px/1 'Space Mono', monospace; color:#16140F; border-bottom:2px solid #16140F">
+          <span>9:41</span>
+          <div style="display:flex; gap:4px; align-items:center"><div style="width:16px; height:8px; background:#16140F"></div><div style="width:8px; height:8px; border:2px solid #16140F"></div></div>
+        </div>
+        <div style="height:52px; flex:0 0 52px; border-bottom:3px solid #16140F; display:flex; align-items:center; padding:0 16px; gap:12px">
+          <div style="font:400 19px/1 'Archivo Black', Helvetica, sans-serif; color:#16140F">MANCHE 4<span style="color:#5C574A">/10</span></div>
+          <div style="display:flex; align-items:center; gap:8px; margin-left:auto">
+            <div style="display:flex; gap:3px">
+              <div style="width:12px; height:18px; background:#16140F"></div><div style="width:12px; height:18px; background:#16140F"></div><div style="width:12px; height:18px; background:#16140F"></div><div style="width:12px; height:18px; border:2px solid #16140F"></div>
+            </div>
+            <div style="font:700 13px/1 'Space Mono', monospace; color:#16140F">3/4 ONT JOUÉ</div>
+          </div>
+        </div>
+        <div style="flex:1; padding:14px; display:flex; flex-direction:column; gap:14px">
+          <div style="flex:1; display:grid; grid-template-columns:1fr; grid-template-rows:repeat(4, auto); align-content:space-between; gap:10px">
+            <sc-for list="{{ s7.players }}" as="p" hint-placeholder-count="4">
+              <div style="border:2px solid #16140F; background:#F2EEE4; padding:10px 12px; display:flex; flex-direction:column; gap:8px; outline:{{ p.ring }}; outline-offset:-7px">
+                <div style="display:flex; align-items:center; gap:9px">
+                  <div style="width:18px; height:18px; flex:0 0 18px; background:{{ p.color }}; border-radius:{{ p.radius }}; clip-path:{{ p.clip }}"></div>
+                  <div style="font:700 15px/1 Archivo, sans-serif; color:#16140F">{{ p.name }}</div>
+                  <div style="border:2px solid #16140F; background:{{ p.lastBg }}; background-image:{{ p.lastHatch }}; padding:3px 4px; display:flex; align-items:center; gap:5px">
+                    <div style="background:#E5DFD1; display:flex; align-items:center; gap:5px; padding:1px 3px">
+                      {{ p.lastPicto }}
+                      <div style="font:700 8px/1 'Space Mono', monospace; letter-spacing:0.04em; color:#16140F">{{ p.lastLabel }}</div>
+                    </div>
+                  </div>
+                  <div style="font:700 8px/1 'Space Mono', monospace; letter-spacing:0.06em; color:#16140F; margin-left:auto">{{ p.tag }}</div>
+                </div>
+                <div style="height:38px; flex:0 0 38px; display:flex; gap:5px; align-items:stretch">
+                  <sc-for list="{{ p.bricks }}" as="b" hint-placeholder-count="5">
+                    <div style="flex:1; height:100%; background:#16140F; clip-path:polygon(0 0, calc(100% - 5px) 0, 100% 5px, 100% 100%, 0 100%); position:relative">
+                      <div style="position:absolute; inset:2px; background:{{ b.fill }}; clip-path:polygon(0 0, calc(100% - 3px) 0, 100% 3px, 100% 100%, 0 100%)"></div>
+                      <sc-if value="{{ b.broken }}" hint-placeholder-val="{{ false }}">
+                        <div style="position:absolute; left:2px; right:2px; top:calc(50% - 1px); height:2px; background:#16140F; transform:rotate(-24deg)"></div>
+                      </sc-if>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="border:3px solid #16140F; background:#16140F; padding:10px 12px; display:flex; align-items:center; gap:10px">
+            <div style="background:#F2EEE4; padding:3px">{{ pk.frapper.md }}</div>
+            <div style="display:flex; flex-direction:column; gap:3px">
+              <div style="font:400 17px/1 'Archivo Black', Helvetica, sans-serif; color:#F2EEE4">FRAPPER → Malo</div>
+              <div style="font:400 11px/1.3 Archivo, sans-serif; color:#F2EEE4">Enregistré · modifiable jusqu’à la révélation</div>
+            </div>
+          </div>
+          <div style="border-top:3px solid #16140F; padding-top:12px; display:flex; flex-direction:column; gap:10px; margin-top:auto">
+            <div style="display:flex; gap:8px">
+              <sc-for list="{{ s7.hand }}" as="c" hint-placeholder-count="4">
+                <div style="flex:1; height:122px; border:{{ c.bd }}; background:{{ c.bg }}; background-image:{{ c.hatch }}; padding:9px 6px; display:flex; flex-direction:column; align-items:center; justify-content:space-between; clip-path:polygon(0 0, calc(100% - 11px) 0, 100% 11px, 100% 100%, 0 100%)">
+                  <div style="width:100%; height:3px; background:{{ c.fg }}"></div>
+                  {{ c.picto }}
+                  <div style="font:700 10px/1 'Space Mono', monospace; color:{{ c.fg }}; background:{{ c.bg }}; padding:1px 2px">{{ c.label }}</div>
+                  <div style="font:700 7px/1.2 'Space Mono', monospace; color:{{ c.fg }}; background:{{ c.bg }}; padding:1px 2px; text-align:center">{{ c.note }}</div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="height:56px; border:2px solid #16140F; display:flex; align-items:center; justify-content:center; gap:10px">
+              <span style="font:700 12px/1 'Space Mono', monospace; letter-spacing:0.1em; color:#16140F">CHANGER DE CARTE</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="flex:0 0 390px">
+      <div style="font:700 11px/1 'Space Mono', monospace; letter-spacing:0.12em; color:#5C574A; margin-bottom:8px">08 · JEU · RÉVÉLATION (PIÈGE RETOURNÉ)</div>
+      <div style="width:390px; height:844px; border:3px solid #16140F; background:#F2EEE4; display:flex; flex-direction:column; overflow:hidden">
+        <div style="height:52px; flex:0 0 52px; display:flex; align-items:flex-end; justify-content:space-between; padding:0 14px 7px; font:700 10px/1 'Space Mono', monospace; color:#16140F; border-bottom:2px solid #16140F">
+          <span>9:41</span>
+          <div style="display:flex; gap:4px; align-items:center"><div style="width:16px; height:8px; background:#16140F"></div><div style="width:8px; height:8px; border:2px solid #16140F"></div></div>
+        </div>
+        <div style="height:64px; flex:0 0 64px; background:#16140F; display:flex; align-items:center; padding:0 16px; gap:12px">
+          <div style="font:400 30px/1 'Archivo Black', Helvetica, sans-serif; color:#F2EEE4; text-transform:uppercase">Révélation</div>
+          <div style="font:700 11px/1 'Space Mono', monospace; color:#F2EEE4; margin-left:auto">MANCHE 4/10</div>
+        </div>
+        <div style="flex:1; padding:14px 14px 8px 14px; display:flex; flex-direction:column; gap:10px">
+          <div style="display:flex; flex-direction:column; gap:6px">
+            <sc-for list="{{ s8.log }}" as="r" hint-placeholder-count="4">
+              <div style="border:2px solid #16140F; background:#F2EEE4; padding:7px 9px; display:flex; align-items:center; gap:8px">
+                <div style="width:15px; height:15px; flex:0 0 15px; background:{{ r.aColor }}; border-radius:{{ r.aRadius }}; clip-path:{{ r.aClip }}"></div>
+                <div style="font:700 13px/1 Archivo, sans-serif; color:#16140F">{{ r.aName }}</div>
+                {{ r.picto }}
+                <div style="font:700 12px/1 'Space Mono', monospace; color:#5C574A">{{ r.arrow }}</div>
+                <sc-if value="{{ r.hasB }}" hint-placeholder-val="{{ true }}">
+                  <div style="width:15px; height:15px; flex:0 0 15px; background:{{ r.bColor }}; border-radius:{{ r.bRadius }}; clip-path:{{ r.bClip }}"></div>
+                </sc-if>
+                <div style="font:700 13px/1 Archivo, sans-serif; color:#16140F">{{ r.bName }}</div>
+                <div style="margin-left:auto; border:{{ r.tagBd }}; background:{{ r.tagBg }}; color:{{ r.tagFg }}; font:700 8px/1 'Space Mono', monospace; letter-spacing:0.06em; padding:4px 5px">{{ r.tag }}</div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px">
+            <sc-for list="{{ s8.players }}" as="p" hint-placeholder-count="4">
+              <div style="border:2px solid #16140F; background:#F2EEE4; padding:9px; display:flex; flex-direction:column; gap:8px; outline:{{ p.ring }}; outline-offset:-7px">
+                <div style="display:flex; align-items:center; gap:7px">
+                  <div style="width:17px; height:17px; flex:0 0 17px; background:{{ p.color }}; border-radius:{{ p.radius }}; clip-path:{{ p.clip }}"></div>
+                  <div style="font:700 14px/1 Archivo, sans-serif; color:#16140F">{{ p.name }}</div>
+                  <div style="font:700 8px/1 'Space Mono', monospace; color:#5C574A; margin-left:auto">{{ p.tag }}</div>
+                </div>
+                <div style="height:38px; flex:0 0 38px; display:flex; gap:5px; align-items:stretch">
+                  <sc-for list="{{ p.bricks }}" as="b" hint-placeholder-count="5">
+                    <div style="flex:1; height:100%; background:#16140F; clip-path:polygon(0 0, calc(100% - 5px) 0, 100% 5px, 100% 100%, 0 100%); position:relative">
+                      <div style="position:absolute; inset:2px; background:{{ b.fill }}; clip-path:polygon(0 0, calc(100% - 3px) 0, 100% 3px, 100% 100%, 0 100%)"></div>
+                      <sc-if value="{{ b.broken }}" hint-placeholder-val="{{ false }}">
+                        <div style="position:absolute; left:2px; right:2px; top:calc(50% - 1px); height:2px; background:#16140F; transform:rotate(-24deg)"></div>
+                      </sc-if>
+                    </div>
+                  </sc-for>
+                </div>
+                <div style="border:2px solid #16140F; background:#16140F; padding:5px 6px; display:flex; align-items:center; gap:6px">
+                  <div style="background:#F2EEE4; padding:1px 2px; display:flex">{{ p.ovPicto }}</div>
+                  <div style="font:700 8px/1.2 'Space Mono', monospace; color:#F2EEE4">{{ p.ovLabel }}</div>
+                </div>
+                <div style="font:700 8px/1 'Space Mono', monospace; letter-spacing:0.06em; color:#16140F; border:2px solid #16140F; padding:3px 4px; align-self:flex-start">{{ p.ovTag }}</div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="border:3px solid #16140F; background:#C98A16; padding:12px 14px; font:600 13px/1.4 Archivo, sans-serif; color:#16140F">Léa a frappé Nour, qui piégeait : la frappe se retourne, <strong>Léa perd une brique</strong>. Iris a frappé Malo, qui bloquait : annulé.</div>
+          <div style="margin-top:auto; height:60px; border:3px solid #16140F; background:#16140F; display:flex; align-items:center; justify-content:space-between; padding:0 16px; clip-path:polygon(0 0, calc(100% - 13px) 0, 100% 13px, 100% 100%, 0 100%)">
+            <span style="font:400 20px/1 'Archivo Black', Helvetica, sans-serif; color:#F2EEE4; text-transform:uppercase">Manche 5</span>
+            <span style="font:700 11px/1 'Space Mono', monospace; color:#F2EEE4">CARTE DE MANCHE À VENIR</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="flex:0 0 390px">
+      <div style="font:700 11px/1 'Space Mono', monospace; letter-spacing:0.12em; color:#5C574A; margin-bottom:8px">08 BIS · RÉVÉLATION (BLOCAGE QUI ANNULE DEUX FRAPPES)</div>
+      <div style="width:390px; height:844px; border:3px solid #16140F; background:#F2EEE4; display:flex; flex-direction:column; overflow:hidden">
+        <div style="height:52px; flex:0 0 52px; display:flex; align-items:flex-end; justify-content:space-between; padding:0 14px 7px; font:700 10px/1 'Space Mono', monospace; color:#16140F; border-bottom:2px solid #16140F">
+          <span>9:41</span>
+          <div style="display:flex; gap:4px; align-items:center"><div style="width:16px; height:8px; background:#16140F"></div><div style="width:8px; height:8px; border:2px solid #16140F"></div></div>
+        </div>
+        <div style="height:64px; flex:0 0 64px; background:#16140F; display:flex; align-items:center; padding:0 16px; gap:12px">
+          <div style="font:400 30px/1 'Archivo Black', Helvetica, sans-serif; color:#F2EEE4; text-transform:uppercase">Révélation</div>
+          <div style="font:700 11px/1 'Space Mono', monospace; color:#F2EEE4; margin-left:auto">MANCHE 7/10</div>
+        </div>
+        <div style="flex:1; padding:14px 14px 8px 14px; display:flex; flex-direction:column; gap:10px">
+          <div style="display:flex; flex-direction:column; gap:6px">
+            <sc-for list="{{ s8b.log }}" as="r" hint-placeholder-count="4">
+              <div style="border:2px solid #16140F; background:#F2EEE4; padding:7px 9px; display:flex; align-items:center; gap:8px">
+                <div style="width:15px; height:15px; flex:0 0 15px; background:{{ r.aColor }}; border-radius:{{ r.aRadius }}; clip-path:{{ r.aClip }}"></div>
+                <div style="font:700 13px/1 Archivo, sans-serif; color:#16140F">{{ r.aName }}</div>
+                {{ r.picto }}
+                <div style="font:700 12px/1 'Space Mono', monospace; color:#5C574A">{{ r.arrow }}</div>
+                <sc-if value="{{ r.hasB }}" hint-placeholder-val="{{ true }}">
+                  <div style="width:15px; height:15px; flex:0 0 15px; background:{{ r.bColor }}; border-radius:{{ r.bRadius }}; clip-path:{{ r.bClip }}"></div>
+                </sc-if>
+                <div style="font:700 13px/1 Archivo, sans-serif; color:#16140F">{{ r.bName }}</div>
+                <div style="margin-left:auto; border:{{ r.tagBd }}; background:{{ r.tagBg }}; color:{{ r.tagFg }}; font:700 8px/1 'Space Mono', monospace; letter-spacing:0.06em; padding:4px 5px">{{ r.tag }}</div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px">
+            <sc-for list="{{ s8b.players }}" as="p" hint-placeholder-count="4">
+              <div style="border:2px solid #16140F; background:#F2EEE4; padding:9px; display:flex; flex-direction:column; gap:8px; outline:{{ p.ring }}; outline-offset:-7px">
+                <div style="display:flex; align-items:center; gap:7px">
+                  <div style="width:17px; height:17px; flex:0 0 17px; background:{{ p.color }}; border-radius:{{ p.radius }}; clip-path:{{ p.clip }}"></div>
+                  <div style="font:700 14px/1 Archivo, sans-serif; color:#16140F">{{ p.name }}</div>
+                  <div style="font:700 8px/1 'Space Mono', monospace; color:#5C574A; margin-left:auto">{{ p.tag }}</div>
+                </div>
+                <div style="height:38px; flex:0 0 38px; display:flex; gap:5px; align-items:stretch">
+                  <sc-for list="{{ p.bricks }}" as="b" hint-placeholder-count="5">
+                    <div style="flex:1; height:100%; background:#16140F; clip-path:polygon(0 0, calc(100% - 5px) 0, 100% 5px, 100% 100%, 0 100%); position:relative">
+                      <div style="position:absolute; inset:2px; background:{{ b.fill }}; clip-path:polygon(0 0, calc(100% - 3px) 0, 100% 3px, 100% 100%, 0 100%)"></div>
+                      <sc-if value="{{ b.broken }}" hint-placeholder-val="{{ false }}">
+                        <div style="position:absolute; left:2px; right:2px; top:calc(50% - 1px); height:2px; background:#16140F; transform:rotate(-24deg)"></div>
+                      </sc-if>
+                      <sc-if value="{{ b.plus }}" hint-placeholder-val="{{ false }}">
+                        <div style="position:absolute; left:50%; top:50%; width:16px; height:3px; background:#16140F; transform:translate(-50%,-50%)"></div>
+                        <div style="position:absolute; left:50%; top:50%; width:3px; height:16px; background:#16140F; transform:translate(-50%,-50%)"></div>
+                      </sc-if>
+                    </div>
+                  </sc-for>
+                </div>
+                <div style="border:2px solid #16140F; background:#16140F; padding:5px 6px; display:flex; align-items:center; gap:6px">
+                  <div style="background:#F2EEE4; padding:1px 2px; display:flex">{{ p.ovPicto }}</div>
+                  <div style="font:700 8px/1.2 'Space Mono', monospace; color:#F2EEE4">{{ p.ovLabel }}</div>
+                </div>
+                <div style="font:700 8px/1 'Space Mono', monospace; letter-spacing:0.06em; color:#16140F; border:2px solid #16140F; padding:3px 4px; align-self:flex-start">{{ p.ovTag }}</div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="border:3px solid #16140F; background:#C98A16; padding:12px 14px; font:600 13px/1.4 Archivo, sans-serif; color:#16140F">Malo a bloqué : <strong>les deux frappes sont annulées</strong>. Il joue la manche 8 sans BLOQUER, et tout le monde le sait.</div>
+          <div style="margin-top:auto; height:60px; border:3px solid #16140F; background:#16140F; display:flex; align-items:center; justify-content:space-between; padding:0 16px; clip-path:polygon(0 0, calc(100% - 13px) 0, 100% 13px, 100% 100%, 0 100%)">
+            <span style="font:400 20px/1 'Archivo Black', Helvetica, sans-serif; color:#F2EEE4; text-transform:uppercase">Manche 8</span>
+            <span style="font:700 11px/1 'Space Mono', monospace; color:#F2EEE4">MALO EST À DÉCOUVERT</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="flex:0 0 390px">
+      <div style="font:700 11px/1 'Space Mono', monospace; letter-spacing:0.12em; color:#5C574A; margin-bottom:8px">09 · JEU · MANCHE À BONUS</div>
+      <div style="width:390px; height:844px; border:3px solid #16140F; background:#F2EEE4; display:flex; flex-direction:column; overflow:hidden">
+        <div style="height:52px; flex:0 0 52px; display:flex; align-items:flex-end; justify-content:space-between; padding:0 14px 7px; font:700 10px/1 'Space Mono', monospace; color:#16140F; border-bottom:2px solid #16140F">
+          <span>9:41</span>
+          <div style="display:flex; gap:4px; align-items:center"><div style="width:16px; height:8px; background:#16140F"></div><div style="width:8px; height:8px; border:2px solid #16140F"></div></div>
+        </div>
+        <div style="height:44px; flex:0 0 44px; border-bottom:3px solid #16140F; display:flex; align-items:center; padding:0 16px">
+          <div style="font:400 19px/1 'Archivo Black', Helvetica, sans-serif; color:#16140F">MANCHE 6<span style="color:#5C574A">/10</span></div>
+        </div>
+        <div style="border-bottom:3px solid #16140F; background:#C98A16; padding:6px 14px; display:flex; flex-direction:column; gap:5px">
+          <div style="display:flex; align-items:center; gap:10px">
+            <div style="font:700 10px/1 'Space Mono', monospace; letter-spacing:0.14em; color:#16140F">CARTE DE MANCHE · TIRÉE POUR TOUT LE MONDE</div>
+            <div style="font:700 10px/1 'Space Mono', monospace; color:#16140F; margin-left:auto; border:2px solid #16140F; padding:3px 5px">AVANT LES CHOIX</div>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px">
+            <div style="background:#16140F; padding:5px; display:flex">{{ pk.frapper.md2 }}</div>
+            <div style="font:400 20px/1.05 'Archivo Black', Helvetica, sans-serif; color:#16140F; text-transform:uppercase">Frapper casse 2 briques</div>
+          </div>
+          <div style="font:600 11px/1.3 Archivo, sans-serif; color:#16140F">Vaut pour cette manche uniquement. Bloquer et piéger fonctionnent normalement.</div>
+        </div>
+        <div style="flex:1; padding:14px 14px 8px; display:flex; flex-direction:column; gap:10px">
+          <div style="flex:1; display:grid; grid-template-columns:1fr; grid-template-rows:repeat(4, auto); align-content:space-between; gap:10px">
+            <sc-for list="{{ s9.players }}" as="p" hint-placeholder-count="4">
+              <div style="border:2px solid #16140F; background:#F2EEE4; padding:10px 12px; display:flex; flex-direction:column; gap:8px; outline:{{ p.ring }}; outline-offset:-7px">
+                <div style="display:flex; align-items:center; gap:9px">
+                  <div style="width:18px; height:18px; flex:0 0 18px; background:{{ p.color }}; border-radius:{{ p.radius }}; clip-path:{{ p.clip }}"></div>
+                  <div style="font:700 15px/1 Archivo, sans-serif; color:#16140F">{{ p.name }}</div>
+                  <div style="border:2px solid #16140F; background:{{ p.lastBg }}; background-image:{{ p.lastHatch }}; padding:3px 4px; display:flex; align-items:center; gap:5px">
+                    <div style="background:#E5DFD1; display:flex; align-items:center; gap:5px; padding:1px 3px">
+                      {{ p.lastPicto }}
+                      <div style="font:700 8px/1 'Space Mono', monospace; letter-spacing:0.04em; color:#16140F">{{ p.lastLabel }}</div>
+                    </div>
+                  </div>
+                  <div style="font:700 8px/1 'Space Mono', monospace; color:#5C574A; margin-left:auto">{{ p.tag }}</div>
+                </div>
+                <div style="height:38px; flex:0 0 38px; display:flex; gap:5px; align-items:stretch">
+                  <sc-for list="{{ p.bricks }}" as="b" hint-placeholder-count="5">
+                    <div style="flex:1; height:100%; background:#16140F; clip-path:polygon(0 0, calc(100% - 5px) 0, 100% 5px, 100% 100%, 0 100%); position:relative">
+                      <div style="position:absolute; inset:2px; background:{{ b.fill }}; clip-path:polygon(0 0, calc(100% - 3px) 0, 100% 3px, 100% 100%, 0 100%)"></div>
+                      <sc-if value="{{ b.broken }}" hint-placeholder-val="{{ false }}">
+                        <div style="position:absolute; left:2px; right:2px; top:calc(50% - 1px); height:2px; background:#16140F; transform:rotate(-24deg)"></div>
+                      </sc-if>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="border-top:3px solid #16140F; padding-top:12px; display:flex; flex-direction:column; gap:10px; margin-top:auto">
+            <div style="display:flex; gap:8px">
+              <sc-for list="{{ s9.hand }}" as="c" hint-placeholder-count="4">
+                <div style="flex:1; height:108px; border:{{ c.bd }}; background:{{ c.bg }}; background-image:{{ c.hatch }}; padding:9px 6px; display:flex; flex-direction:column; align-items:center; justify-content:space-between; clip-path:polygon(0 0, calc(100% - 11px) 0, 100% 11px, 100% 100%, 0 100%)">
+                  <div style="width:100%; height:3px; background:{{ c.fg }}"></div>
+                  {{ c.picto }}
+                  <div style="font:700 10px/1 'Space Mono', monospace; color:{{ c.fg }}; background:{{ c.bg }}; padding:1px 2px">{{ c.label }}</div>
+                  <div style="font:700 7px/1.2 'Space Mono', monospace; color:{{ c.fg }}; background:{{ c.bg }}; padding:1px 2px; text-align:center">{{ c.note }}</div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="height:48px; border:2px solid #16140F; background:#C98A16; display:flex; align-items:center; justify-content:center; font:700 12px/1 'Space Mono', monospace; letter-spacing:0.08em; color:#16140F">FRAPPER VAUT DOUBLE CETTE MANCHE</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="flex:0 0 390px">
+      <div style="font:700 11px/1 'Space Mono', monospace; letter-spacing:0.12em; color:#5C574A; margin-bottom:8px">10 · JEU · MODE ÉQUIPES 2 v 2</div>
+      <div style="width:390px; height:844px; border:3px solid #16140F; background:#F2EEE4; display:flex; flex-direction:column; overflow:hidden">
+        <div style="height:52px; flex:0 0 52px; display:flex; align-items:flex-end; justify-content:space-between; padding:0 14px 7px; font:700 10px/1 'Space Mono', monospace; color:#16140F; border-bottom:2px solid #16140F">
+          <span>9:41</span>
+          <div style="display:flex; gap:4px; align-items:center"><div style="width:16px; height:8px; background:#16140F"></div><div style="width:8px; height:8px; border:2px solid #16140F"></div></div>
+        </div>
+        <div style="height:52px; flex:0 0 52px; border-bottom:3px solid #16140F; display:flex; align-items:center; padding:0 16px; gap:10px">
+          <div style="font:400 19px/1 'Archivo Black', Helvetica, sans-serif; color:#16140F">MANCHE 5<span style="color:#5C574A">/10</span></div>
+          <div style="font:700 10px/1 'Space Mono', monospace; letter-spacing:0.1em; color:#16140F; margin-left:auto; border:2px solid #16140F; padding:4px 6px">RÉPARER · CHOISIS UN MUR AMI</div>
+        </div>
+        <div style="flex:1; padding:14px; display:flex; flex-direction:column; gap:12px">
+          <div style="border:3px solid #16140F; padding:10px; display:flex; flex-direction:column; gap:9px">
+            <div style="display:flex; align-items:baseline; gap:10px">
+              <div style="font:700 10px/1 'Space Mono', monospace; letter-spacing:0.12em; color:#16140F">TON ÉQUIPE</div>
+              <div style="font:400 16px/1 'Archivo Black', Helvetica, sans-serif; color:#16140F; margin-left:auto">7 BRIQUES</div>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px">
+              <sc-for list="{{ s10.teamA }}" as="p" hint-placeholder-count="2">
+                <div style="border:2px solid #16140F; background:#F2EEE4; padding:9px; display:flex; flex-direction:column; gap:8px; outline:{{ p.ring }}; outline-offset:-7px">
+                  <div style="display:flex; align-items:center; gap:7px">
+                    <div style="width:17px; height:17px; flex:0 0 17px; background:{{ p.color }}; border-radius:{{ p.radius }}; clip-path:{{ p.clip }}"></div>
+                    <div style="font:700 14px/1 Archivo, sans-serif; color:#16140F">{{ p.name }}</div>
+                    <div style="font:700 8px/1 'Space Mono', monospace; color:#16140F; margin-left:auto">{{ p.tag }}</div>
+                  </div>
+                  <div style="height:38px; flex:0 0 38px; display:flex; gap:5px; align-items:stretch">
+                    <sc-for list="{{ p.bricks }}" as="b" hint-placeholder-count="5">
+                      <div style="flex:1; height:100%; background:#16140F; clip-path:polygon(0 0, calc(100% - 5px) 0, 100% 5px, 100% 100%, 0 100%); position:relative">
+                        <div style="position:absolute; inset:2px; background:{{ b.fill }}; clip-path:polygon(0 0, calc(100% - 3px) 0, 100% 3px, 100% 100%, 0 100%)"></div>
+                        <sc-if value="{{ b.broken }}" hint-placeholder-val="{{ false }}">
+                          <div style="position:absolute; left:2px; right:2px; top:calc(50% - 1px); height:2px; background:#16140F; transform:rotate(-24deg)"></div>
+                        </sc-if>
+                      </div>
+                    </sc-for>
+                  </div>
+                  <div style="border:2px solid #16140F; background:{{ p.lastBg }}; background-image:{{ p.lastHatch }}; padding:4px 5px; display:flex; align-items:center; gap:5px">
+                    <div style="background:#E5DFD1; display:flex; align-items:center; gap:5px; padding:1px 3px">
+                      {{ p.lastPicto }}
+                      <div style="font:700 8px/1 'Space Mono', monospace; color:#16140F">{{ p.lastLabel }}</div>
+                    </div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="border:2px solid #16140F; background:#16140F; padding:8px 10px; display:flex; align-items:center; gap:9px">
+              <div style="background:#F2EEE4; padding:2px; display:flex">{{ pk.reparer.sm }}</div>
+              <div style="font:600 12px/1.3 Archivo, sans-serif; color:#F2EEE4">Tu répares le mur de Malo : <strong>+1 brique chez lui</strong>. Tu restes sans défense ce tour.</div>
+            </div>
+          </div>
+          <div style="border:2px solid #16140F; padding:10px; display:flex; flex-direction:column; gap:9px">
+            <div style="display:flex; align-items:baseline; gap:10px">
+              <div style="font:700 10px/1 'Space Mono', monospace; letter-spacing:0.12em; color:#5C574A">ÉQUIPE ADVERSE</div>
+              <div style="font:400 16px/1 'Archivo Black', Helvetica, sans-serif; color:#16140F; margin-left:auto">9 BRIQUES</div>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px">
+              <sc-for list="{{ s10.teamB }}" as="p" hint-placeholder-count="2">
+                <div style="border:2px solid #16140F; background:#F2EEE4; padding:9px; display:flex; flex-direction:column; gap:8px">
+                  <div style="display:flex; align-items:center; gap:7px">
+                    <div style="width:17px; height:17px; flex:0 0 17px; background:{{ p.color }}; border-radius:{{ p.radius }}; clip-path:{{ p.clip }}"></div>
+                    <div style="font:700 14px/1 Archivo, sans-serif; color:#16140F">{{ p.name }}</div>
+                  </div>
+                  <div style="height:38px; flex:0 0 38px; display:flex; gap:5px; align-items:stretch">
+                    <sc-for list="{{ p.bricks }}" as="b" hint-placeholder-count="5">
+                      <div style="flex:1; height:100%; background:#16140F; clip-path:polygon(0 0, calc(100% - 5px) 0, 100% 5px, 100% 100%, 0 100%); position:relative">
+                        <div style="position:absolute; inset:2px; background:{{ b.fill }}; clip-path:polygon(0 0, calc(100% - 3px) 0, 100% 3px, 100% 100%, 0 100%)"></div>
+                        <sc-if value="{{ b.broken }}" hint-placeholder-val="{{ false }}">
+                          <div style="position:absolute; left:2px; right:2px; top:calc(50% - 1px); height:2px; background:#16140F; transform:rotate(-24deg)"></div>
+                        </sc-if>
+                      </div>
+                    </sc-for>
+                  </div>
+                  <div style="border:2px solid #16140F; background:{{ p.lastBg }}; background-image:{{ p.lastHatch }}; padding:4px 5px; display:flex; align-items:center; gap:5px">
+                    <div style="background:#E5DFD1; display:flex; align-items:center; gap:5px; padding:1px 3px">
+                      {{ p.lastPicto }}
+                      <div style="font:700 8px/1 'Space Mono', monospace; color:#16140F">{{ p.lastLabel }}</div>
+                    </div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="border-top:3px solid #16140F; padding-top:12px; display:flex; gap:8px; margin-top:auto">
+            <sc-for list="{{ s10.hand }}" as="c" hint-placeholder-count="4">
+              <div style="flex:1; height:126px; border:{{ c.bd }}; background:{{ c.bg }}; background-image:{{ c.hatch }}; padding:9px 6px; display:flex; flex-direction:column; align-items:center; justify-content:space-between; clip-path:polygon(0 0, calc(100% - 11px) 0, 100% 11px, 100% 100%, 0 100%)">
+                <div style="width:100%; height:3px; background:{{ c.fg }}"></div>
+                {{ c.picto }}
+                <div style="font:700 10px/1 'Space Mono', monospace; color:{{ c.fg }}; background:{{ c.bg }}; padding:1px 2px">{{ c.label }}</div>
+                <div style="font:700 7px/1.2 'Space Mono', monospace; color:{{ c.fg }}; background:{{ c.bg }}; padding:1px 2px; text-align:center">{{ c.note }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="flex:0 0 390px">
+      <div style="font:700 11px/1 'Space Mono', monospace; letter-spacing:0.12em; color:#5C574A; margin-bottom:8px">11 · FIN DE PARTIE</div>
+      <div style="width:390px; height:844px; border:3px solid #16140F; background:#F2EEE4; display:flex; flex-direction:column; overflow:hidden">
+        <div style="height:52px; flex:0 0 52px; display:flex; align-items:flex-end; justify-content:space-between; padding:0 14px 7px; font:700 10px/1 'Space Mono', monospace; color:#16140F; border-bottom:2px solid #16140F">
+          <span>9:41</span>
+          <div style="display:flex; gap:4px; align-items:center"><div style="width:16px; height:8px; background:#16140F"></div><div style="width:8px; height:8px; border:2px solid #16140F"></div></div>
+        </div>
+        <div style="background:#16140F; padding:20px 16px; display:flex; flex-direction:column; gap:6px">
+          <div style="font:700 10px/1 'Space Mono', monospace; letter-spacing:0.14em; color:#F2EEE4">10 MANCHES · 4 MIN 12 S</div>
+          <div style="font:400 40px/0.95 'Archivo Black', Helvetica, sans-serif; color:#F2EEE4; text-transform:uppercase">Malo garde<br>son mur</div>
+        </div>
+        <div style="flex:1; padding:14px; display:flex; flex-direction:column; gap:12px">
+          <sc-for list="{{ rankL }}" as="r" hint-placeholder-count="4">
+            <div style="border:2px solid #16140F; padding:10px; display:flex; align-items:center; gap:10px">
+              <div style="font:400 22px/1 'Archivo Black', Helvetica, sans-serif; color:#16140F; flex:0 0 20px">{{ r.pos }}</div>
+              <div style="width:18px; height:18px; flex:0 0 18px; background:{{ r.color }}; border-radius:{{ r.radius }}; clip-path:{{ r.clip }}"></div>
+              <div style="font:700 15px/1 Archivo, sans-serif; color:#16140F; flex:0 0 46px">{{ r.name }}</div>
+              <div style="display:flex; gap:3px; flex:1; align-items:flex-end">
+                <sc-for list="{{ r.bricks }}" as="b" hint-placeholder-count="5">
+                  <div style="flex:1; height:26px; background:#16140F; clip-path:polygon(0 0, calc(100% - 5px) 0, 100% 5px, 100% 100%, 0 100%); position:relative">
+                    <div style="position:absolute; inset:2px; background:{{ b.fill }}; clip-path:polygon(0 0, calc(100% - 4px) 0, 100% 4px, 100% 100%, 0 100%)"></div>
+                    <sc-if value="{{ b.broken }}" hint-placeholder-val="{{ false }}">
+                      <div style="position:absolute; left:2px; right:2px; top:12px; height:2px; background:#16140F; transform:rotate(-24deg)"></div>
+                    </sc-if>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="font:700 15px/1 'Space Mono', monospace; color:#16140F; flex:0 0 20px; text-align:right">{{ r.n }}</div>
+            </div>
+          </sc-for>
+          <div style="display:flex; flex-direction:column; gap:8px; border-top:3px solid #16140F; padding-top:12px">
+            <div style="font:700 11px/1 'Space Mono', monospace; letter-spacing:0.12em; color:#5C574A">STATISTIQUES</div>
+            <div style="display:flex; gap:8px">
+              <div style="flex:1; border:2px solid #16140F; padding:10px; display:flex; flex-direction:column; gap:6px">
+                <div style="font:700 9px/1.2 'Space Mono', monospace; color:#5C574A">LE PLUS VISÉ</div>
+                <div style="display:flex; align-items:center; gap:7px">
+                  <div style="width:16px; height:16px; background:#1E6A47; clip-path:polygon(50% 0, 100% 100%, 0 100%)"></div>
+                  <div style="font:700 14px/1 Archivo, sans-serif; color:#16140F">Nour</div>
+                </div>
+                <div style="font:400 22px/1 'Archivo Black', Helvetica, sans-serif; color:#16140F">9 frappes</div>
+              </div>
+              <div style="flex:1; border:2px solid #16140F; padding:10px; display:flex; flex-direction:column; gap:6px">
+                <div style="font:700 9px/1.2 'Space Mono', monospace; color:#5C574A">MEILLEUR PIÉGEUR</div>
+                <div style="display:flex; align-items:center; gap:7px">
+                  <div style="width:16px; height:16px; background:#6C3479; clip-path:polygon(50% 0, 100% 38%, 82% 100%, 18% 100%, 0 38%)"></div>
+                  <div style="font:700 14px/1 Archivo, sans-serif; color:#16140F">Iris</div>
+                </div>
+                <div style="font:400 22px/1 'Archivo Black', Helvetica, sans-serif; color:#16140F">3 pièges</div>
+              </div>
+            </div>
+            <div style="display:flex; gap:8px">
+              <div style="flex:1; border:2px solid #16140F; padding:10px; display:flex; flex-direction:column; gap:4px">
+                <div style="font:700 9px/1.2 'Space Mono', monospace; color:#5C574A">BRIQUES RÉPARÉES</div>
+                <div style="font:400 22px/1 'Archivo Black', Helvetica, sans-serif; color:#16140F">7</div>
+              </div>
+              <div style="flex:1; border:2px solid #16140F; padding:10px; display:flex; flex-direction:column; gap:4px">
+                <div style="font:700 9px/1.2 'Space Mono', monospace; color:#5C574A">BLOCAGES UTILES</div>
+                <div style="font:400 22px/1 'Archivo Black', Helvetica, sans-serif; color:#16140F">6 / 11</div>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:auto; display:flex; flex-direction:column; gap:10px">
+            <div style="border:3px solid #16140F; background:#16140F; height:62px; display:flex; align-items:center; justify-content:center; clip-path:polygon(0 0, calc(100% - 13px) 0, 100% 13px, 100% 100%, 0 100%)">
+              <span style="font:400 21px/1 'Archivo Black', Helvetica, sans-serif; color:#F2EEE4; text-transform:uppercase">Rejouer, mêmes joueurs</span>
+            </div>
+            <div style="border:2px solid #16140F; height:52px; display:flex; align-items:center; justify-content:center; font:700 12px/1 'Space Mono', monospace; letter-spacing:0.1em; color:#16140F">RETOUR À L’ACCUEIL</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="flex:0 0 390px">
+      <div style="font:700 11px/1 'Space Mono', monospace; letter-spacing:0.12em; color:#5C574A; margin-bottom:8px">11 BIS · PALMARÈS · TOUTES LES PARTIES</div>
+      <div style="width:390px; height:844px; border:3px solid #16140F; background:#F2EEE4; display:flex; flex-direction:column; overflow:hidden">
+        <div style="height:52px; flex:0 0 52px; display:flex; align-items:flex-end; justify-content:space-between; padding:0 14px 7px; font:700 10px/1 'Space Mono', monospace; color:#16140F; border-bottom:2px solid #16140F">
+          <span>9:41</span>
+          <div style="display:flex; gap:4px; align-items:center"><div style="width:16px; height:8px; background:#16140F"></div><div style="width:8px; height:8px; border:2px solid #16140F"></div></div>
+        </div>
+        <div style="height:44px; flex:0 0 44px; border-bottom:3px solid #16140F; display:flex; align-items:center; gap:12px; padding:0 16px">
+          <div style="font:700 15px/1 'Space Mono', monospace; color:#16140F">←</div>
+          <div style="font:400 20px/1 'Archivo Black', Helvetica, sans-serif; color:#16140F; text-transform:uppercase">Palmarès</div>
+          <div style="font:700 9px/1 'Space Mono', monospace; letter-spacing:0.1em; color:#5C574A; margin-left:auto">SUR CET APPAREIL</div>
+        </div>
+        <div style="flex:1; padding:14px 14px 8px 14px; display:flex; flex-direction:column; gap:8px">
+          <div style="display:flex; gap:6px">
+            <div style="flex:1; border:3px solid #16140F; background:#16140F; padding:8px 11px; display:flex; flex-direction:column; gap:5px">
+              <div style="font:700 9px/1 'Space Mono', monospace; letter-spacing:0.1em; color:#F2EEE4">PARTIES</div>
+              <div style="font:400 30px/1 'Archivo Black', Helvetica, sans-serif; color:#F2EEE4">23</div>
+            </div>
+            <div style="flex:1; border:2px solid #16140F; padding:11px; display:flex; flex-direction:column; gap:5px">
+              <div style="font:700 9px/1 'Space Mono', monospace; letter-spacing:0.1em; color:#5C574A">TES VICTOIRES</div>
+              <div style="font:400 30px/1 'Archivo Black', Helvetica, sans-serif; color:#16140F">7</div>
+            </div>
+            <div style="flex:1; border:2px solid #16140F; padding:11px; display:flex; flex-direction:column; gap:5px">
+              <div style="font:700 9px/1 'Space Mono', monospace; letter-spacing:0.1em; color:#5C574A">BRIQUES SAUVÉES</div>
+              <div style="font:400 30px/1 'Archivo Black', Helvetica, sans-serif; color:#16140F">78</div>
+            </div>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:8px">
+            <div style="font:700 11px/1 'Space Mono', monospace; letter-spacing:0.12em; color:#5C574A">JOUEURS RÉCURRENTS</div>
+            <sc-for list="{{ palPlayers }}" as="p" hint-placeholder-count="4">
+              <div style="border:2px solid #16140F; padding:8px 10px; display:flex; align-items:center; gap:9px">
+                <div style="width:16px; height:16px; flex:0 0 16px; background:{{ p.color }}; border-radius:{{ p.radius }}; clip-path:{{ p.clip }}"></div>
+                <div style="font:700 14px/1 Archivo, sans-serif; color:#16140F; flex:0 0 44px">{{ p.name }}</div>
+                <div style="flex:1; height:10px; border:2px solid #16140F; display:flex">
+                  <div style="width:{{ p.w }}; background:#16140F"></div>
+                </div>
+                <div style="font:700 9px/1 'Space Mono', monospace; letter-spacing:0.04em; color:#5C574A; flex:0 0 96px; text-align:right">{{ p.line }}</div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:8px">
+            <div style="font:700 11px/1 'Space Mono', monospace; letter-spacing:0.12em; color:#5C574A">TON STYLE DE JEU</div>
+            <div style="border:2px solid #16140F; padding:10px; display:flex; flex-direction:column; gap:7px">
+              <sc-for list="{{ palCards }}" as="c" hint-placeholder-count="4">
+                <div style="display:flex; align-items:center; gap:8px">
+                  {{ c.picto }}
+                  <div style="font:700 9px/1 'Space Mono', monospace; letter-spacing:0.06em; color:#16140F; flex:0 0 62px">{{ c.label }}</div>
+                  <div style="flex:1; height:10px; border:2px solid #16140F; display:flex">
+                    <div style="width:{{ c.w }}; background:#16140F"></div>
+                  </div>
+                  <div style="font:700 10px/1 'Space Mono', monospace; color:#16140F; flex:0 0 34px; text-align:right">{{ c.pct }}</div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:8px">
+            <div style="display:flex; align-items:baseline; gap:10px">
+              <div style="font:700 11px/1 'Space Mono', monospace; letter-spacing:0.12em; color:#5C574A">DERNIÈRES PARTIES</div>
+              <div style="font:700 10px/1 'Space Mono', monospace; color:#16140F; margin-left:auto">VOIR LES 23</div>
+            </div>
+            <sc-for list="{{ palGames }}" as="g" hint-placeholder-count="5">
+              <div style="border:2px solid #16140F; padding:7px 10px; display:flex; align-items:center; gap:10px">
+                <div style="display:flex; flex-direction:column; gap:3px; flex:1">
+                  <div style="font:700 11px/1 'Space Mono', monospace; color:#16140F">{{ g.date }}</div>
+                  <div style="font:700 8px/1 'Space Mono', monospace; letter-spacing:0.06em; color:#5C574A">{{ g.fmt }}</div>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:3px; align-items:flex-end">
+                  <div style="font:700 12px/1 Archivo, sans-serif; color:#16140F">{{ g.res }}</div>
+                  <div style="font:700 8px/1 'Space Mono', monospace; color:#5C574A">TOI · {{ g.mine }}</div>
+                </div>
+                <div style="border:2px solid #16140F; background:{{ g.tagBg }}; color:{{ g.tagFg }}; font:700 8px/1 'Space Mono', monospace; letter-spacing:0.06em; padding:4px 5px">{{ g.tag }}</div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="margin-top:auto; display:flex; flex-direction:column; gap:8px">
+            <div style="border:2px solid #16140F; background:#E5DFD1; padding:9px 11px; font:600 12px/1.35 Archivo, sans-serif; color:#16140F">Blocages utiles 61 % · pièges déclenchés 14. Tout est stocké sur ton téléphone, rien n’est envoyé.</div>
+            <div style="border:2px solid #16140F; height:44px; display:flex; align-items:center; justify-content:center; font:700 11px/1 'Space Mono', monospace; letter-spacing:0.1em; color:#16140F">EFFACER LE PALMARÈS</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="flex:0 0 390px">
+      <div style="font:700 11px/1 'Space Mono', monospace; letter-spacing:0.12em; color:#5C574A; margin-bottom:8px">12 · CAS LIMITE · DÉCONNEXION EN PLEINE MANCHE</div>
+      <div style="width:390px; height:844px; border:3px solid #16140F; background:#F2EEE4; display:flex; flex-direction:column; overflow:hidden; position:relative">
+        <div style="height:52px; flex:0 0 52px; display:flex; align-items:flex-end; justify-content:space-between; padding:0 14px 7px; font:700 10px/1 'Space Mono', monospace; color:#16140F; border-bottom:2px solid #16140F">
+          <span>9:41</span>
+          <div style="display:flex; gap:4px; align-items:center"><div style="width:16px; height:8px; background:#16140F"></div><div style="width:8px; height:8px; border:2px solid #16140F"></div></div>
+        </div>
+        <div style="height:52px; flex:0 0 52px; border-bottom:3px solid #16140F; display:flex; align-items:center; padding:0 16px">
+          <div style="font:400 19px/1 'Archivo Black', Helvetica, sans-serif; color:#16140F">MANCHE 4<span style="color:#5C574A">/10</span></div>
+          <div style="font:700 10px/1 'Space Mono', monospace; letter-spacing:0.1em; color:#16140F; margin-left:auto; border:2px solid #16140F; padding:4px 6px">MANCHE GELÉE</div>
+        </div>
+        <div style="flex:1; padding:14px; display:flex; flex-direction:column; gap:12px">
+          <div style="flex:1; display:grid; grid-template-columns:1fr; grid-template-rows:repeat(4, auto); align-content:start; gap:10px">
+            <sc-for list="{{ s12.players }}" as="p" hint-placeholder-count="4">
+              <div style="border:2px solid #16140F; background:#F2EEE4; padding:10px 12px; display:flex; flex-direction:column; gap:8px; outline:{{ p.ring }}; outline-offset:-7px">
+                <div style="display:flex; align-items:center; gap:9px">
+                  <div style="width:18px; height:18px; flex:0 0 18px; background:{{ p.color }}; border-radius:{{ p.radius }}; clip-path:{{ p.clip }}"></div>
+                  <div style="font:700 15px/1 Archivo, sans-serif; color:#16140F">{{ p.name }}</div>
+                  <div style="border:2px solid #16140F; background:{{ p.lastBg }}; background-image:{{ p.lastHatch }}; padding:3px 4px; display:flex; align-items:center; gap:5px">
+                    <div style="background:#E5DFD1; display:flex; align-items:center; gap:5px; padding:1px 3px">
+                      {{ p.lastPicto }}
+                      <div style="font:700 8px/1 'Space Mono', monospace; letter-spacing:0.04em; color:#16140F">{{ p.lastLabel }}</div>
+                    </div>
+                  </div>
+                  <div style="font:700 8px/1 'Space Mono', monospace; color:#16140F; margin-left:auto">{{ p.tag }}</div>
+                </div>
+                <div style="height:38px; flex:0 0 38px; display:flex; gap:5px; align-items:stretch">
+                  <sc-for list="{{ p.bricks }}" as="b" hint-placeholder-count="5">
+                    <div style="flex:1; height:100%; background:#16140F; clip-path:polygon(0 0, calc(100% - 5px) 0, 100% 5px, 100% 100%, 0 100%); position:relative">
+                      <div style="position:absolute; inset:2px; background:{{ b.fill }}; clip-path:polygon(0 0, calc(100% - 3px) 0, 100% 3px, 100% 100%, 0 100%)"></div>
+                      <sc-if value="{{ b.broken }}" hint-placeholder-val="{{ false }}">
+                        <div style="position:absolute; left:2px; right:2px; top:calc(50% - 1px); height:2px; background:#16140F; transform:rotate(-24deg)"></div>
+                      </sc-if>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="position:absolute; inset:82px 0 0 0; background:rgba(22,20,15,0.42); display:flex; align-items:flex-end; padding:14px">
+          <div style="width:100%; border:3px solid #16140F; background:#F2EEE4; padding:18px; display:flex; flex-direction:column; gap:14px">
+            <div style="display:flex; align-items:center; gap:10px">
+              <div style="width:26px; height:26px; background:#1E6A47; clip-path:polygon(50% 0, 100% 100%, 0 100%)"></div>
+              <div style="font:400 24px/1 'Archivo Black', Helvetica, sans-serif; color:#16140F; text-transform:uppercase">Nour a quitté</div>
+            </div>
+            <div style="font:600 14px/1.4 Archivo, sans-serif; color:#16140F">La manche est gelée : aucun choix n’est révélé, rien n’est perdu. Son mur reste sur la table.</div>
+            <div style="border:2px solid #16140F; background:#E5DFD1; padding:12px; display:flex; align-items:center; gap:12px">
+              <div style="font:700 26px/1 'Space Mono', monospace; color:#16140F">0:14</div>
+              <div style="font:600 12px/1.35 Archivo, sans-serif; color:#16140F; flex:1">Reconnexion possible avec le code <strong>7K2P</strong>. Reprise automatique à son retour.</div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:10px">
+              <div style="border:3px solid #16140F; background:#16140F; height:58px; display:flex; align-items:center; justify-content:center; clip-path:polygon(0 0, calc(100% - 13px) 0, 100% 13px, 100% 100%, 0 100%)">
+                <span style="font:400 19px/1 'Archivo Black', Helvetica, sans-serif; color:#F2EEE4; text-transform:uppercase">Attendre Nour</span>
+              </div>
+              <div style="border:2px solid #16140F; height:52px; display:flex; align-items:center; justify-content:center; gap:8px">
+                <span style="font:700 11px/1 'Space Mono', monospace; letter-spacing:0.08em; color:#16140F">CONTINUER À 3 · SON MUR EST FIGÉ</span>
+              </div>
+              <div style="font:400 11px/1.4 'Space Mono', monospace; color:#5C574A; text-align:center">L’HÔTE DÉCIDE · LES AUTRES SONT PRÉVENUS</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section style="padding:24px 56px 80px; display:flex; flex-direction:column; gap:24px">
+  <div style="font:400 30px/1 'Archivo Black', Helvetica, sans-serif; color:#16140F; text-transform:uppercase; border-bottom:4px solid #16140F; padding-bottom:14px">4 écrans · thème sombre</div>
+  <div style="display:flex; gap:28px; flex-wrap:wrap; align-items:flex-start">
+
+    <div style="flex:0 0 390px">
+      <div style="font:700 11px/1 'Space Mono', monospace; letter-spacing:0.12em; color:#5C574A; margin-bottom:8px">01 · ACCUEIL · SOMBRE</div>
+      <div style="width:390px; height:844px; border:3px solid #16140F; background:#15140E; display:flex; flex-direction:column; overflow:hidden">
+        <div style="height:52px; flex:0 0 52px; display:flex; align-items:flex-end; justify-content:space-between; padding:0 14px 7px; font:700 10px/1 'Space Mono', monospace; color:#F2EEE4; border-bottom:2px solid #F2EEE4">
+          <span>9:41</span>
+          <div style="display:flex; gap:4px; align-items:center"><div style="width:16px; height:8px; background:#F2EEE4"></div><div style="width:8px; height:8px; border:2px solid #F2EEE4"></div></div>
+        </div>
+        <div style="flex:1; display:flex; flex-direction:column; padding:26px 22px; gap:22px">
+          <div style="display:flex; gap:5px; align-items:flex-end">
+            <div style="width:30px; height:42px; background:#F2EEE4; clip-path:polygon(0 0, calc(100% - 7px) 0, 100% 7px, 100% 100%, 0 100%)"></div>
+            <div style="width:30px; height:42px; background:#F2EEE4; clip-path:polygon(0 0, calc(100% - 7px) 0, 100% 7px, 100% 100%, 0 100%)"></div>
+            <div style="width:30px; height:42px; border:3px solid #F2EEE4; clip-path:polygon(0 0, calc(100% - 7px) 0, 100% 7px, 100% 100%, 0 100%)"></div>
+            <div style="width:30px; height:42px; background:#F2EEE4; clip-path:polygon(0 0, calc(100% - 7px) 0, 100% 7px, 100% 100%, 0 100%)"></div>
+            <div style="width:30px; height:42px; background:#F2EEE4; clip-path:polygon(0 0, calc(100% - 7px) 0, 100% 7px, 100% 100%, 0 100%)"></div>
+          </div>
+          <div>
+            <div style="font:400 62px/0.88 'Archivo Black', Helvetica, sans-serif; color:#F2EEE4; text-transform:uppercase; letter-spacing:-0.02em">Brèche</div>
+            <div style="font:600 15px/1.35 Archivo, sans-serif; color:#F2EEE4; margin-top:12px; text-wrap:pretty">Chacun choisit en secret une carte parmi 4. La carte jouée est interdite la manche suivante.</div>
+            <div style="font:700 10px/1 'Space Mono', monospace; letter-spacing:0.12em; color:#ADA695; margin-top:10px">2–4 JOUEURS · 10 MANCHES · 4 MIN</div>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:12px; margin-top:auto">
+            <div style="border:3px solid #F2EEE4; background:#F2EEE4; height:64px; display:flex; align-items:center; justify-content:space-between; padding:0 18px; clip-path:polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%)">
+              <span style="font:400 22px/1 'Archivo Black', Helvetica, sans-serif; color:#15140E; text-transform:uppercase">Créer une partie</span>
+              <span style="font:700 18px/1 'Space Mono', monospace; color:#15140E">→</span>
+            </div>
+            <div style="border:3px solid #F2EEE4; height:64px; display:flex; align-items:center; gap:12px; padding:0 18px; clip-path:polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%)">
+              <span style="font:400 22px/1 'Archivo Black', Helvetica, sans-serif; color:#F2EEE4; text-transform:uppercase">Rejoindre</span>
+              <span style="font:700 13px/1 'Space Mono', monospace; color:#ADA695; letter-spacing:0.1em; margin-left:auto">CODE À 4</span>
+            </div>
+            <div style="display:flex; gap:10px">
+              <div style="flex:1; border:2px solid #F2EEE4; height:52px; display:flex; align-items:center; justify-content:center; font:700 11px/1 'Space Mono', monospace; letter-spacing:0.08em; color:#F2EEE4">RÈGLES</div>
+              <div style="flex:1; border:2px solid #F2EEE4; height:52px; display:flex; align-items:center; justify-content:center; font:700 11px/1 'Space Mono', monospace; letter-spacing:0.08em; color:#F2EEE4">PALMARÈS</div>
+              <div style="flex:1; border:2px solid #F2EEE4; height:52px; display:flex; align-items:center; justify-content:center; font:700 11px/1 'Space Mono', monospace; letter-spacing:0.08em; color:#F2EEE4">RÉGLAGES</div>
+            </div>
+            <div style="font:400 11px/1.5 'Space Mono', monospace; color:#ADA695; text-align:center; padding-top:4px">SANS COMPTE · SANS PUB · SANS TRACKING · FONCTIONNE HORS LIGNE</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="flex:0 0 390px">
+      <div style="font:700 11px/1 'Space Mono', monospace; letter-spacing:0.12em; color:#5C574A; margin-bottom:8px">05 · JEU · ÉTAT NEUTRE · SOMBRE</div>
+      <div style="width:390px; height:844px; border:3px solid #16140F; background:#15140E; display:flex; flex-direction:column; overflow:hidden">
+        <div style="height:52px; flex:0 0 52px; display:flex; align-items:flex-end; justify-content:space-between; padding:0 14px 7px; font:700 10px/1 'Space Mono', monospace; color:#F2EEE4; border-bottom:2px solid #F2EEE4">
+          <span>9:41</span>
+          <div style="display:flex; gap:4px; align-items:center"><div style="width:16px; height:8px; background:#F2EEE4"></div><div style="width:8px; height:8px; border:2px solid #F2EEE4"></div></div>
+        </div>
+        <div style="height:52px; flex:0 0 52px; border-bottom:3px solid #F2EEE4; display:flex; align-items:center; padding:0 16px; gap:12px">
+          <div style="font:400 19px/1 'Archivo Black', Helvetica, sans-serif; color:#F2EEE4">MANCHE 4<span style="color:#ADA695">/10</span></div>
+          <div style="display:flex; gap:3px; margin-left:auto">
+            <div style="width:9px; height:16px; background:#F2EEE4"></div><div style="width:9px; height:16px; background:#F2EEE4"></div><div style="width:9px; height:16px; background:#F2EEE4"></div><div style="width:9px; height:16px; border:2px solid #F2EEE4"></div><div style="width:9px; height:16px; border:2px solid #F2EEE4"></div><div style="width:9px; height:16px; border:2px solid #F2EEE4"></div><div style="width:9px; height:16px; border:2px solid #F2EEE4"></div><div style="width:9px; height:16px; border:2px solid #F2EEE4"></div><div style="width:9px; height:16px; border:2px solid #F2EEE4"></div><div style="width:9px; height:16px; border:2px solid #F2EEE4"></div>
+          </div>
+        </div>
+        <div style="flex:1; padding:14px; display:flex; flex-direction:column; gap:14px">
+          <div style="flex:1; display:grid; grid-template-columns:1fr; grid-template-rows:repeat(4, auto); align-content:space-between; gap:10px">
+            <sc-for list="{{ d5.players }}" as="p" hint-placeholder-count="4">
+              <div style="border:2px solid #F2EEE4; background:#15140E; padding:10px 12px; display:flex; flex-direction:column; gap:8px; outline:{{ p.ring }}; outline-offset:-7px">
+                <div style="display:flex; align-items:center; gap:9px">
+                  <div style="width:18px; height:18px; flex:0 0 18px; background:{{ p.color }}; border-radius:{{ p.radius }}; clip-path:{{ p.clip }}"></div>
+                  <div style="font:700 15px/1 Archivo, sans-serif; color:#F2EEE4">{{ p.name }}</div>
+                  <div style="border:2px solid #F2EEE4; background:{{ p.lastBg }}; background-image:{{ p.lastHatch }}; padding:3px 4px; display:flex; align-items:center; gap:5px">
+                    <div style="background:#221F16; display:flex; align-items:center; gap:5px; padding:1px 3px">
+                      {{ p.lastPicto }}
+                      <div style="font:700 8px/1 'Space Mono', monospace; color:#F2EEE4">{{ p.lastLabel }}</div>
+                    </div>
+                  </div>
+                  <div style="font:700 8px/1 'Space Mono', monospace; color:#ADA695; margin-left:auto">{{ p.tag }}</div>
+                </div>
+                <div style="height:38px; flex:0 0 38px; display:flex; gap:5px; align-items:stretch">
+                  <sc-for list="{{ p.bricks }}" as="b" hint-placeholder-count="5">
+                    <div style="flex:1; height:100%; background:#F2EEE4; clip-path:polygon(0 0, calc(100% - 5px) 0, 100% 5px, 100% 100%, 0 100%); position:relative">
+                      <div style="position:absolute; inset:2px; background:{{ b.fill }}; clip-path:polygon(0 0, calc(100% - 3px) 0, 100% 3px, 100% 100%, 0 100%)"></div>
+                      <sc-if value="{{ b.broken }}" hint-placeholder-val="{{ false }}">
+                        <div style="position:absolute; left:2px; right:2px; top:calc(50% - 1px); height:2px; background:#F2EEE4; transform:rotate(-24deg)"></div>
+                      </sc-if>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="border-top:3px solid #F2EEE4; padding-top:12px; display:flex; flex-direction:column; gap:10px; margin-top:auto">
+            <div style="display:flex; align-items:baseline; gap:10px">
+              <div style="font:700 11px/1 'Space Mono', monospace; letter-spacing:0.12em; color:#ADA695">MA MAIN</div>
+              <div style="font:600 12px/1 Archivo, sans-serif; color:#F2EEE4">Choisis une carte.</div>
+            </div>
+            <div style="display:flex; gap:8px">
+              <sc-for list="{{ d5.hand }}" as="c" hint-placeholder-count="4">
+                <div style="flex:1; height:122px; border:{{ c.bd }}; background:{{ c.bg }}; background-image:{{ c.hatch }}; padding:9px 6px; display:flex; flex-direction:column; align-items:center; justify-content:space-between; clip-path:polygon(0 0, calc(100% - 11px) 0, 100% 11px, 100% 100%, 0 100%)">
+                  <div style="width:100%; height:3px; background:{{ c.fg }}"></div>
+                  {{ c.picto }}
+                  <div style="font:700 10px/1 'Space Mono', monospace; color:{{ c.fg }}; background:{{ c.bg }}; padding:1px 2px">{{ c.label }}</div>
+                  <div style="font:700 7px/1.2 'Space Mono', monospace; color:{{ c.fg }}; background:{{ c.bg }}; padding:1px 2px; text-align:center">{{ c.note }}</div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="height:56px; border:2px dashed #F2EEE4; display:flex; align-items:center; justify-content:center; font:700 11px/1 'Space Mono', monospace; letter-spacing:0.1em; color:#ADA695">CHOISIS UNE CARTE POUR CONTINUER</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="flex:0 0 390px">
+      <div style="font:700 11px/1 'Space Mono', monospace; letter-spacing:0.12em; color:#5C574A; margin-bottom:8px">08 · RÉVÉLATION · SOMBRE</div>
+      <div style="width:390px; height:844px; border:3px solid #16140F; background:#15140E; display:flex; flex-direction:column; overflow:hidden">
+        <div style="height:52px; flex:0 0 52px; display:flex; align-items:flex-end; justify-content:space-between; padding:0 14px 7px; font:700 10px/1 'Space Mono', monospace; color:#F2EEE4; border-bottom:2px solid #F2EEE4">
+          <span>9:41</span>
+          <div style="display:flex; gap:4px; align-items:center"><div style="width:16px; height:8px; background:#F2EEE4"></div><div style="width:8px; height:8px; border:2px solid #F2EEE4"></div></div>
+        </div>
+        <div style="height:64px; flex:0 0 64px; background:#F2EEE4; display:flex; align-items:center; padding:0 16px; gap:12px">
+          <div style="font:400 30px/1 'Archivo Black', Helvetica, sans-serif; color:#15140E; text-transform:uppercase">Révélation</div>
+          <div style="font:700 11px/1 'Space Mono', monospace; color:#15140E; margin-left:auto">MANCHE 4/10</div>
+        </div>
+        <div style="flex:1; padding:14px 14px 8px 14px; display:flex; flex-direction:column; gap:10px">
+          <div style="display:flex; flex-direction:column; gap:6px">
+            <sc-for list="{{ d8.log }}" as="r" hint-placeholder-count="4">
+              <div style="border:2px solid #F2EEE4; background:#15140E; padding:7px 9px; display:flex; align-items:center; gap:8px">
+                <div style="width:15px; height:15px; flex:0 0 15px; background:{{ r.aColor }}; border-radius:{{ r.aRadius }}; clip-path:{{ r.aClip }}"></div>
+                <div style="font:700 13px/1 Archivo, sans-serif; color:#F2EEE4">{{ r.aName }}</div>
+                {{ r.picto }}
+                <div style="font:700 12px/1 'Space Mono', monospace; color:#ADA695">{{ r.arrow }}</div>
+                <sc-if value="{{ r.hasB }}" hint-placeholder-val="{{ true }}">
+                  <div style="width:15px; height:15px; flex:0 0 15px; background:{{ r.bColor }}; border-radius:{{ r.bRadius }}; clip-path:{{ r.bClip }}"></div>
+                </sc-if>
+                <div style="font:700 13px/1 Archivo, sans-serif; color:#F2EEE4">{{ r.bName }}</div>
+                <div style="margin-left:auto; border:{{ r.tagBd }}; background:{{ r.tagBg }}; color:{{ r.tagFg }}; font:700 8px/1 'Space Mono', monospace; letter-spacing:0.06em; padding:4px 5px">{{ r.tag }}</div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px">
+            <sc-for list="{{ d8.players }}" as="p" hint-placeholder-count="4">
+              <div style="border:2px solid #F2EEE4; background:#15140E; padding:9px; display:flex; flex-direction:column; gap:8px; outline:{{ p.ring }}; outline-offset:-7px">
+                <div style="display:flex; align-items:center; gap:7px">
+                  <div style="width:17px; height:17px; flex:0 0 17px; background:{{ p.color }}; border-radius:{{ p.radius }}; clip-path:{{ p.clip }}"></div>
+                  <div style="font:700 14px/1 Archivo, sans-serif; color:#F2EEE4">{{ p.name }}</div>
+                  <div style="font:700 8px/1 'Space Mono', monospace; color:#ADA695; margin-left:auto">{{ p.tag }}</div>
+                </div>
+                <div style="height:38px; flex:0 0 38px; display:flex; gap:5px; align-items:stretch">
+                  <sc-for list="{{ p.bricks }}" as="b" hint-placeholder-count="5">
+                    <div style="flex:1; height:100%; background:#F2EEE4; clip-path:polygon(0 0, calc(100% - 5px) 0, 100% 5px, 100% 100%, 0 100%); position:relative">
+                      <div style="position:absolute; inset:2px; background:{{ b.fill }}; clip-path:polygon(0 0, calc(100% - 3px) 0, 100% 3px, 100% 100%, 0 100%)"></div>
+                      <sc-if value="{{ b.broken }}" hint-placeholder-val="{{ false }}">
+                        <div style="position:absolute; left:2px; right:2px; top:calc(50% - 1px); height:2px; background:#F2EEE4; transform:rotate(-24deg)"></div>
+                      </sc-if>
+                    </div>
+                  </sc-for>
+                </div>
+                <div style="border:2px solid #F2EEE4; background:#F2EEE4; padding:5px 6px; display:flex; align-items:center; gap:6px">
+                  <div style="background:#15140E; padding:1px 2px; display:flex">{{ p.ovPicto }}</div>
+                  <div style="font:700 8px/1.2 'Space Mono', monospace; color:#15140E">{{ p.ovLabel }}</div>
+                </div>
+                <div style="font:700 8px/1 'Space Mono', monospace; letter-spacing:0.06em; color:#F2EEE4; border:2px solid #F2EEE4; padding:3px 4px; align-self:flex-start">{{ p.ovTag }}</div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="border:3px solid #F2EEE4; background:#E0A62E; padding:12px 14px; font:600 13px/1.4 Archivo, sans-serif; color:#15140E">Léa a frappé Nour, qui piégeait : la frappe se retourne, <strong>Léa perd une brique</strong>. Iris a frappé Malo, qui bloquait : annulé.</div>
+          <div style="margin-top:auto; height:60px; border:3px solid #F2EEE4; background:#F2EEE4; display:flex; align-items:center; justify-content:space-between; padding:0 16px; clip-path:polygon(0 0, calc(100% - 13px) 0, 100% 13px, 100% 100%, 0 100%)">
+            <span style="font:400 20px/1 'Archivo Black', Helvetica, sans-serif; color:#15140E; text-transform:uppercase">Manche 5</span>
+            <span style="font:700 11px/1 'Space Mono', monospace; color:#15140E">CARTE DE MANCHE À VENIR</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="flex:0 0 390px">
+      <div style="font:700 11px/1 'Space Mono', monospace; letter-spacing:0.12em; color:#5C574A; margin-bottom:8px">11 · FIN DE PARTIE · SOMBRE</div>
+      <div style="width:390px; height:844px; border:3px solid #16140F; background:#15140E; display:flex; flex-direction:column; overflow:hidden">
+        <div style="height:52px; flex:0 0 52px; display:flex; align-items:flex-end; justify-content:space-between; padding:0 14px 7px; font:700 10px/1 'Space Mono', monospace; color:#F2EEE4; border-bottom:2px solid #F2EEE4">
+          <span>9:41</span>
+          <div style="display:flex; gap:4px; align-items:center"><div style="width:16px; height:8px; background:#F2EEE4"></div><div style="width:8px; height:8px; border:2px solid #F2EEE4"></div></div>
+        </div>
+        <div style="background:#F2EEE4; padding:20px 16px; display:flex; flex-direction:column; gap:6px">
+          <div style="font:700 10px/1 'Space Mono', monospace; letter-spacing:0.14em; color:#15140E">10 MANCHES · 4 MIN 12 S</div>
+          <div style="font:400 40px/0.95 'Archivo Black', Helvetica, sans-serif; color:#15140E; text-transform:uppercase">Malo garde<br>son mur</div>
+        </div>
+        <div style="flex:1; padding:14px; display:flex; flex-direction:column; gap:12px">
+          <sc-for list="{{ rankD }}" as="r" hint-placeholder-count="4">
+            <div style="border:2px solid #F2EEE4; padding:10px; display:flex; align-items:center; gap:10px">
+              <div style="font:400 22px/1 'Archivo Black', Helvetica, sans-serif; color:#F2EEE4; flex:0 0 20px">{{ r.pos }}</div>
+              <div style="width:18px; height:18px; flex:0 0 18px; background:{{ r.color }}; border-radius:{{ r.radius }}; clip-path:{{ r.clip }}"></div>
+              <div style="font:700 15px/1 Archivo, sans-serif; color:#F2EEE4; flex:0 0 46px">{{ r.name }}</div>
+              <div style="display:flex; gap:3px; flex:1; align-items:flex-end">
+                <sc-for list="{{ r.bricks }}" as="b" hint-placeholder-count="5">
+                  <div style="flex:1; height:26px; background:#F2EEE4; clip-path:polygon(0 0, calc(100% - 5px) 0, 100% 5px, 100% 100%, 0 100%); position:relative">
+                    <div style="position:absolute; inset:2px; background:{{ b.fill }}; clip-path:polygon(0 0, calc(100% - 4px) 0, 100% 4px, 100% 100%, 0 100%)"></div>
+                    <sc-if value="{{ b.broken }}" hint-placeholder-val="{{ false }}">
+                      <div style="position:absolute; left:2px; right:2px; top:12px; height:2px; background:#F2EEE4; transform:rotate(-24deg)"></div>
+                    </sc-if>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="font:700 15px/1 'Space Mono', monospace; color:#F2EEE4; flex:0 0 20px; text-align:right">{{ r.n }}</div>
+            </div>
+          </sc-for>
+          <div style="display:flex; flex-direction:column; gap:8px; border-top:3px solid #F2EEE4; padding-top:12px">
+            <div style="font:700 11px/1 'Space Mono', monospace; letter-spacing:0.12em; color:#ADA695">STATISTIQUES</div>
+            <div style="display:flex; gap:8px">
+              <div style="flex:1; border:2px solid #F2EEE4; padding:10px; display:flex; flex-direction:column; gap:6px">
+                <div style="font:700 9px/1.2 'Space Mono', monospace; color:#ADA695">LE PLUS VISÉ</div>
+                <div style="display:flex; align-items:center; gap:7px">
+                  <div style="width:16px; height:16px; background:#4FB27E; clip-path:polygon(50% 0, 100% 100%, 0 100%)"></div>
+                  <div style="font:700 14px/1 Archivo, sans-serif; color:#F2EEE4">Nour</div>
+                </div>
+                <div style="font:400 22px/1 'Archivo Black', Helvetica, sans-serif; color:#F2EEE4">9 frappes</div>
+              </div>
+              <div style="flex:1; border:2px solid #F2EEE4; padding:10px; display:flex; flex-direction:column; gap:6px">
+                <div style="font:700 9px/1.2 'Space Mono', monospace; color:#ADA695">MEILLEUR PIÉGEUR</div>
+                <div style="display:flex; align-items:center; gap:7px">
+                  <div style="width:16px; height:16px; background:#BE83CE; clip-path:polygon(50% 0, 100% 38%, 82% 100%, 18% 100%, 0 38%)"></div>
+                  <div style="font:700 14px/1 Archivo, sans-serif; color:#F2EEE4">Iris</div>
+                </div>
+                <div style="font:400 22px/1 'Archivo Black', Helvetica, sans-serif; color:#F2EEE4">3 pièges</div>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:auto; display:flex; flex-direction:column; gap:10px">
+            <div style="border:3px solid #F2EEE4; background:#F2EEE4; height:62px; display:flex; align-items:center; justify-content:center; clip-path:polygon(0 0, calc(100% - 13px) 0, 100% 13px, 100% 100%, 0 100%)">
+              <span style="font:400 21px/1 'Archivo Black', Helvetica, sans-serif; color:#15140E; text-transform:uppercase">Rejouer, mêmes joueurs</span>
+            </div>
+            <div style="border:2px solid #F2EEE4; height:52px; display:flex; align-items:center; justify-content:center; font:700 12px/1 'Space Mono', monospace; letter-spacing:0.1em; color:#F2EEE4">RETOUR À L’ACCUEIL</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1720,&quot;height&quot;:1100},&quot;annotations&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Planche&quot;},&quot;denseWalls&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Jeu&quot;}}">
+class Component extends DCLogic {
+  T = {
+    ink: '#16140F', paper: '#F2EEE4', paper2: '#E5DFD1', mute: '#5C574A',
+    nink: '#F2EEE4', nbg: '#15140E', nbg2: '#221F16', nmute: '#ADA695',
+    ochre: '#C98A16',
+    L: ['#B8391F', '#2A4E8F', '#1E6A47', '#6C3479'],
+    D: ['#E4663F', '#7CA4EA', '#4FB27E', '#BE83CE']
+  };
+
+  shape(kind) {
+    if (kind === 'circle') return { radius: '50%', clip: 'none' };
+    if (kind === 'square') return { radius: '0', clip: 'none' };
+    if (kind === 'triangle') return { radius: '0', clip: 'polygon(50% 0, 100% 100%, 0 100%)' };
+    return { radius: '0', clip: 'polygon(50% 0, 100% 38%, 82% 100%, 18% 100%, 0 38%)' };
+  }
+
+  pic(k, s, c) {
+    const E = React.createElement;
+    const w = Math.max(2, s * 0.11);
+    const st = { stroke: c, strokeWidth: w, fill: 'none', strokeLinecap: 'butt' };
+    const kids = [];
+    if (k === 'frapper') {
+      kids.push(E('path', { key: 'a', d: 'M3 3 L13.5 13.5', ...st }));
+      kids.push(E('path', { key: 'b', d: 'M17 8.5 L22.5 6.5', ...st }));
+      kids.push(E('path', { key: 'c', d: 'M18.5 14 L23 17', ...st }));
+      kids.push(E('path', { key: 'd', d: 'M12.5 18 L13.5 23', ...st }));
+    } else if (k === 'bloquer') {
+      kids.push(E('path', { key: 'a', d: 'M1.5 5.5 L22.5 5.5', ...st }));
+      kids.push(E('path', { key: 'b', d: 'M5 20 L12 12.5 L19 20', ...st }));
+    } else if (k === 'reparer') {
+      kids.push(E('path', { key: 'a', d: 'M3.5 14.5 L20.5 14.5 L20.5 21.5 L3.5 21.5 Z', ...st }));
+      kids.push(E('path', { key: 'b', d: 'M12 1.5 L12 10.5', ...st }));
+      kids.push(E('path', { key: 'c', d: 'M7.5 6 L16.5 6', ...st }));
+    } else {
+      kids.push(E('path', { key: 'a', d: 'M2.5 2.5 L21.5 2.5 L12 11 Z', fill: c }));
+      kids.push(E('path', { key: 'b', d: 'M2.5 21.5 L21.5 21.5 L12 13 Z', fill: c }));
+    }
+    return E('svg', { width: s, height: s, viewBox: '0 0 24 24', style: { display: 'block', flex: '0 0 auto' } }, kids);
+  }
+
+  label(k) {
+    return { frapper: 'FRAPPER', bloquer: 'BLOQUER', reparer: 'RÉPARER', pieger: 'PIÉGER' }[k];
+  }
+
+  bricks(code, color, surface) {
+    return code.split('').map((ch) => ({
+      fill: ch === 'B' ? surface : color,
+      broken: ch === 'B',
+      plus: ch === 'R'
+    }));
+  }
+
+  mk(dark, name, kind, ci, wall, last, extra) {
+    const T = this.T;
+    const ink = dark ? T.nink : T.ink;
+    const surface = dark ? T.nbg : T.paper;
+    const color = (dark ? T.D : T.L)[ci];
+    const sh = this.shape(kind);
+    const o = {
+      name, color, radius: sh.radius, clip: sh.clip,
+      tag: '', ring: 'none',
+      bricks: this.bricks(wall, color, surface),
+      lastBg: dark ? T.nbg2 : T.paper2,
+      lastHatch: 'repeating-linear-gradient(45deg, ' + ink + ' 0 2px, transparent 2px 11px)',
+      lastPicto: last ? this.pic(last, 14, ink) : null,
+      lastLabel: last ? this.label(last) + ' · INDISPO' : 'RIEN JOUÉ',
+      overlay: false, ovPicto: null, ovLabel: '', ovTag: '',
+      ovTagBg: ink, ovTagFg: dark ? T.nbg : T.paper
+    };
+    return Object.assign(o, extra || {});
+  }
+
+  hand(dark, sel, dis) {
+    const T = this.T;
+    const ink = dark ? T.nink : T.ink;
+    const bg = dark ? T.nbg : T.paper;
+    const bg2 = dark ? T.nbg2 : T.paper2;
+    return ['frapper', 'bloquer', 'reparer', 'pieger'].map((k) => {
+      const isSel = k === sel, isDis = k === dis;
+      return {
+        label: this.label(k),
+        picto: this.pic(k, 26, isSel ? bg : ink),
+        bg: isSel ? ink : (isDis ? bg2 : bg),
+        bd: isSel ? '3px solid ' + ink : '2px solid ' + ink,
+        fg: isSel ? bg : ink,
+        hatch: isDis ? 'repeating-linear-gradient(45deg, ' + ink + ' 0 1.5px, transparent 1.5px 7px)' : 'none',
+        note: isSel ? 'CHOISIE' : (isDis ? 'JOUÉE · INDISPO' : 'DISPONIBLE')
+      };
+    });
+  }
+
+  logRow(dark, a, ai, ak, b, bi, outcome, tagInv) {
+    const T = this.T;
+    const ink = dark ? T.nink : T.ink;
+    const cols = dark ? T.D : T.L;
+    const sa = this.shape(a.kind), sb = b ? this.shape(b.kind) : null;
+    return {
+      aName: a.name, aColor: cols[ai], aRadius: sa.radius, aClip: sa.clip,
+      picto: this.pic(ak, 18, ink),
+      arrow: b ? '→' : '',
+      bName: b ? b.name : '',
+      bColor: b ? cols[bi] : 'transparent',
+      bRadius: sb ? sb.radius : '0', bClip: sb ? sb.clip : 'none',
+      hasB: !!b,
+      tag: outcome,
+      tagBg: tagInv ? ink : 'transparent',
+      tagFg: tagInv ? (dark ? T.nbg : T.paper) : ink,
+      tagBd: '2px solid ' + ink
+    };
+  }
+
+  VT = {
+    a: { pc: ['#C0562F', '#2F5D8C', '#1F6B4F', '#7A4A86'], pe: ['#8E3A1C', '#1F3F63', '#124B36', '#54305D'],
+      off: '#EFE2C8', offEdge: '#DCC9A6', mute: '#7A6B55', fg: '#2E2418',
+      cardBg: '#F3E7CE', cardEdge: '#D9C4A0', selBg: '#2E2418', selEdge: '#170F06', selFg: '#FCF7EC',
+      hotBg: '#C0562F', hotFg: '#FCF7EC' },
+    b: { pc: ['#FF3E63', '#2039C4', '#0F8A6A', '#7A3FCB'], pe: ['#171B3D', '#171B3D', '#171B3D', '#171B3D'],
+      off: '#EDE5CE', offEdge: '#171B3D', mute: '#5A5F80', fg: '#171B3D',
+      cardBg: '#FFFDF6', cardEdge: '#171B3D', selBg: '#FFC53D', selEdge: '#171B3D', selFg: '#171B3D',
+      hotBg: '#FF3E63', hotFg: '#FFFDF6' },
+    c: { pc: ['#FF8A7A', '#6FB3FF', '#5FE0A8', '#C79BFF'], pe: ['#8E4A42', '#33608F', '#2A7A59', '#6B4F94'],
+      off: '#242938', offEdge: '#1A1E2A', mute: '#8A93A6', fg: '#EDF1F7',
+      cardBg: '#1F2430', cardEdge: '#0B0D12', selBg: '#A9EE5E', selEdge: '#5E9421', selFg: '#101319',
+      hotBg: '#A9EE5E', hotFg: '#101319' }
+  };
+
+  vSet(key) {
+    const t = this.VT[key];
+    const kinds = ['circle', 'square', 'triangle', 'penta'];
+    const tg = (hot) => hot ? { ovBg: t.hotBg, ovFg: t.hotFg } : { ovBg: 'transparent', ovFg: t.mute };
+    const P = (name, ci, wall, last, extra) => {
+      const sh = this.shape(kinds[ci]);
+      return Object.assign({
+        name, color: t.pc[ci], radius: sh.radius, clip: sh.clip, tag: '', ring: 'none',
+        bricks: wall.split('').map((ch) => ({
+          fill: ch === 'B' ? t.off : t.pc[ci],
+          edge: ch === 'B' ? t.offEdge : t.pe[ci],
+          broken: ch === 'B'
+        })),
+        lastPicto: last ? this.pic(last, 13, t.mute) : null,
+        lastName: last ? this.label(last) : '—',
+        ovPicto: null, ovLabel: '', ovTag: '', ovBg: 'transparent', ovFg: t.mute
+      }, extra || {});
+    };
+    const hand = (sel, dis) => ['frapper', 'bloquer', 'reparer', 'pieger'].map((k) => {
+      const isSel = k === sel, isDis = k === dis;
+      return {
+        label: this.label(k),
+        picto: this.pic(k, 26, isSel ? t.selFg : (isDis ? t.mute : t.fg)),
+        bg: isSel ? t.selBg : t.cardBg,
+        edge: isSel ? t.selEdge : t.cardEdge,
+        fg: isSel ? t.selFg : (isDis ? t.mute : t.fg),
+        fg2: isSel ? t.selFg : t.mute,
+        note: isSel ? 'choisie' : (isDis ? 'jouée · indispo' : 'dispo'),
+        dim: isDis ? '0.6' : '1'
+      };
+    });
+    return {
+      players: [
+        P('Léa', 0, 'IIIBI', 'bloquer', { tag: 'toi', ring: '2px solid ' + t.pc[0] }),
+        P('Malo', 1, 'IIIII', 'frapper'),
+        P('Nour', 2, 'IIBBI', 'reparer'),
+        P('Iris', 3, 'IIIIB', 'pieger')
+      ],
+      hand: hand(null, 'bloquer'),
+      reveal: [
+        P('Léa', 0, 'IIBBI', 'bloquer', Object.assign({ tag: 'toi', ring: '2px solid ' + t.pc[0],
+          ovPicto: this.pic('frapper', 15, t.fg), ovLabel: 'Frapper → Nour', ovTag: 'retourné −1' }, tg(true))),
+        P('Malo', 1, 'IIIII', 'frapper', Object.assign({
+          ovPicto: this.pic('bloquer', 15, t.fg), ovLabel: 'Bloquer', ovTag: '1 frappe annulée' }, tg(false))),
+        P('Nour', 2, 'IIBBI', 'reparer', Object.assign({
+          ovPicto: this.pic('pieger', 15, t.fg), ovLabel: 'Piéger', ovTag: 'piège déclenché' }, tg(true))),
+        P('Iris', 3, 'IIIIB', 'pieger', Object.assign({
+          ovPicto: this.pic('frapper', 15, t.fg), ovLabel: 'Frapper → Malo', ovTag: 'annulé' }, tg(false)))
+      ]
+    };
+  }
+
+  renderVals() {
+    const T = this.T;
+    const dense = this.props.denseWalls ?? false;
+    const brickH = dense ? '22px' : '30px';
+    const A = { name: 'Léa', kind: 'circle' }, B = { name: 'Malo', kind: 'square' },
+      C = { name: 'Nour', kind: 'triangle' }, D = { name: 'Iris', kind: 'penta' };
+
+    const pk = {};
+    ['frapper', 'bloquer', 'reparer', 'pieger'].forEach((k) => {
+      pk[k] = {
+        big: this.pic(k, 46, T.ink), md: this.pic(k, 24, T.ink),
+        sm: this.pic(k, 14, T.ink), inv: this.pic(k, 46, T.paper), md2: this.pic(k, 30, T.paper)
+      };
+    });
+
+    // 05 neutre
+    const s5 = {
+      players: [
+        this.mk(0, 'Léa', 'circle', 0, 'IIIBI', 'bloquer', { tag: 'TOI', ring: '3px solid ' + T.ink }),
+        this.mk(0, 'Malo', 'square', 1, 'IIIII', 'frapper'),
+        this.mk(0, 'Nour', 'triangle', 2, 'IIBBI', 'reparer'),
+        this.mk(0, 'Iris', 'penta', 3, 'IIIIB', 'pieger')
+      ],
+      hand: this.hand(0, null, 'bloquer')
+    };
+    // 06 carte sélectionnée
+    const s6 = {
+      players: [
+        this.mk(0, 'Léa', 'circle', 0, 'IIIBI', 'bloquer', { tag: 'TOI', ring: '3px solid ' + T.ink }),
+        this.mk(0, 'Malo', 'square', 1, 'IIIII', 'frapper', { tag: 'CIBLER', ring: '3px dashed ' + T.ink }),
+        this.mk(0, 'Nour', 'triangle', 2, 'IIBBI', 'reparer', { tag: 'CIBLER', ring: '3px dashed ' + T.ink }),
+        this.mk(0, 'Iris', 'penta', 3, 'IIIIB', 'pieger', { tag: 'CIBLER', ring: '3px dashed ' + T.ink })
+      ],
+      hand: this.hand(0, 'frapper', 'bloquer')
+    };
+    // 07 attente
+    const s7 = {
+      players: [
+        this.mk(0, 'Léa', 'circle', 0, 'IIIBI', 'bloquer', { tag: 'TOI · MODIFIABLE', ring: '3px solid ' + T.ink }),
+        this.mk(0, 'Malo', 'square', 1, 'IIIII', 'frapper', { tag: 'A JOUÉ' }),
+        this.mk(0, 'Nour', 'triangle', 2, 'IIBBI', 'reparer', { tag: 'A JOUÉ' }),
+        this.mk(0, 'Iris', 'penta', 3, 'IIIIB', 'pieger', { tag: 'CHOISIT…' })
+      ],
+      hand: this.hand(0, 'frapper', 'bloquer')
+    };
+    // 08 révélation (piège retourné)
+    const s8 = {
+      players: [
+        this.mk(0, 'Léa', 'circle', 0, 'IIBBI', 'bloquer', {
+          tag: 'TOI', ring: '3px solid ' + T.ink, overlay: true,
+          ovPicto: this.pic('frapper', 18, T.ink), ovLabel: 'FRAPPER → Nour', ovTag: 'RETOURNÉ −1'
+        }),
+        this.mk(0, 'Malo', 'square', 1, 'IIIII', 'frapper', {
+          overlay: true, ovPicto: this.pic('bloquer', 18, T.ink), ovLabel: 'BLOQUER', ovTag: '1 FRAPPE ANNULÉE'
+        }),
+        this.mk(0, 'Nour', 'triangle', 2, 'IIBBI', 'reparer', {
+          overlay: true, ovPicto: this.pic('pieger', 18, T.ink), ovLabel: 'PIÉGER', ovTag: 'PIÈGE DÉCLENCHÉ'
+        }),
+        this.mk(0, 'Iris', 'penta', 3, 'IIIIB', 'pieger', {
+          overlay: true, ovPicto: this.pic('frapper', 18, T.ink), ovLabel: 'FRAPPER → Malo', ovTag: 'ANNULÉ'
+        })
+      ],
+      log: [
+        this.logRow(0, A, 0, 'frapper', C, 2, 'RETOURNÉ · Léa −1', true),
+        this.logRow(0, C, 2, 'pieger', null, 0, 'PIÈGE DÉCLENCHÉ', false),
+        this.logRow(0, D, 3, 'frapper', B, 1, 'ANNULÉ', false),
+        this.logRow(0, B, 1, 'bloquer', null, 0, '1 FRAPPE ANNULÉE', false)
+      ]
+    };
+    // 08 bis révélation (blocage qui annule deux frappes)
+    const s8b = {
+      players: [
+        this.mk(0, 'Léa', 'circle', 0, 'IIBBI', 'frapper', {
+          tag: 'TOI', ring: '3px solid ' + T.ink, overlay: true,
+          ovPicto: this.pic('frapper', 18, T.ink), ovLabel: 'FRAPPER → Malo', ovTag: 'ANNULÉ'
+        }),
+        this.mk(0, 'Malo', 'square', 1, 'IIIII', 'bloquer', {
+          overlay: true, ovPicto: this.pic('bloquer', 18, T.ink), ovLabel: 'BLOQUER', ovTag: '2 FRAPPES ANNULÉES'
+        }),
+        this.mk(0, 'Nour', 'triangle', 2, 'IIBBI', 'frapper', {
+          overlay: true, ovPicto: this.pic('frapper', 18, T.ink), ovLabel: 'FRAPPER → Malo', ovTag: 'ANNULÉ'
+        }),
+        this.mk(0, 'Iris', 'penta', 3, 'IIIRI', 'reparer', {
+          overlay: true, ovPicto: this.pic('reparer', 18, T.ink), ovLabel: 'RÉPARER', ovTag: '+1 BRIQUE'
+        })
+      ],
+      log: [
+        this.logRow(0, A, 0, 'frapper', B, 1, 'ANNULÉ', false),
+        this.logRow(0, C, 2, 'frapper', B, 1, 'ANNULÉ', false),
+        this.logRow(0, B, 1, 'bloquer', null, 0, '2 FRAPPES ANNULÉES', true),
+        this.logRow(0, D, 3, 'reparer', null, 0, '+1 BRIQUE', false)
+      ]
+    };
+    // 09 manche à bonus
+    const s9 = {
+      players: s5.players.map((p) => p),
+      hand: this.hand(0, null, 'bloquer')
+    };
+    // 10 équipes
+    const s10 = {
+      teamA: [
+        this.mk(0, 'Léa', 'circle', 0, 'IIIBI', 'bloquer', { tag: 'TOI', ring: '3px solid ' + T.ink }),
+        this.mk(0, 'Malo', 'square', 1, 'IIBBB', 'frapper', { tag: 'RÉPARER ICI', ring: '3px dashed ' + T.ink })
+      ],
+      teamB: [
+        this.mk(0, 'Nour', 'triangle', 2, 'IIIII', 'reparer'),
+        this.mk(0, 'Iris', 'penta', 3, 'IIIIB', 'pieger')
+      ],
+      hand: this.hand(0, 'reparer', 'bloquer')
+    };
+    // 12 déconnexion
+    const s12 = {
+      players: [
+        this.mk(0, 'Léa', 'circle', 0, 'IIIBI', 'bloquer', { tag: 'TOI', ring: '3px solid ' + T.ink }),
+        this.mk(0, 'Malo', 'square', 1, 'IIIII', 'frapper', { tag: 'A JOUÉ' }),
+        this.mk(0, 'Nour', 'triangle', 2, 'IIBBI', 'reparer', {
+          tag: 'HORS LIGNE',
+          lastLabel: 'DÉCONNECTÉ · MANCHE GELÉE'
+        }),
+        this.mk(0, 'Iris', 'penta', 3, 'IIIIB', 'pieger', { tag: 'A JOUÉ' })
+      ]
+    };
+    // dark
+    const d5 = {
+      players: [
+        this.mk(1, 'Léa', 'circle', 0, 'IIIBI', 'bloquer', { tag: 'TOI', ring: '3px solid ' + T.nink }),
+        this.mk(1, 'Malo', 'square', 1, 'IIIII', 'frapper'),
+        this.mk(1, 'Nour', 'triangle', 2, 'IIBBI', 'reparer'),
+        this.mk(1, 'Iris', 'penta', 3, 'IIIIB', 'pieger')
+      ],
+      hand: this.hand(1, null, 'bloquer')
+    };
+    const d8 = {
+      players: [
+        this.mk(1, 'Léa', 'circle', 0, 'IIBBI', 'bloquer', {
+          tag: 'TOI', ring: '3px solid ' + T.nink, overlay: true,
+          ovPicto: this.pic('frapper', 18, T.nink), ovLabel: 'FRAPPER → Nour', ovTag: 'RETOURNÉ −1'
+        }),
+        this.mk(1, 'Malo', 'square', 1, 'IIIII', 'frapper', {
+          overlay: true, ovPicto: this.pic('bloquer', 18, T.nink), ovLabel: 'BLOQUER', ovTag: '1 FRAPPE ANNULÉE'
+        }),
+        this.mk(1, 'Nour', 'triangle', 2, 'IIBBI', 'reparer', {
+          overlay: true, ovPicto: this.pic('pieger', 18, T.nink), ovLabel: 'PIÉGER', ovTag: 'PIÈGE DÉCLENCHÉ'
+        }),
+        this.mk(1, 'Iris', 'penta', 3, 'IIIIB', 'pieger', {
+          overlay: true, ovPicto: this.pic('frapper', 18, T.nink), ovLabel: 'FRAPPER → Malo', ovTag: 'ANNULÉ'
+        })
+      ],
+      log: [
+        this.logRow(1, A, 0, 'frapper', C, 2, 'RETOURNÉ · Léa −1', true),
+        this.logRow(1, C, 2, 'pieger', null, 0, 'PIÈGE DÉCLENCHÉ', false),
+        this.logRow(1, D, 3, 'frapper', B, 1, 'ANNULÉ', false),
+        this.logRow(1, B, 1, 'bloquer', null, 0, '1 FRAPPE ANNULÉE', false)
+      ]
+    };
+
+    const rank = (dark) => {
+      const cols = dark ? T.D : T.L;
+      const rows = [
+        { pos: '1', name: 'Malo', kind: 'square', ci: 1, wall: 'IIIII', n: '5' },
+        { pos: '2', name: 'Iris', kind: 'penta', ci: 3, wall: 'IIIBI', n: '4' },
+        { pos: '3', name: 'Léa', kind: 'circle', ci: 0, wall: 'IIBBI', n: '3' },
+        { pos: '4', name: 'Nour', kind: 'triangle', ci: 2, wall: 'IBBBB', n: '1' }
+      ];
+      return rows.map((r) => {
+        const sh = this.shape(r.kind);
+        return {
+          pos: r.pos, name: r.name, n: r.n, color: cols[r.ci],
+          radius: sh.radius, clip: sh.clip,
+          bricks: this.bricks(r.wall, cols[r.ci], dark ? T.nbg : T.paper)
+        };
+      });
+    };
+
+    const palPlayers = [
+      { name: 'Malo', kind: 'square', ci: 1, wins: 8, played: 23, w: '72%' },
+      { name: 'Léa', kind: 'circle', ci: 0, wins: 7, played: 23, w: '63%' },
+      { name: 'Iris', kind: 'penta', ci: 3, wins: 5, played: 19, w: '45%' },
+      { name: 'Nour', kind: 'triangle', ci: 2, wins: 3, played: 21, w: '27%' }
+    ].map((p) => {
+      const sh = this.shape(p.kind);
+      return Object.assign({}, p, {
+        color: T.L[p.ci], radius: sh.radius, clip: sh.clip,
+        line: p.wins + ' VICTOIRES · ' + p.played + ' PARTIES'
+      });
+    });
+
+    const palCards = [
+      { label: 'FRAPPER', pct: '38 %', w: '38%', picto: pk.frapper.sm },
+      { label: 'BLOQUER', pct: '24 %', w: '24%', picto: pk.bloquer.sm },
+      { label: 'RÉPARER', pct: '22 %', w: '22%', picto: pk.reparer.sm },
+      { label: 'PIÉGER', pct: '16 %', w: '16%', picto: pk.pieger.sm }
+    ];
+
+    const palGames = [
+      { date: '08/09 · 21 H 04', fmt: 'CHACUN POUR SOI · 4 J', res: 'Malo', mine: '3 briques', win: false },
+      { date: '08/09 · 20 H 41', fmt: 'ÉQUIPES 2 v 2', res: 'Léa + Malo', mine: '7 briques', win: true },
+      { date: '07/09 · 19 H 12', fmt: 'CHACUN POUR SOI · 3 J', res: 'Léa', mine: '5 briques', win: true },
+      { date: '06/09 · 22 H 30', fmt: 'CHACUN POUR SOI · 4 J', res: 'Iris', mine: '2 briques', win: false }
+    ].map((g) => Object.assign({}, g, {
+      tag: g.win ? 'GAGNÉE' : 'PERDUE',
+      tagBg: g.win ? T.ink : 'transparent',
+      tagFg: g.win ? T.paper : T.ink
+    }));
+
+    const idPlayers = [
+      { name: 'Léa', kind: 'circle', form: 'CERCLE', hex: T.L[0], dhex: T.D[0] },
+      { name: 'Malo', kind: 'square', form: 'CARRÉ', hex: T.L[1], dhex: T.D[1] },
+      { name: 'Nour', kind: 'triangle', form: 'TRIANGLE', hex: T.L[2], dhex: T.D[2] },
+      { name: 'Iris', kind: 'penta', form: 'PENTAGONE', hex: T.L[3], dhex: T.D[3] }
+    ].map((p) => {
+      const sh = this.shape(p.kind);
+      return Object.assign({}, p, { radius: sh.radius, clip: sh.clip });
+    });
+
+    const wallStates = [
+      { title: 'INTACT', sub: '5 / 5', bricks: this.bricks('IIIII', T.L[1], T.paper) },
+      { title: 'ENTAMÉ', sub: '3 / 5', bricks: this.bricks('IIBBI', T.L[1], T.paper) },
+      { title: 'À ZÉRO', sub: '0 / 5 · joue encore', bricks: this.bricks('BBBBB', T.L[1], T.paper) },
+      { title: 'RÉPARÉ CE TOUR', sub: '4 / 5 · +1', bricks: this.bricks('IIRBI', T.L[1], T.paper) }
+    ];
+
+    const iconBricks = this.bricks('IIBII', T.paper, T.ink);
+    const names = [
+      { n: 'Fissure', why: 'Une faille qui s’élargit à chaque manche. Court, prononçable, disponible à l’oral comme verbe : « il m’a fissuré ».' },
+      { n: 'Encoche', why: 'La marque qu’on laisse sur le mur d’en face. Très concret, mais moins évocateur du bluff.' },
+      { n: 'Cinq Briques', why: 'Dit la règle dans le titre. Excellent pour la découverte, un peu descriptif.' },
+      { n: 'Contrefort', why: 'Beau mot d’architecture, côté défense. Long et un peu savant sur une icône.' },
+      { n: 'À Découvert', why: 'Nomme le cœur du jeu : après avoir bloqué, tu es nu. Deux mots, difficile à chercher.' }
+    ];
+
+    return {
+      brickH, pk, s5, s6, s7, s8, s8b, s9, s10, s12, d5, d8,
+      rankL: rank(0), rankD: rank(1), idPlayers, wallStates, iconBricks, names,
+      palPlayers, palCards, palGames,
+      va: this.vSet('a'), vb: this.vSet('b'), vc: this.vSet('c'),
+      annotations: this.props.annotations ?? true,
+      handDemo: this.hand(0, null, 'bloquer')
+    };
+  }
+}
+</script>
+</body>
+</html>
