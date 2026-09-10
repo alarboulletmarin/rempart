@@ -26,6 +26,29 @@ import { useTheme } from '../ui/theme'
 import { FeuilleDeconnexion } from './Deconnexion'
 
 /**
+ * La géométrie de chaque cadre de la planche, relevée au pixel.
+ *
+ * `pad` et `gap` sont ceux du corps de l'écran, `mur` la hauteur d'une rangée
+ * de briques, `carte` celle d'une carte en main, `pied` celle de la barre du
+ * bas. Les six écrans ci-dessous sont rendus par un seul composant, mais la
+ * planche ne leur donne pas les mêmes mesures.
+ */
+const GEOMETRIE = {
+  /** 05 · état neutre */
+  neutre: { pad: '14px', gap: 11, mur: 42, carte: 126, pied: 56 },
+  /** 06 · carte choisie, choix de la cible */
+  cible: { pad: '14px 14px 8px 14px', gap: 8, mur: 42, carte: 126, pied: 56 },
+  /** 07 · en attente des autres */
+  attente: { pad: '14px', gap: 11, mur: 36, carte: 126, pied: 52 },
+  /** 09 · manche à carte commune */
+  manche: { pad: '14px 14px 8px 14px', gap: 8, mur: 36, carte: 120, pied: 54 },
+  /** 10 · équipes 2 contre 2 */
+  equipes: { pad: '14px', gap: 12, mur: 34, carte: 118, pied: 54 },
+  /** 12 · déconnexion en pleine manche */
+  pause: { pad: '14px', gap: 11, mur: 36, carte: 126, pied: 56 },
+} as const
+
+/**
  * 05–07, 09, 10, 12 · Le tour de jeu.
  *
  * Un seul écran pour toute la manche : le plateau ne change pas de forme d'un
@@ -189,6 +212,8 @@ export function Jeu({
     return {}
   }
 
+  const deconnecte = state.players.find((p) => !p.connected)
+
   const bandeauDe = (p: Player) => {
     // Le mur visé porte un bandeau qui nomme l'action : sans lui, on ne sait
     // pas si la ligne mise en avant est la cible ou soi-même.
@@ -197,9 +222,26 @@ export function Jeu({
     return <BandeauCible card="frapper" texte="Ta frappe part sur ce mur" />
   }
 
-  // Les murs se resserrent quand une autre information partage l'écran : le
-  // bandeau ocre d'une carte de manche, ou le bandeau de cible une fois joué.
-  const hauteurMur = equipes ? 34 : state.activeRoundCard || envoye ? 36 : 42
+  /*
+   * La géométrie de chaque cadre, relevée sur la planche.
+   *
+   * Un seul composant sert les écrans 05, 06, 07, 09, 10 et 12, mais la planche
+   * ne leur donne pas les mêmes mesures : chaque information de plus à l'écran
+   * — le bandeau ocre, la note de ciblage, la seconde ligne d'équipe — reprend
+   * sa place sur les murs, les cartes et la barre du bas. Les approximer, c'est
+   * faire déborder un cadre sur deux.
+   */
+  const cadre = deconnecte
+    ? GEOMETRIE.pause
+    : equipes
+      ? GEOMETRIE.equipes
+      : state.activeRoundCard
+        ? GEOMETRIE.manche
+        : carteEnCours
+          ? GEOMETRIE.cible
+          : envoye
+            ? GEOMETRIE.attente
+            : GEOMETRIE.neutre
 
   const ligne = (p: Player, nu = false) => {
     const { tag, couleur } = tagDe(p)
@@ -210,9 +252,10 @@ export function Jeu({
         player={p}
         moi={p.id === moi}
         nu={nu}
+        verrou={!deconnecte}
         tag={tag}
         tagColor={couleur}
-        hauteurMur={nu ? 34 : hauteurMur}
+        hauteurMur={nu ? GEOMETRIE.equipes.mur : cadre.mur}
         bandeau={bandeauDe(p)}
         onClick={ciblable ? () => choisirCible(p.id) : undefined}
         ariaLabel={
@@ -227,9 +270,11 @@ export function Jeu({
   const attendus = playersToAct(state).filter((p) => !aJoue(p.id))
 
   const pied = carteEnCours ? (
-    <BarrePied ton="ink">Touche un mur pour cibler</BarrePied>
+    <BarrePied ton="ink" hauteur={cadre.pied}>
+      Touche un mur pour cibler
+    </BarrePied>
   ) : envoye ? (
-    <BarrePied ton="creux" point>
+    <BarrePied ton="creux" point hauteur={cadre.pied}>
       {attendus.length === 0
         ? 'Tout le monde a joué'
         : attendus.length === 1
@@ -237,7 +282,9 @@ export function Jeu({
           : `On attend ${attendus.length} joueurs…`}
     </BarrePied>
   ) : (
-    <BarrePied ton="creux">Touche une carte pour continuer</BarrePied>
+    <BarrePied ton="creux" hauteur={cadre.pied}>
+      Touche une carte pour continuer
+    </BarrePied>
   )
 
   // En temps normal la carte interdite se lit sur la carte elle-même, donc le
@@ -264,8 +311,6 @@ export function Jeu({
     )
   }
 
-  const deconnecte = state.players.find((p) => !p.connected)
-
   return (
     <Ecran>
       <EnTete
@@ -280,7 +325,7 @@ export function Jeu({
         hauteur={state.activeRoundCard ? 98 : 104}
         pad={18}
       />
-      <Corps pad={14} gap={state.activeRoundCard ? 8 : 11}>
+      <Corps pad={cadre.pad} gap={cadre.gap}>
         {state.activeRoundCard && (
           <BandeauManche nom={state.activeRoundCard.n} detail={state.activeRoundCard.d} />
         )}
@@ -291,8 +336,11 @@ export function Jeu({
             minHeight: 0,
             display: 'flex',
             flexDirection: 'column',
-            gap: state.activeRoundCard ? 8 : 11,
+            gap: cadre.gap,
             overflowY: 'auto',
+            // Le plateau reste lisible derrière la feuille de pause, mais en
+            // retrait : la manche est arrêtée, il n'y a rien à y lire vite.
+            opacity: deconnecte ? 0.45 : 1,
           }}
         >
           {equipes ? (
@@ -322,7 +370,12 @@ export function Jeu({
           )}
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        {/* En pause, la main disparaît : la planche ne montre que les murs, et
+            la feuille couvre le bas de l'écran. */}
+        <div
+          style={{ display: 'flex', flexDirection: 'column', gap: 10 }}
+          hidden={!!deconnecte}
+        >
           {jeJoue ? (
             <>
               {!carteEnCours && (
@@ -334,7 +387,7 @@ export function Jeu({
                 cards={CARD_KEYS}
                 etat={etatCarte}
                 onPick={choisirCarte}
-                height={state.activeRoundCard ? 120 : equipes ? 118 : 126}
+                height={cadre.carte}
               />
               {pied}
             </>
@@ -350,7 +403,6 @@ export function Jeu({
         <FeuilleDeconnexion
           joueur={deconnecte}
           depuis={absentsDepuis.get(deconnecte.id)}
-          hautDuVoile={state.activeRoundCard ? 98 : 104}
           onContinuer={onSuite}
           onQuitter={onQuitter}
         />
@@ -388,18 +440,21 @@ function BarrePied({
   children,
   ton,
   point,
+  hauteur = 56,
 }: {
   children: React.ReactNode
   ton: 'ink' | 'creux'
   point?: boolean
+  /** La planche donne 56 px à l'écran 05, 52 à l'écran 07, 54 aux 09 et 10. */
+  hauteur?: number
 }) {
   const t = useTheme()
   const ink = ton === 'ink'
   return (
     <div
       style={{
-        height: 56,
-        flex: '0 0 56px',
+        height: hauteur,
+        flex: `0 0 ${hauteur}px`,
         borderRadius: 16,
         background: ink ? t.selBg : t.cardOff,
         boxShadow: ink ? `0 4px 0 ${t.selEdge}` : undefined,

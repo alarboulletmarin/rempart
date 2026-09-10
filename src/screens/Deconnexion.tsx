@@ -14,7 +14,6 @@ import { useTheme } from '../ui/theme'
 export function FeuilleDeconnexion({
   joueur,
   depuis,
-  hautDuVoile = 0,
   onContinuer,
   onQuitter,
 }: {
@@ -22,8 +21,6 @@ export function FeuilleDeconnexion({
   /** L'instant réel du départ. Le décompte s'y accroche plutôt qu'à un
    *  compteur local, qui repartirait de zéro au moindre rendu. */
   depuis?: number
-  /** L'en-tête reste net : le voile ne commence qu'en dessous. */
-  hautDuVoile?: number
   onContinuer: () => void
   onQuitter: () => void
 }) {
@@ -38,30 +35,15 @@ export function FeuilleDeconnexion({
     return () => clearInterval(id)
   }, [attend, debut])
 
-  const feminin = /[ae]$/i.test(joueur.name)
   const minutes = Math.floor(reste / 60)
   const secondes = String(reste % 60).padStart(2, '0')
 
   return (
     <>
-      {/* Le plateau reste lisible derrière, mis en retrait — mais l'en-tête
-          garde son contraste : on doit toujours savoir où en est la partie. */}
-      <div
-        style={{
-          position: 'absolute',
-          top: `calc(${hautDuVoile}px + max(0px, env(safe-area-inset-top)))`,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: t.table,
-          opacity: 0.55,
-          pointerEvents: 'none',
-        }}
-      />
       <div
         role="dialog"
         aria-modal="true"
-        aria-label={`${joueur.name} s’est déconnecté${feminin ? 'e' : ''}`}
+        aria-label={`${joueur.name} a perdu la connexion`}
         style={{
           position: 'absolute',
           left: 0,
@@ -77,14 +59,18 @@ export function FeuilleDeconnexion({
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <Scribble nom="pause" width={56} height={46} />
+          {/* « a perdu la connexion » plutôt que « s'est déconnecté·e » : le
+              nom d'un joueur ne dit pas son genre, et le deviner serait se
+              tromper sur quelqu'un de réel. La phrase garde la place et le ton
+              de la planche, sans accord à faire. */}
           <div style={{ font: `700 24px/1.1 ${TITRE}`, color: t.ink, textWrap: 'pretty' }}>
-            {joueur.name} s’est déconnecté{feminin ? 'e' : ''}.
+            {joueur.name} a perdu la connexion.
           </div>
         </div>
 
         <Texte size={14}>
-          La manche est mise en pause. {feminin ? 'Si elle ne revient pas' : 'S’il ne revient pas'},
-          son mur reste en place et ses cartes ne sont plus jouées — la partie continue.
+          La manche est mise en pause. Si la connexion ne revient pas, son mur reste en place et
+          ses cartes ne sont plus jouées — la partie continue.
         </Texte>
 
         {attend && (
@@ -102,7 +88,7 @@ export function FeuilleDeconnexion({
               {minutes}:{secondes}
             </span>
             <Texte size={12} style={{ flex: 1, lineHeight: 1.35 }}>
-              avant de continuer sans {feminin ? 'elle' : 'lui'}
+              avant de continuer sans {joueur.name}
             </Texte>
           </div>
         )}
@@ -123,7 +109,7 @@ export function FeuilleDeconnexion({
               cursor: 'pointer',
             }}
           >
-            Continuer sans {feminin ? 'elle' : 'lui'}
+            Continuer sans {joueur.name}
           </button>
           <button
             type="button"
