@@ -2,6 +2,7 @@ import { SAFE_TOP, TEXTE, TITRE } from '../theme'
 import { DECK } from '../game/content'
 import { CARD_LABEL } from '../game/types'
 import { Bouton, BoutonCreux, Etiquette, Panneau, Texte } from '../ui/atoms'
+import { LONGUEUR_CODE } from '../net/room'
 import { Logo, MurMiniature } from '../ui/Logo'
 import { Pictogramme } from '../ui/Pictogramme'
 import { Ecran } from '../ui/shell'
@@ -131,7 +132,7 @@ export function Accueil({
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <Bouton onClick={onCreer}>Créer une partie</Bouton>
-          <Bouton ton="panel" onClick={onRejoindre} note="code à 4">
+          <Bouton ton="panel" onClick={onRejoindre} note={`code à ${LONGUEUR_CODE}`}>
             Rejoindre
           </Bouton>
           <div style={{ display: 'flex', gap: 10 }}>
