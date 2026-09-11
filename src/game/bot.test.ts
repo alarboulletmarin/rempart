@@ -38,7 +38,7 @@ function avecVerrous(jeu: GameState, verrous: Record<string, CardKey[]>): GameSt
   }
 }
 
-/** Ce que le robot joue sur cent graines : la distribution, pas le coup. */
+/** Ce que le bot joue sur cent graines : la distribution, pas le coup. */
 function surCentGraines(fabrique: (jeu: GameState) => GameState, qui = 'b'): CardKey[] {
   const cartes: CardKey[] = []
   for (let seed = 0; seed < 100; seed++) {
@@ -50,7 +50,7 @@ function surCentGraines(fabrique: (jeu: GameState) => GameState, qui = 'b'): Car
 
 const part = (cartes: CardKey[], k: CardKey) => cartes.filter((c) => c === k).length / cartes.length
 
-describe('le robot', () => {
+describe('le bot', () => {
   it('ne joue que des coups que le moteur accepte', () => {
     for (let seed = 0; seed < 200; seed++) {
       const jeu = partie(seed)
@@ -95,7 +95,7 @@ describe('le robot', () => {
 
   /**
    * À la première manche, tous les murs sont pleins et personne n'a encore
-   * frappé : un robot qui se barricade d'entrée donne une partie où il ne se
+   * frappé : un bot qui se barricade d'entrée donne une partie où il ne se
    * passe rien pendant trois manches.
    */
   it('ouvre la partie en frappant plus souvent qu’en se barricadant', () => {
@@ -112,7 +112,7 @@ describe('le robot', () => {
   /**
    * Le verrou est la mémoire du jeu, et c'est une information publique : un
    * adversaire qui a frappé la manche passée ne peut pas frapper celle-ci. Un
-   * robot qui bloque contre une table désarmée passe son tour.
+   * bot qui bloque contre une table désarmée passe son tour.
    */
   it('ne se protège pas quand plus personne ne peut frapper', () => {
     const cartes = surCentGraines((jeu) =>
@@ -164,7 +164,7 @@ describe('le robot', () => {
     expect(choisirBot(jeu, 'b')).toEqual(choisirBot(jeu, 'b'))
   })
 
-  it('mène une partie de dix manches jusqu’au bout, entre robots', () => {
+  it('mène une partie de dix manches jusqu’au bout, entre bots', () => {
     let jeu = partie(42)
     let garde = 0
     while (jeu.phase !== 'fin' && garde++ < 200) {

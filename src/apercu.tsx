@@ -233,7 +233,7 @@ function Galerie() {
             onQuitter={noop}
           />
         </Cadre>
-        <Cadre titre="03 quater · Salon · un robot à la table">
+        <Cadre titre="03 quater · Salon · un bot à la table">
           <Salon
             etat={vueSalon({
               salon: {
@@ -242,7 +242,7 @@ function Galerie() {
                 joueurs: [
                   JOUEURS_SALON[0],
                   {
-                    clientId: 'robot-1',
+                    clientId: 'bot-1',
                     nom: 'Maillet',
                     ci: 1 as const,
                     peerId: null,

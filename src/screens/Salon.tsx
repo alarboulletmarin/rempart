@@ -17,7 +17,7 @@ import { useTheme } from '../ui/theme'
  * Trois ajouts que la planche ne pouvait pas prévoir, parce qu'ils naissent du
  * réseau et non du jeu : l'état de la mise en relation (un code affiché alors
  * que personne ne peut le joindre serait un mensonge), les demandes d'entrée —
- * le code amène à la porte, l'hôte l'ouvre — et les robots, sans quoi un salon
+ * le code amène à la porte, l'hôte l'ouvre — et les bots, sans quoi un salon
  * ouvert seul n'offre rien d'autre que d'attendre. Les trois sont dessinés
  * avec les seules pièces de la planche : un panneau, une pastille, un mot.
  */
@@ -166,7 +166,7 @@ export function Salon({
               <Etiquette
                 size={10}
                 color={
-                  // Un robot n'est ni prêt ni pas prêt : le vert de l'attente
+                  // Un bot n'est ni prêt ni pas prêt : le vert de l'attente
                   // n'a rien à dire de lui.
                   j.bot
                     ? t.ink2
@@ -174,15 +174,15 @@ export function Salon({
                 }
                 style={{ letterSpacing: '0.1em', marginLeft: 'auto' }}
               >
-                {j.bot ? 'robot' : etiquetteJoueur(j.clientId === moi, j.hote, j.pret, j.connecte)}
+                {j.bot ? 'bot' : etiquetteJoueur(j.clientId === moi, j.hote, j.pret, j.connecte)}
               </Etiquette>
-              {/* Un robot se relève tant que la partie n'a pas commencé :
+              {/* Un bot se relève tant que la partie n'a pas commencé :
                   un ami arrive toujours à la dernière seconde. */}
               {j.bot && hote && !salon.lancee && (
                 <button
                   type="button"
                   onClick={() => onRetirerBot(j.clientId)}
-                  aria-label={`Retirer le robot ${j.nom}`}
+                  aria-label={`Retirer le bot ${j.nom}`}
                   style={{
                     background: 'none',
                     border: 'none',
@@ -259,7 +259,7 @@ export function Salon({
                 // et dans une colonne ce même flex lui mangerait sa hauteur.
                 <div style={{ display: 'flex' }}>
                   <BoutonPorte ton="ink" onClick={onAjouterBot}>
-                    Ajouter un robot
+                    Ajouter un bot
                   </BoutonPorte>
                 </div>
               )}
