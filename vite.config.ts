@@ -10,7 +10,12 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['assets/*.svg'],
+      includeAssets: [
+        'assets/*.svg',
+        'icon.svg',
+        'icon-32.png',
+        'apple-touch-icon.png',
+      ],
       workbox: {
         // Tout l'applicatif est mis en cache : le jeu doit démarrer hors ligne.
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
@@ -53,10 +58,21 @@ export default defineConfig({
         background_color: '#E4D7BE',
         theme_color: '#E4D7BE',
         categories: ['games'],
+        /*
+         * `any` et `maskable` sont deux dessins, pas deux usages du même.
+         *
+         * Un système qui applique son gabarit ne garde que le cercle inscrit à
+         * 80 % du côté : servir l'icône `any` en maskable, comme on le faisait,
+         * c'était laisser rogner les deux briques des bouts, qui touchent
+         * justement ce cercle. Le fichier `-maskable` reprend le même mur, plus
+         * petit, pour que le rognage ne tombe que sur du fond. L'`any` garde sa
+         * pleine largeur, pour les systèmes qui affichent le fichier tel quel.
+         */
         icons: [
-          { src: 'icon-192.png', sizes: '192x192', type: 'image/png' },
-          { src: 'icon-512.png', sizes: '512x512', type: 'image/png' },
-          { src: 'icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+          { src: 'icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+          { src: 'icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+          { src: 'icon-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+          { src: 'icon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any' },
         ],
       },
     }),

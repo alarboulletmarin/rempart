@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Rempart">
+  <rect width="512" height="512" fill="#E4D7BE"/>
+  <rect x="56.32" y="208.32" width="69.33" height="95.37" rx="17.33" fill="#8E3A1C"/>
+  <rect x="56.32" y="208.32" width="69.33" height="82.40" rx="17.33" fill="#C0562F"/>
+  <rect x="138.83" y="208.32" width="69.33" height="95.37" rx="17.33" fill="#8E3A1C"/>
+  <rect x="138.83" y="208.32" width="69.33" height="82.40" rx="17.33" fill="#C0562F"/>
+  <rect x="221.33" y="208.32" width="69.33" height="95.37" rx="17.33" fill="#DCC9A6"/>
+  <rect x="221.33" y="208.32" width="69.33" height="82.40" rx="17.33" fill="#EFE2C8"/>
+  <line x1="245.03" y1="254.40" x2="266.97" y2="244.63" stroke="#C6AF88" stroke-width="6.49" stroke-linecap="round"/>
+  <rect x="303.84" y="208.32" width="69.33" height="95.37" rx="17.33" fill="#8E3A1C"/>
+  <rect x="303.84" y="208.32" width="69.33" height="82.40" rx="17.33" fill="#C0562F"/>
+  <rect x="386.35" y="208.32" width="69.33" height="95.37" rx="17.33" fill="#8E3A1C"/>
+  <rect x="386.35" y="208.32" width="69.33" height="82.40" rx="17.33" fill="#C0562F"/>
+</svg>
