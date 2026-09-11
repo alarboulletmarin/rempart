@@ -227,6 +227,39 @@ function Galerie() {
             onPret={noop}
             onAdmettre={noop}
             onRefuser={noop}
+            onAjouterBot={noop}
+            onRetirerBot={noop}
+            onLancer={noop}
+            onQuitter={noop}
+          />
+        </Cadre>
+        <Cadre titre="03 quater · Salon · un robot à la table">
+          <Salon
+            etat={vueSalon({
+              salon: {
+                ...vueSalon().salon,
+                places: 3,
+                joueurs: [
+                  JOUEURS_SALON[0],
+                  {
+                    clientId: 'robot-1',
+                    nom: 'Maillet',
+                    ci: 1 as const,
+                    peerId: null,
+                    hote: false,
+                    pret: true,
+                    connecte: true,
+                    bot: true,
+                  },
+                ],
+              },
+            })}
+            onIdentite={noop}
+            onPret={noop}
+            onAdmettre={noop}
+            onRefuser={noop}
+            onAjouterBot={noop}
+            onRetirerBot={noop}
             onLancer={noop}
             onQuitter={noop}
           />
@@ -240,6 +273,8 @@ function Galerie() {
             onPret={noop}
             onAdmettre={noop}
             onRefuser={noop}
+            onAjouterBot={noop}
+            onRetirerBot={noop}
             onLancer={noop}
             onQuitter={noop}
           />
@@ -259,6 +294,8 @@ function Galerie() {
             onPret={noop}
             onAdmettre={noop}
             onRefuser={noop}
+            onAjouterBot={noop}
+            onRetirerBot={noop}
             onLancer={noop}
             onQuitter={noop}
           />
@@ -406,6 +443,8 @@ function Galerie() {
             onPret={noop}
             onAdmettre={noop}
             onRefuser={noop}
+            onAjouterBot={noop}
+            onRetirerBot={noop}
             onLancer={noop}
             onQuitter={noop}
           />

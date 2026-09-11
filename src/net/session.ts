@@ -17,6 +17,8 @@
  *  - **le battement** (`tick`/`pong`), qui dit qui est encore là — et non
  *    l'avis du transport, qui déclare un pair perdu puis ne dit plus rien.
  */
+import { choisirBot, delaiBot } from '../game/bot.ts'
+import { hasPlayed, playersToAct } from '../game/engine.ts'
 import type { Choice, Format, GameState, PlayerId } from '../game/types.ts'
 import {
   ABANDON_MS,
@@ -131,6 +133,9 @@ export class Session {
   /** Côté hôte : verdicts déjà rendus, pour répondre sans rejouer le geste. */
   private juges = new Map<string, Recu>()
   private nonces = 0
+
+  /** Côté hôte : le prochain robot à poser sa carte. Un seul à la fois. */
+  private minuteurBot: ReturnType<typeof setTimeout> | null = null
 
   private battement: ReturnType<typeof setInterval> | null = null
   private minuteurLien: ReturnType<typeof setTimeout> | null = null
@@ -451,12 +456,63 @@ export class Session {
 
   quitter(): void {
     this.ferme = true
+    this.arreterBots()
     if (this.battement) clearInterval(this.battement)
     if (this.minuteurLien) clearTimeout(this.minuteurLien)
     this.viderGraceHote()
     this.viderEnVol()
     void this.canal?.quitter()
     this.canal = null
+  }
+
+  // ───────────────────────────── robots ─────────────────────────────
+
+  private estBot(id: string): boolean {
+    return this.salon.joueurs.some((j) => j.clientId === id && j.bot === true)
+  }
+
+  /**
+   * Le prochain coup de robot, si la manche en attend un.
+   *
+   * Un seul minuteur à la fois, et il n'est jamais réarmé tant qu'il court :
+   * la fonction est appelée à chaque changement d'état *et* à chaque battement,
+   * et un minuteur qu'on repousse à chaque appel ne se déclenche jamais.
+   *
+   * Les robots posent l'un après l'autre plutôt que tous ensemble : le
+   * « 2 / 4 ont joué » de l'écran 07 se remplit alors comme avec des amis, et
+   * la manche ne se résout pas d'un bloc une seconde après son ouverture.
+   */
+  private planifierBot(): void {
+    if (this.minuteurBot || !this.estHote) return
+    const jeu = this.table.jeu
+    if (!jeu || (jeu.phase !== 'choix' && jeu.phase !== 'mort-subite')) return
+    const attendu = playersToAct(jeu).find((p) => this.estBot(p.id) && !hasPlayed(jeu, p.id))
+    if (!attendu) return
+
+    this.minuteurBot = setTimeout(() => {
+      this.minuteurBot = null
+      const courant = this.table.jeu
+      if (this.ferme || !this.estHote || !courant) return
+      // L'état a pu changer pendant la réflexion : la manche s'est résolue, le
+      // robot a été relevé, l'arbitrage est passé à quelqu'un d'autre. On
+      // redemande simplement qui doit jouer maintenant.
+      if (
+        (courant.phase === 'choix' || courant.phase === 'mort-subite') &&
+        !hasPlayed(courant, attendu.id) &&
+        this.estBot(attendu.id)
+      ) {
+        this.table.appliquer(attendu.id, { t: 'choix', choix: choisirBot(courant, attendu.id) })
+        this.diffuserEtat()
+        this.changer()
+      }
+      this.planifierBot()
+    }, delaiBot())
+  }
+
+  private arreterBots(): void {
+    if (!this.minuteurBot) return
+    clearTimeout(this.minuteurBot)
+    this.minuteurBot = null
   }
 
   // ───────────────────────── battement de cœur ─────────────────────────
@@ -475,6 +531,10 @@ export class Session {
         at: Date.now(),
       })
       this.balayer()
+      // Le filet des robots : les coups qui les remettent en mouvement sont
+      // appelés là où l'état change, mais un arbitre qui vient de reprendre la
+      // main au milieu d'une manche n'a, lui, rien vu changer.
+      this.planifierBot()
       return
     }
     if (!this.salon.hoteClientId) return
@@ -494,6 +554,9 @@ export class Session {
     let change = false
     for (const joueur of this.table.salon.joueurs) {
       if (joueur.clientId === this.moi || !joueur.connecte) continue
+      // Un robot ne dit jamais rien : le déclarer absent au bout de huit
+      // secondes de silence viderait la table de ses robots à la première manche.
+      if (joueur.bot) continue
       if (maintenant - (this.vuA.get(joueur.clientId) ?? 0) <= SILENCE_MS) continue
       this.marquerAbsent(joueur.clientId)
       change = true
@@ -540,7 +603,9 @@ export class Session {
 
   private marquerAbsent(id: string): void {
     if (!this.absentsDepuis.has(id)) this.absentsDepuis.set(id, Date.now())
-    if (this.estHote) this.table.sortir(id)
+    if (!this.estHote) return
+    this.table.sortir(id)
+    this.planifierBot()
   }
 
   // ───────────────────── salon reçu, règne comparé ─────────────────────
@@ -644,6 +709,9 @@ export class Session {
    * des coups datés d'une partie que plus personne ne joue.
    */
   private cesserArbitrage(): void {
+    // Les robots sont du ressort de l'arbitre : leur coup en attente vise une
+    // partie dont on n'a plus la charge.
+    this.arreterBots()
     this.jeuRecu = null
     this.juges.clear()
     this.demandesEnAttente = []
@@ -662,6 +730,7 @@ export class Session {
     if (actuel && actuel.seq >= jeu.seq) return
     this.table.adopter(this.table.salon, jeu)
     this.diffuserEtat()
+    this.planifierBot()
     this.changer()
   }
 
@@ -808,6 +877,9 @@ export class Session {
     // le dire que d'élire un arbitre pour une table qui n'existe pas.
     if (!this.salon.lancee) return
     const presents = this.salon.joueurs
+      // Un robot n'arbitre pas : il n'a ni canal ni écran, et la table
+      // resterait sans personne pour faire avancer les manches.
+      .filter((j) => !j.bot)
       .filter((j) => j.connecte || j.clientId === this.moi)
       .map((j) => j.clientId)
       .sort()
@@ -868,6 +940,7 @@ export class Session {
       if (!ok) this.ecouteurs.onAvis({ code: 'gestRefuse' })
       this.publierSalon()
       this.diffuserEtat()
+      this.planifierBot()
       this.changer()
       return
     }
@@ -940,6 +1013,7 @@ export class Session {
     this.canal?.envoyer('ack', reponse, peer)
     this.publierSalon()
     this.diffuserEtat()
+    this.planifierBot()
     this.changer()
   }
 
@@ -1026,6 +1100,7 @@ export class Session {
     this.table.lancer()
     this.publierSalon()
     this.diffuserEtat()
+    this.planifierBot()
     this.changer()
   }
 
@@ -1034,6 +1109,28 @@ export class Session {
     this.table.rejouer()
     this.publierSalon()
     this.diffuserEtat()
+    this.planifierBot()
+    this.changer()
+  }
+
+  /**
+   * Un robot de plus à la table.
+   *
+   * Réservé à l'hôte, comme les autres réglages : c'est lui qui tiendra leurs
+   * cartes. Un invité qui en demanderait un ne ferait que peupler un salon que
+   * personne d'autre ne voit.
+   */
+  ajouterBot(): void {
+    if (!this.estHote) return
+    if (!this.table.ajouterBot()) return
+    this.publierSalon()
+    this.changer()
+  }
+
+  retirerBot(id: string): void {
+    if (!this.estHote) return
+    if (!this.table.retirerBot(id)) return
+    this.publierSalon()
     this.changer()
   }
 }

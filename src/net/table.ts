@@ -18,6 +18,7 @@ import {
   resolveRound,
   submitChoice,
 } from '../game/engine.ts'
+import { NOMS_ROBOTS } from '../game/bot.ts'
 import type { Format, GameState, PlayerId } from '../game/types.ts'
 import { MAX_SIEGES, type Geste, type JoueurSalon, type Salon } from './room.ts'
 import { accueilPour, peutAdmettre, type Accueil } from './admission.ts'
@@ -35,6 +36,10 @@ export type Table = {
   appliquer(id: PlayerId, geste: Geste): boolean
   /** Fait entrer un joueur au salon, une fois l'hôte d'accord. */
   admettre(id: string, nom: string, peer: string | null): boolean
+  /** Assied un robot sur une place libre. Renvoie son identité, ou null. */
+  ajouterBot(): string | null
+  /** Relève un robot de son siège, avant le lancement. */
+  retirerBot(id: string): boolean
   /** Marque un joueur parti : son mur reste, ses cartes ne sont plus jouées. */
   sortir(id: string): void
   /** Le retour d'un joueur : il retrouve son siège et son mur, sans rien demander. */
@@ -57,6 +62,15 @@ function siegeLibre(joueurs: JoueurSalon[]): 0 | 1 | 2 | 3 {
   }
   return 0
 }
+
+/**
+ * L'identité d'un robot.
+ *
+ * Elle se déduit de sa forme, donc elle est unique à la table sans tirage :
+ * deux robots ne partagent jamais une forme. Et elle ne peut pas collisionner
+ * avec l'identité d'un appareil, qui est un UUID.
+ */
+export const idBot = (ci: number) => `robot-${ci}`
 
 export function salonNeuf(code: string, hoteId: string, nom: string): Salon {
   return {
@@ -139,6 +153,41 @@ export function creerTable(salonInitial: Salon): Table {
         pret: false,
         connecte: true,
       })
+      return true
+    },
+
+    /**
+     * Un robot s'assied.
+     *
+     * Rien d'autre qu'un siège de plus, avec un drapeau : le moteur ne saura
+     * jamais que ce joueur-là n'a pas de téléphone, et c'est ce qui garantit
+     * qu'un robot joue exactement au même jeu que les autres. Il est « prêt »
+     * d'emblée — il n'a personne à attendre.
+     */
+    ajouterBot() {
+      if (salon.lancee || salon.joueurs.length >= salon.places) return null
+      const ci = siegeLibre(salon.joueurs)
+      const id = idBot(ci)
+      if (salon.joueurs.some((j) => j.clientId === id)) return null
+      salon.joueurs.push({
+        clientId: id,
+        nom: NOMS_ROBOTS[ci],
+        ci,
+        peerId: null,
+        hote: false,
+        pret: true,
+        connecte: true,
+        bot: true,
+      })
+      return id
+    },
+
+    /** On ne relève pas un robot d'une partie commencée : son mur est en jeu. */
+    retirerBot(id) {
+      if (salon.lancee) return false
+      const joueur = salon.joueurs.find((j) => j.clientId === id)
+      if (!joueur?.bot) return false
+      salon.joueurs = salon.joueurs.filter((j) => j.clientId !== id)
       return true
     },
 

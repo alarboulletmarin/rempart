@@ -14,10 +14,11 @@ import { useTheme } from '../ui/theme'
  * 64/20/20, écarts de 18, panneau de code à pleine encre, lignes de joueur à
  * 12 × 14, pastilles d'identité de 70 px.
  *
- * Deux ajouts que la planche ne pouvait pas prévoir, parce qu'ils naissent du
+ * Trois ajouts que la planche ne pouvait pas prévoir, parce qu'ils naissent du
  * réseau et non du jeu : l'état de la mise en relation (un code affiché alors
- * que personne ne peut le joindre serait un mensonge), et les demandes
- * d'entrée — le code amène à la porte, l'hôte l'ouvre. Les deux sont dessinés
+ * que personne ne peut le joindre serait un mensonge), les demandes d'entrée —
+ * le code amène à la porte, l'hôte l'ouvre — et les robots, sans quoi un salon
+ * ouvert seul n'offre rien d'autre que d'attendre. Les trois sont dessinés
  * avec les seules pièces de la planche : un panneau, une pastille, un mot.
  */
 export function Salon({
@@ -27,6 +28,8 @@ export function Salon({
   onPret,
   onAdmettre,
   onRefuser,
+  onAjouterBot,
+  onRetirerBot,
   onLancer,
   onQuitter,
 }: {
@@ -36,6 +39,8 @@ export function Salon({
   onPret: (pret: boolean) => void
   onAdmettre: (id: string) => void
   onRefuser: (id: string) => void
+  onAjouterBot: () => void
+  onRetirerBot: (id: string) => void
   onLancer: () => void
   onQuitter: () => void
 }) {
@@ -160,11 +165,41 @@ export function Salon({
               <span style={{ font: `700 17px/1 ${TITRE}`, color: t.ink }}>{j.nom}</span>
               <Etiquette
                 size={10}
-                color={etiquetteCouleur(j.clientId === moi, j.hote, j.pret, j.connecte, t.ink2, t.green, t.clayText)}
+                color={
+                  // Un robot n'est ni prêt ni pas prêt : le vert de l'attente
+                  // n'a rien à dire de lui.
+                  j.bot
+                    ? t.ink2
+                    : etiquetteCouleur(j.clientId === moi, j.hote, j.pret, j.connecte, t.ink2, t.green, t.clayText)
+                }
                 style={{ letterSpacing: '0.1em', marginLeft: 'auto' }}
               >
-                {etiquetteJoueur(j.clientId === moi, j.hote, j.pret, j.connecte)}
+                {j.bot ? 'robot' : etiquetteJoueur(j.clientId === moi, j.hote, j.pret, j.connecte)}
               </Etiquette>
+              {/* Un robot se relève tant que la partie n'a pas commencé :
+                  un ami arrive toujours à la dernière seconde. */}
+              {j.bot && hote && !salon.lancee && (
+                <button
+                  type="button"
+                  onClick={() => onRetirerBot(j.clientId)}
+                  aria-label={`Retirer le robot ${j.nom}`}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    // De quoi viser au pouce sans grandir la ligne : la
+                    // hauteur reste celle de la pastille d'identité.
+                    padding: '8px 0 8px 10px',
+                    font: `600 10px/1 ${TEXTE}`,
+                    letterSpacing: '0.1em',
+                    textTransform: 'uppercase',
+                    color: t.clayText,
+                    cursor: 'pointer',
+                    WebkitTapHighlightColor: 'transparent',
+                  }}
+                >
+                  Retirer
+                </button>
+              )}
             </Panneau>
           ))}
 
@@ -206,15 +241,28 @@ export function Salon({
                 background: t.cardOff,
                 padding: '12px 14px',
                 display: 'flex',
-                alignItems: 'center',
+                flexDirection: 'column',
                 gap: 12,
                 minHeight: 52,
               }}
             >
-              <Scribble nom="wait" width={58} height={40} />
-              <Texte size={13} style={{ lineHeight: 1.3 }}>
-                {placeLibre(salon.places - joueurs.length, assez, joueurs.length)}
-              </Texte>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <Scribble nom="wait" width={58} height={40} />
+                <Texte size={13} style={{ lineHeight: 1.3 }}>
+                  {placeLibre(salon.places - joueurs.length, assez, joueurs.length)}
+                </Texte>
+              </div>
+              {/* Personne n'est encore là, et il faut être deux : sans ce
+                  bouton, l'hôte seul n'a rien d'autre à faire qu'attendre. */}
+              {hote && (
+                // En ligne : le bouton porte `flex: 1` pour occuper la largeur,
+                // et dans une colonne ce même flex lui mangerait sa hauteur.
+                <div style={{ display: 'flex' }}>
+                  <BoutonPorte ton="ink" onClick={onAjouterBot}>
+                    Ajouter un robot
+                  </BoutonPorte>
+                </div>
+              )}
             </div>
           )}
         </div>

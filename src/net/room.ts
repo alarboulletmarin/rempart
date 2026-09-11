@@ -48,6 +48,17 @@ export type JoueurSalon = {
   hote: boolean
   pret: boolean
   connecte: boolean
+  /**
+   * Un siège tenu par un robot, et non par un appareil.
+   *
+   * Il voyage avec le salon parce que tout le monde a besoin de le savoir :
+   * l'écran, pour l'écrire sur la ligne plutôt que de laisser croire qu'un ami
+   * est arrivé ; l'arbitre, parce que c'est lui qui joue les cartes de ce
+   * siège-là ; et le battement, qui ne doit pas déclarer absent un joueur qui
+   * n'a jamais eu de téléphone. Optionnel : un salon publié par une version
+   * plus ancienne n'en porte pas, et n'a alors aucun robot à la table.
+   */
+  bot?: boolean
 }
 
 export type Salon = {

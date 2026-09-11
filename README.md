@@ -19,7 +19,7 @@ suivante** : c'est le verrou, et c'est lui qui porte tout le jeu.
 ```bash
 npm install
 npm run dev          # l'app, sur http://localhost:5173
-npm test             # moteur, table, admission, secret des choix
+npm test             # moteur, robots, table, admission, secret des choix
 npm run typecheck
 npm run build        # dist/ prêt à servir en statique
 npm run icons        # régénère les icônes depuis scripts/icone.py
@@ -29,6 +29,29 @@ npm run icons        # régénère les icônes depuis scripts/icone.py
 tous les écrans dans un cadre 390 × 844, avec les mêmes données que la planche de
 design. Elle sert à vérifier la fidélité écran par écran ; elle n'est pas une
 entrée de build et ne part donc jamais en production.
+
+## Jouer seul, ou à deux en attendant les autres
+
+Le salon ne sert pas qu'à partager un code : l'hôte peut **asseoir des robots**
+sur les places libres, et lancer. Une partie contre trois robots ne demande
+aucun réseau — ni relais, ni pair, ni code transmis — et c'est le moyen le plus
+court d'apprendre le verrou avant de jouer avec des amis.
+
+Un robot est un siège comme un autre. Il porte un nom d'outil (Truelle,
+Maillet, Équerre, Rabot) pour qu'on ne le confonde jamais avec un ami arrivé, et
+il se relève d'un geste tant que la partie n'a pas commencé. C'est l'hôte qui
+tient ses cartes, par le chemin exact d'un geste reçu d'un téléphone
+(`table.appliquer`) : **le moteur ne sait pas lequel de ces quatre murs est tenu
+par un robot**, donc un robot ne peut pas jouer un coup qu'un joueur n'aurait pas
+le droit de jouer.
+
+Ce qu'il ne lit jamais, c'est `state.choices` des autres — l'hôte les a pourtant
+sous la main. Un robot qui lit les cartes avant la révélation bloque toujours au
+bon moment, et le jeu n'existe plus. Il décide donc sur ce qu'un joueur voit :
+les murs, et **les verrous**, qui sont la mémoire du jeu. Un adversaire qui a
+frappé la manche passée ne peut pas frapper celle-ci : quand plus personne ne
+peut frapper, se barricader est un tour perdu, et le robot le sait sans avoir
+rien vu de secret (`game/bot.ts`).
 
 ## Le multijoueur
 
@@ -86,6 +109,7 @@ src/
   game/
     types.ts        Le vocabulaire du jeu.
     engine.ts       Le moteur. Fonctions pures, aucun DOM, aucun réseau.
+    bot.ts          Le robot. Pur lui aussi, et sans accès aux choix des autres.
     narrate.ts      Le récit de la révélation, dérivé des faits de la manche.
     roundCards.ts   Les neuf cartes de manche.
     content.ts      Tout le texte de règles, à un seul endroit.
@@ -130,7 +154,7 @@ Les 28 cadres de la planche sont tous implémentés : 14 écrans clairs (01–12
 08 bis, 11 bis), 4 en veillée (01, 05, 08, 11), les 8 chapitres de règles (R0–R7)
 et les 2 écrans de cartes de manche (C1, C2).
 
-Cinq écrans que la planche ne pouvait pas prévoir s'y ajoutent, parce qu'ils
+Six écrans que la planche ne pouvait pas prévoir s'y ajoutent, parce qu'ils
 naissent du réseau et non du jeu — tous dessinés avec les seules pièces de la
 planche :
 
@@ -138,6 +162,8 @@ planche :
   appellent sans que la planche les dessine ;
 - **Salon · une demande à la porte** et **Salon · invité en attente**, les deux
   moments de l'admission ;
+- **Salon · un robot à la table**, la place libre qui se remplit d'un geste —
+  sans quoi l'hôte n'a rien d'autre à faire qu'attendre ;
 - le **nom du joueur**, demandé à la création et à l'arrivée plutôt qu'au salon :
   la planche du salon ne porte que le code, les joueurs et les identités, et un
   champ de saisie de plus y aurait chassé les pastilles d'identité.
@@ -156,6 +182,7 @@ Deux écarts assumés, en plus :
 
 **La poignée de main WebRTC.** Les relais de signalisation sont injoignables
 depuis l'environnement de développement utilisé (politique réseau). Le moteur,
-l'autorité de l'hôte, l'admission, le secret des choix et une partie complète de
-bout en bout sont couverts par 90 tests ; **l'établissement de la connexion entre
-deux appareils reste à valider sur un réseau ouvert.**
+les robots, l'autorité de l'hôte, l'admission, le secret des choix et une partie
+complète de bout en bout sont couverts par 114 tests — et une partie contre des
+robots, elle, se joue sans réseau du tout ; **l'établissement de la connexion
+entre deux appareils reste à valider sur un réseau ouvert.**
