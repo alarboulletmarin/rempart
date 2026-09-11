@@ -229,28 +229,30 @@ function Galerie() {
             onRefuser={noop}
             onAjouterBot={noop}
             onRetirerBot={noop}
+            onNiveauBot={noop}
             onLancer={noop}
             onQuitter={noop}
           />
         </Cadre>
-        <Cadre titre="03 quater · Salon · un bot à la table">
+        <Cadre titre="03 quater · Salon · trois bots, trois niveaux">
           <Salon
             etat={vueSalon({
               salon: {
                 ...vueSalon().salon,
-                places: 3,
+                places: 4,
                 joueurs: [
                   JOUEURS_SALON[0],
-                  {
-                    clientId: 'bot-1',
-                    nom: 'Maillet',
-                    ci: 1 as const,
+                  ...([1, 2, 3] as const).map((ci) => ({
+                    clientId: `bot-${ci}`,
+                    nom: ['Truelle', 'Maillet', 'Équerre', 'Rabot'][ci],
+                    ci,
                     peerId: null,
                     hote: false,
                     pret: true,
                     connecte: true,
                     bot: true,
-                  },
+                    niveau: (['tranquille', 'normal', 'redoutable'] as const)[ci - 1],
+                  })),
                 ],
               },
             })}
@@ -260,6 +262,7 @@ function Galerie() {
             onRefuser={noop}
             onAjouterBot={noop}
             onRetirerBot={noop}
+            onNiveauBot={noop}
             onLancer={noop}
             onQuitter={noop}
           />
@@ -275,6 +278,7 @@ function Galerie() {
             onRefuser={noop}
             onAjouterBot={noop}
             onRetirerBot={noop}
+            onNiveauBot={noop}
             onLancer={noop}
             onQuitter={noop}
           />
@@ -296,6 +300,7 @@ function Galerie() {
             onRefuser={noop}
             onAjouterBot={noop}
             onRetirerBot={noop}
+            onNiveauBot={noop}
             onLancer={noop}
             onQuitter={noop}
           />
@@ -445,6 +450,7 @@ function Galerie() {
             onRefuser={noop}
             onAjouterBot={noop}
             onRetirerBot={noop}
+            onNiveauBot={noop}
             onLancer={noop}
             onQuitter={noop}
           />

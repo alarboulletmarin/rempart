@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { SAFE_TOP, TEXTE, TITRE } from '../theme'
+import { NIVEAUX_BOT, NIVEAU_DEFAUT, NOM_NIVEAU, type NiveauBot } from '../game/bot'
 import { MAX_SIEGES } from '../net/room'
 import type { VueSession } from '../net/session'
 import { Etiquette, Forme, Panneau, Scribble, Texte, shapeName, usePanneauEncre } from '../ui/atoms'
@@ -30,6 +31,7 @@ export function Salon({
   onRefuser,
   onAjouterBot,
   onRetirerBot,
+  onNiveauBot,
   onLancer,
   onQuitter,
 }: {
@@ -41,6 +43,7 @@ export function Salon({
   onRefuser: (id: string) => void
   onAjouterBot: () => void
   onRetirerBot: (id: string) => void
+  onNiveauBot: (id: string, niveau: NiveauBot) => void
   onLancer: () => void
   onQuitter: () => void
 }) {
@@ -155,50 +158,55 @@ export function Salon({
           </div>
 
           {joueurs.map((j) => (
-            <Panneau
-              key={j.clientId}
-              radius={16}
-              pad="12px 14px"
-              style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}
-            >
-              <Forme ci={j.ci} size={26} />
-              <span style={{ font: `700 17px/1 ${TITRE}`, color: t.ink }}>{j.nom}</span>
-              <Etiquette
-                size={10}
-                color={
-                  // Un bot n'est ni prêt ni pas prêt : le vert de l'attente
-                  // n'a rien à dire de lui.
-                  j.bot
-                    ? t.ink2
-                    : etiquetteCouleur(j.clientId === moi, j.hote, j.pret, j.connecte, t.ink2, t.green, t.clayText)
-                }
-                style={{ letterSpacing: '0.1em', marginLeft: 'auto' }}
-              >
-                {j.bot ? 'bot' : etiquetteJoueur(j.clientId === moi, j.hote, j.pret, j.connecte)}
-              </Etiquette>
-              {/* Un bot se relève tant que la partie n'a pas commencé :
-                  un ami arrive toujours à la dernière seconde. */}
-              {j.bot && hote && !salon.lancee && (
-                <button
-                  type="button"
-                  onClick={() => onRetirerBot(j.clientId)}
-                  aria-label={`Retirer le bot ${j.nom}`}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    // De quoi viser au pouce sans grandir la ligne : la
-                    // hauteur reste celle de la pastille d'identité.
-                    padding: '8px 0 8px 10px',
-                    font: `600 10px/1 ${TEXTE}`,
-                    letterSpacing: '0.1em',
-                    textTransform: 'uppercase',
-                    color: t.clayText,
-                    cursor: 'pointer',
-                    WebkitTapHighlightColor: 'transparent',
-                  }}
+            <Panneau key={j.clientId} radius={16} pad="12px 14px" gap={10}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <Forme ci={j.ci} size={26} />
+                <span style={{ font: `700 17px/1 ${TITRE}`, color: t.ink }}>{j.nom}</span>
+                <Etiquette
+                  size={10}
+                  color={
+                    // Un bot n'est ni prêt ni pas prêt : le vert de l'attente
+                    // n'a rien à dire de lui.
+                    j.bot
+                      ? t.ink2
+                      : etiquetteCouleur(j.clientId === moi, j.hote, j.pret, j.connecte, t.ink2, t.green, t.clayText)
+                  }
+                  style={{ letterSpacing: '0.1em', marginLeft: 'auto' }}
                 >
-                  Retirer
-                </button>
+                  {j.bot ? 'bot' : etiquetteJoueur(j.clientId === moi, j.hote, j.pret, j.connecte)}
+                </Etiquette>
+                {/* Un bot se relève tant que la partie n'a pas commencé :
+                    un ami arrive toujours à la dernière seconde. */}
+                {j.bot && hote && !salon.lancee && (
+                  <button
+                    type="button"
+                    onClick={() => onRetirerBot(j.clientId)}
+                    aria-label={`Retirer le bot ${j.nom}`}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      // De quoi viser au pouce sans grandir la ligne : la
+                      // hauteur reste celle de la pastille d'identité.
+                      padding: '8px 0 8px 10px',
+                      font: `600 10px/1 ${TEXTE}`,
+                      letterSpacing: '0.1em',
+                      textTransform: 'uppercase',
+                      color: t.clayText,
+                      cursor: 'pointer',
+                      WebkitTapHighlightColor: 'transparent',
+                    }}
+                  >
+                    Retirer
+                  </button>
+                )}
+              </div>
+              {j.bot && (
+                <Niveau
+                  nom={j.nom}
+                  niveau={j.niveau ?? NIVEAU_DEFAUT}
+                  reglable={hote && !salon.lancee}
+                  onNiveau={(n) => onNiveauBot(j.clientId, n)}
+                />
               )}
             </Panneau>
           ))}
@@ -410,6 +418,68 @@ function attente(statut: VueSession['statutDemande'], lien: VueSession['lien']):
   if (lien === 'perdu') return 'On ne trouve pas cette partie.'
   if (statut === 'attente') return 'On a frappé — l’hôte doit ouvrir.'
   return 'On cherche la partie…'
+}
+
+/**
+ * Le niveau d'un bot : trois cartons, sous sa ligne.
+ *
+ * **Trois cartons et non un cycle.** Un cycle tient sur la ligne du nom, mais
+ * il faut le toucher deux fois pour savoir ce qu'il propose ; ici les trois
+ * niveaux sont lisibles sans rien toucher, et le bon se pose d'un geste. C'est
+ * exactement le contrôle du « nombre de joueurs » de l'écran de création —
+ * même forme, même matière : rien de neuf à apprendre.
+ *
+ * **Par siège, et non par table.** À quatre on veut souvent un adversaire
+ * sérieux et deux qui laissent respirer ; un réglage unique l'interdirait.
+ *
+ * Chez l'invité, les mêmes cartons sans le geste : il lit la table qu'on lui
+ * propose, il ne la règle pas — les bots ne jouent que chez l'hôte.
+ */
+function Niveau({
+  nom,
+  niveau,
+  reglable,
+  onNiveau,
+}: {
+  nom: string
+  niveau: NiveauBot
+  reglable: boolean
+  onNiveau: (n: NiveauBot) => void
+}) {
+  const t = useTheme()
+  return (
+    <div style={{ display: 'flex', gap: 6 }} role="group" aria-label={`Niveau de ${nom}`}>
+      {NIVEAUX_BOT.map((n) => {
+        const choisi = n === niveau
+        return (
+          <button
+            key={n}
+            type="button"
+            onClick={() => reglable && !choisi && onNiveau(n)}
+            disabled={!reglable}
+            aria-pressed={choisi}
+            aria-label={`${nom} : niveau ${NOM_NIVEAU[n]}`}
+            style={{
+              flex: 1,
+              height: 32,
+              borderRadius: 12,
+              background: choisi ? t.selBg : t.cardOff,
+              boxShadow: choisi ? `0 3px 0 ${t.selEdge}` : undefined,
+              border: 'none',
+              font: `600 10px/1 ${TEXTE}`,
+              letterSpacing: '0.06em',
+              textTransform: 'uppercase',
+              color: choisi ? t.selFg : t.ink2,
+              cursor: reglable && !choisi ? 'pointer' : 'default',
+              WebkitTapHighlightColor: 'transparent',
+            }}
+          >
+            {NOM_NIVEAU[n]}
+          </button>
+        )
+      })}
+    </div>
+  )
 }
 
 /** Le bouton du panneau à pleine encre : même matière que son fond. */

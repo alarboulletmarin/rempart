@@ -1,4 +1,5 @@
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
+import { NIVEAU_DEFAUT } from '../game/bot'
 import { choicesRequired, legalCards, possibleTargets, readyCount } from '../game/engine'
 import type { Choice } from '../game/types'
 import { creerTable, salonNeuf } from './table'
@@ -79,6 +80,40 @@ describe('le salon avec des bots', () => {
     t.lancer(1)
     expect(t.retirerBot(bot)).toBe(false)
     expect(t.jeu!.players).toHaveLength(2)
+  })
+
+  it('assied ses bots au niveau du milieu, celui que personne n’a réglé', () => {
+    const t = creerTable(salonNeuf('K7P2M9XR', 'a', 'Léa'))
+    const bot = t.ajouterBot()!
+    expect(t.salon.joueurs.find((j) => j.clientId === bot)!.niveau).toBe(NIVEAU_DEFAUT)
+  })
+
+  it('règle le niveau siège par siège, et pas toute la table', () => {
+    const t = creerTable(salonNeuf('K7P2M9XR', 'a', 'Léa'))
+    const un = t.ajouterBot()!
+    const deux = t.ajouterBot()!
+    expect(t.reglerNiveauBot(un, 'redoutable')).toBe(true)
+    expect(t.salon.joueurs.find((j) => j.clientId === un)!.niveau).toBe('redoutable')
+    expect(t.salon.joueurs.find((j) => j.clientId === deux)!.niveau).toBe(NIVEAU_DEFAUT)
+  })
+
+  it('ne règle pas le niveau d’un joueur, ni celui d’une partie commencée', () => {
+    const t = creerTable(salonNeuf('K7P2M9XR', 'a', 'Léa'))
+    t.admettre('b', 'Malo', 'peer-b')
+    // Un humain n'a pas de niveau : le lui poser ferait croire à un réglage.
+    expect(t.reglerNiveauBot('b', 'redoutable')).toBe(false)
+    const bot = t.ajouterBot()!
+    t.lancer(1)
+    // En pleine partie, changer d'adversaire n'est plus un réglage.
+    expect(t.reglerNiveauBot(bot, 'tranquille')).toBe(false)
+    expect(t.salon.joueurs.find((j) => j.clientId === bot)!.niveau).toBe(NIVEAU_DEFAUT)
+  })
+
+  it('donne à chaque bot le premier nom libre', () => {
+    const t = creerTable(salonNeuf('K7P2M9XR', 'a', 'Léa'))
+    t.ajouterBot()
+    t.ajouterBot()
+    expect(t.salon.joueurs.map((j) => j.nom)).toEqual(['Léa', 'Truelle', 'Maillet'])
   })
 
   it('ne relève pas un joueur en le prenant pour un bot', () => {
@@ -177,6 +212,32 @@ describe('les bots en partie', () => {
     // Le moteur n'a jamais su lequel de ces quatre murs était tenu par un
     // bot : ils ont joué la même partie, avec les mêmes règles.
     expect(jeu.players).toHaveLength(4)
+    session.quitter()
+  })
+
+  it('règle le niveau d’un bot depuis la session, et le publie', () => {
+    const session = solo(2)
+    const [bot] = session.vue().salon.joueurs.filter((j) => j.bot)
+    session.reglerNiveauBot(bot.clientId, 'redoutable')
+    const apres = session.vue().salon.joueurs.find((j) => j.clientId === bot.clientId)!
+    expect(apres.niveau).toBe('redoutable')
+    // L'autre bot n'a pas bougé : le réglage est par siège.
+    expect(session.vue().salon.joueurs.filter((j) => j.niveau === NIVEAU_DEFAUT)).toHaveLength(1)
+    session.quitter()
+  })
+
+  /**
+   * Un bot d'une version d'avant les niveaux arrive sans le champ. Il doit
+   * jouer — au niveau du jeu — et non rester la carte en main.
+   */
+  it('fait jouer un bot qui n’annonce aucun niveau', () => {
+    const session = solo(1)
+    const salon = session.vue().salon
+    const bot = salon.joueurs.find((j) => j.bot)!
+    delete bot.niveau
+    session.lancer()
+    laisserJouerLesBots()
+    expect(readyCount(session.jeu!).played).toBe(1)
     session.quitter()
   })
 

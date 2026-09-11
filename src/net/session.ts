@@ -17,7 +17,13 @@
  *  - **le battement** (`tick`/`pong`), qui dit qui est encore là — et non
  *    l'avis du transport, qui déclare un pair perdu puis ne dit plus rien.
  */
-import { choisirBot, delaiBot } from '../game/bot.ts'
+import {
+  choisirBot,
+  delaiBot,
+  estNiveauBot,
+  NIVEAU_DEFAUT,
+  type NiveauBot,
+} from '../game/bot.ts'
 import { hasPlayed, playersToAct } from '../game/engine.ts'
 import type { Choice, Format, GameState, PlayerId } from '../game/types.ts'
 import {
@@ -472,6 +478,18 @@ export class Session {
   }
 
   /**
+   * Le niveau auquel ce siège joue.
+   *
+   * Le repli n'est pas une précaution de style : un salon publié par une
+   * version d'avant les niveaux n'en porte pas, et un profil introuvable ferait
+   * un bot qui ne joue pas du tout.
+   */
+  private niveauDe(id: string): NiveauBot {
+    const niveau = this.salon.joueurs.find((j) => j.clientId === id)?.niveau
+    return estNiveauBot(niveau) ? niveau : NIVEAU_DEFAUT
+  }
+
+  /**
    * Le prochain coup de bot, si la manche en attend un.
    *
    * Un seul minuteur à la fois, et il n'est jamais réarmé tant qu'il court :
@@ -501,12 +519,13 @@ export class Session {
         !hasPlayed(courant, attendu.id) &&
         this.estBot(attendu.id)
       ) {
-        this.table.appliquer(attendu.id, { t: 'choix', choix: choisirBot(courant, attendu.id) })
+        const choix = choisirBot(courant, attendu.id, this.niveauDe(attendu.id))
+        this.table.appliquer(attendu.id, { t: 'choix', choix })
         this.diffuserEtat()
         this.changer()
       }
       this.planifierBot()
-    }, delaiBot())
+    }, delaiBot(this.niveauDe(attendu.id)))
   }
 
   private arreterBots(): void {
@@ -1130,6 +1149,20 @@ export class Session {
   retirerBot(id: string): void {
     if (!this.estHote) return
     if (!this.table.retirerBot(id)) return
+    this.publierSalon()
+    this.changer()
+  }
+
+  /**
+   * Le niveau d'un bot, siège par siège.
+   *
+   * Réservé à l'hôte comme les autres réglages de table : c'est lui qui joue
+   * les cartes de ces sièges-là, et le niveau que les autres lisent n'est que
+   * le reflet du sien.
+   */
+  reglerNiveauBot(id: string, niveau: NiveauBot): void {
+    if (!this.estHote) return
+    if (!this.table.reglerNiveauBot(id, niveau)) return
     this.publierSalon()
     this.changer()
   }

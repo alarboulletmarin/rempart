@@ -38,8 +38,9 @@ aucun réseau — ni relais, ni pair, ni code transmis — et c'est le moyen le 
 court d'apprendre le verrou avant de jouer avec des amis.
 
 Un bot est un siège comme un autre. Il porte un nom d'outil (Truelle,
-Maillet, Équerre, Rabot) pour qu'on ne le confonde jamais avec un ami arrivé, et
-il se relève d'un geste tant que la partie n'a pas commencé. C'est l'hôte qui
+Maillet, Équerre, Rabot) pour qu'on ne le confonde jamais avec un ami arrivé, il
+se règle en trois niveaux, et il se relève d'un geste tant que la partie n'a pas
+commencé. C'est l'hôte qui
 tient ses cartes, par le chemin exact d'un geste reçu d'un téléphone
 (`table.appliquer`) : **le moteur ne sait pas lequel de ces quatre murs est tenu
 par un bot**, donc un bot ne peut pas jouer un coup qu'un joueur n'aurait pas
@@ -52,6 +53,61 @@ les murs, et **les verrous**, qui sont la mémoire du jeu. Un adversaire qui a
 frappé la manche passée ne peut pas frapper celle-ci : quand plus personne ne
 peut frapper, se barricader est un tour perdu, et le bot le sait sans avoir
 rien vu de secret (`game/bot.ts`).
+
+### Le niveau d'un bot
+
+Trois niveaux — **tranquille**, **normal**, **redoutable** — réglés **siège par
+siège**, sur la ligne du bot dans le salon. Par siège et non par table : à
+quatre, on veut souvent un adversaire sérieux et deux qui laissent respirer.
+Trois cartons plutôt qu'un cycle, et ce sont ceux du « nombre de joueurs » de
+l'écran de création : on lit les trois niveaux sans rien toucher.
+
+La difficulté ne se règle pas en tirant au hasard dans les quatre cartes. Elles
+sont toutes légales tout le temps : un bot bruité ne joue pas plus mal, il joue
+pareil en moyenne — et là où le bruit se verrait, il donnerait un adversaire qui
+répare un mur plein pendant qu'on le démolit. Ce qui change d'un niveau à
+l'autre, c'est **ce qu'il voit du verrou**.
+
+| | tranquille | normal | redoutable |
+|---|---|---|---|
+| voit qui a encore le droit de frapper | non | oui | oui |
+| compare les murs avant de frapper | non | oui | oui |
+| achève un mur à deux briques | non | oui | oui |
+| se garde quand il mène | non | oui | oui |
+| sait que le piège domine le blocage | non | non | oui |
+| voit la cible qui ne peut plus parer | non | non | oui |
+| renonce à frapper quand tout le monde peut piéger | non | non | oui |
+| frappe pour le plaisir de frapper | oui | non | non |
+| suit son propre jugement | de loin | oui | il s'y tient |
+| son délai | 2,2 s | 1,5 s | 0,9 s |
+
+Le « piège domine le blocage » est la lecture qui sépare vraiment le haut du
+milieu : chacun pour soi, les deux cartes annulent la frappe, mais le piège la
+**retourne** — le blocage ne garde sa raison d'être qu'en équipes, où il couvre
+le coéquipier. Le bot d'avant les niveaux ne le savait pas ; il est devenu
+`normal`, sans rien y changer.
+
+L'erreur de `tranquille` est celle d'un joueur, pas celle d'un programme : il se
+barricade contre une table qui n'a plus le droit de frapper, il frappe parce que
+frapper est le seul geste qui se voit — alors que ça n'ajoute aucune brique à
+son propre mur. Il répare toujours son mur à l'agonie : un bot qui se laisse
+tomber à zéro sans réagir n'est pas un adversaire facile, c'est un adversaire
+cassé, et on ne joue pas contre lui, on le regarde perdre.
+
+Soixante duels par paire, sièges alternés, cartes de manche comprises, donnent
+la mesure : **redoutable** l'emporte sur **tranquille** dans 83 % des parties,
+sur **normal** dans 68 %, et **normal** sur **tranquille** dans 58 %. Trois
+tests du dépôt ne vérifient que ça — un sélecteur qui ne changerait pas la
+partie serait une promesse que le salon ne tient pas.
+
+Le niveau vit dans le **salon** et non dans `GameConfig`, qui ne porte que des
+règles et voyage dans l'état : le niveau d'un bot n'est pas une règle du jeu. Le
+bot ne joue que chez l'arbitre, donc ce champ n'a jamais besoin d'être exact
+ailleurs — il n'y sert qu'à être lu.
+
+Ses hésitations se tirent de l'état de la partie, jamais de `Math.random` : même
+manche, même carte. Seul le délai avant de poser la carte est tiré au sort, et
+il ne décide de rien — il évite que trois bots posent à la même seconde.
 
 ## Le multijoueur
 
@@ -109,7 +165,7 @@ src/
   game/
     types.ts        Le vocabulaire du jeu.
     engine.ts       Le moteur. Fonctions pures, aucun DOM, aucun réseau.
-    bot.ts          Le bot. Pur lui aussi, et sans accès aux choix des autres.
+    bot.ts          Le bot, en trois niveaux. Pur, et sans accès aux choix des autres.
     narrate.ts      Le récit de la révélation, dérivé des faits de la manche.
     roundCards.ts   Les neuf cartes de manche.
     content.ts      Tout le texte de règles, à un seul endroit.
@@ -162,8 +218,9 @@ planche :
   appellent sans que la planche les dessine ;
 - **Salon · une demande à la porte** et **Salon · invité en attente**, les deux
   moments de l'admission ;
-- **Salon · un bot à la table**, la place libre qui se remplit d'un geste —
-  sans quoi l'hôte n'a rien d'autre à faire qu'attendre ;
+- **Salon · des bots à la table**, la place libre qui se remplit d'un geste et
+  le niveau posé sous chaque bot — sans quoi l'hôte n'a rien d'autre à faire
+  qu'attendre ;
 - le **nom du joueur**, demandé à la création et à l'arrivée plutôt qu'au salon :
   la planche du salon ne porte que le code, les joueurs et les identités, et un
   champ de saisie de plus y aurait chassé les pastilles d'identité.
@@ -182,7 +239,8 @@ Deux écarts assumés, en plus :
 
 **La poignée de main WebRTC.** Les relais de signalisation sont injoignables
 depuis l'environnement de développement utilisé (politique réseau). Le moteur,
-les bots, l'autorité de l'hôte, l'admission, le secret des choix et une partie
-complète de bout en bout sont couverts par 114 tests — et une partie contre des
+les bots et l'écart entre leurs niveaux, l'autorité de l'hôte, l'admission, le
+secret des choix et une partie complète de bout en bout sont couverts par 135
+tests — et une partie contre des
 bots, elle, se joue sans réseau du tout ; **l'établissement de la connexion
 entre deux appareils reste à valider sur un réseau ouvert.**

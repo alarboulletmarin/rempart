@@ -18,7 +18,7 @@ import {
   resolveRound,
   submitChoice,
 } from '../game/engine.ts'
-import { NOMS_BOTS } from '../game/bot.ts'
+import { NIVEAU_DEFAUT, NOMS_BOTS, type NiveauBot } from '../game/bot.ts'
 import type { Format, GameState, PlayerId } from '../game/types.ts'
 import { MAX_SIEGES, type Geste, type JoueurSalon, type Salon } from './room.ts'
 import { accueilPour, peutAdmettre, type Accueil } from './admission.ts'
@@ -40,6 +40,8 @@ export type Table = {
   ajouterBot(): string | null
   /** Relève un bot de son siège, avant le lancement. */
   retirerBot(id: string): boolean
+  /** Règle le niveau d'un bot, siège par siège. */
+  reglerNiveauBot(id: string, niveau: NiveauBot): boolean
   /** Marque un joueur parti : son mur reste, ses cartes ne sont plus jouées. */
   sortir(id: string): void
   /** Le retour d'un joueur : il retrouve son siège et son mur, sans rien demander. */
@@ -171,15 +173,31 @@ export function creerTable(salonInitial: Salon): Table {
       if (salon.joueurs.some((j) => j.clientId === id)) return null
       salon.joueurs.push({
         clientId: id,
-        nom: NOMS_BOTS[ci],
+        // Le premier nom libre, et non celui de la forme : l'hôte occupe
+        // presque toujours la première, et « Truelle » ne serait jamais sorti.
+        nom: NOMS_BOTS.find((n) => !salon.joueurs.some((j) => j.nom === n)) ?? NOMS_BOTS[ci],
         ci,
         peerId: null,
         hote: false,
         pret: true,
         connecte: true,
         bot: true,
+        niveau: NIVEAU_DEFAUT,
       })
       return id
+    },
+
+    /**
+     * Le niveau se règle au salon, et pas en pleine partie : changer
+     * d'adversaire au milieu d'une manche, ce n'est plus un réglage, c'est une
+     * autre partie.
+     */
+    reglerNiveauBot(id, niveau) {
+      if (salon.lancee) return false
+      const joueur = salon.joueurs.find((j) => j.clientId === id)
+      if (!joueur?.bot) return false
+      joueur.niveau = niveau
+      return true
     },
 
     /** On ne relève pas un bot d'une partie commencée : son mur est en jeu. */
