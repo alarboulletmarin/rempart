@@ -35,6 +35,7 @@ import {
   SILENCE_MS,
   TIC_MS,
 } from './presence.ts'
+import { Discussion, nettoyer, type Message } from './discussion.ts'
 import {
   clientId,
   fabriquerCode,
@@ -95,6 +96,11 @@ export type VueSession = {
   /** Depuis quand chaque joueur absent l'est, pour le compte à rebours de l'écran 12. */
   absentsDepuis: ReadonlyMap<string, number>
   relaisActifs: number
+  /**
+   * La conversation de la table — les phrases du salon et les réactions de
+   * l'éventail dans le même fil, parce que c'est le même canal.
+   */
+  messages: readonly Message[]
 }
 
 export class Session {
@@ -142,6 +148,13 @@ export class Session {
 
   /** Côté hôte : le prochain bot à poser sa carte. Un seul à la fois. */
   private minuteurBot: ReturnType<typeof setTimeout> | null = null
+
+  /**
+   * Ce que la table se dit. Ce n'est pas un état de jeu : il ne passe pas par
+   * l'arbitre, ne porte aucun numéro de séquence, et ne survit pas à la
+   * session — une conversation de quatre minutes ne s'archive pas.
+   */
+  private discussion = new Discussion()
 
   private battement: ReturnType<typeof setInterval> | null = null
   private minuteurLien: ReturnType<typeof setTimeout> | null = null
@@ -224,6 +237,7 @@ export class Session {
       demandes: this.estHote ? this.demandesEnAttente : [],
       absentsDepuis: this.absentsDepuis,
       relaisActifs: this.canal?.relaisActifs() ?? 0,
+      messages: this.discussion.liste(),
     }
   }
 
@@ -356,6 +370,20 @@ export class Session {
       // Un geste décidé sous un autre règne visait une autre partie.
       if (intention.epoch !== this.salon.epoch) return
       this.recevoirIntention(intention, peer)
+    })
+
+    // La conversation. Elle ne passe pas par l'arbitre — voir `MessageChat` —
+    // et c'est pour cela qu'elle tient encore pendant que l'arbitrage change
+    // de main.
+    canal.sur('chat', (m, peer) => {
+      if (!courant()) return
+      // **Des sièges, et d'eux seuls.** Un pair qui a le code mais pas de
+      // place à la table n'a pas de voix : sans ce garde, un inconnu refusé à
+      // la porte pourrait quand même écrire à tout le monde.
+      if (!this.assis(m.de)) return
+      this.noterVivant(m.de, peer)
+      if (m.de === this.salon.hoteClientId) this.noterHoteVivant(peer)
+      if (this.discussion.recevoir(m, Date.now())) this.changer()
     })
 
     canal.sur('ack', (recu) => {
@@ -1069,6 +1097,40 @@ export class Session {
   }
 
   // ───────────────────────────── actions ─────────────────────────────
+
+  /**
+   * Dire quelque chose à la table — une phrase du salon, ou un emoji de
+   * l'éventail : c'est le même geste et le même canal.
+   *
+   * Le repos entre deux envois est tenu ici, chez l'émetteur. Il ne protège
+   * personne à lui seul — ce code-là tourne sur l'appareil de celui qui parle,
+   * et un client bricolé l'enlèverait ; c'est le frein du récepteur
+   * (`BULLES_MAX`) qui fait foi. Celui-ci évite simplement qu'un doigt pressé
+   * ne s'inonde lui-même.
+   *
+   * Rend `false` quand rien n'est parti : l'écran garde alors la phrase dans le
+   * champ plutôt que de l'effacer sur un envoi qui n'a pas eu lieu.
+   */
+  envoyerMessage(texte: string): boolean {
+    const propre = nettoyer(texte)
+    if (!propre) return false
+    const maintenant = Date.now()
+    if (!this.discussion.peutEnvoyer(maintenant)) return false
+    if (!this.assis(this.moi)) return false
+
+    const message = { id: this.discussion.prochainId(this.moi), de: this.moi, texte: propre }
+    this.discussion.noterEnvoi(maintenant)
+    // Chez soi d'abord : la bulle sort de son auteur sans attendre le réseau.
+    this.discussion.recevoir(message, maintenant)
+    this.canal?.envoyer('chat', message)
+    this.changer()
+    return true
+  }
+
+  /** Ce clientId tient-il un siège à cette table ? */
+  private assis(id: string): boolean {
+    return this.salon.joueurs.some((j) => j.clientId === id && !j.bot)
+  }
 
   choisirIdentite(ci: 0 | 1 | 2 | 3): void {
     this.agir({ t: 'identite', ci })

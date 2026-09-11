@@ -77,3 +77,149 @@ input:focus-visible,
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ──────────────────────────── Le mouvement ────────────────────────────
+ *
+ * Cinq mouvements, et chacun porte une information : d'où vient le coup, ce
+ * qu'on ne sait pas encore, ce qu'on attend, ce qui change de règle, ce qu'on
+ * vient de gagner ou de perdre. Rien ici ne décore : le fond de l'app ne bouge
+ * pas, et aucune de ces images ne tourne en boucle sur un écran qu'on lit.
+ *
+ * Les durées et la règle du mouvement réduit vivent dans `ui/mouvement.ts` :
+ * sous `prefers-reduced-motion`, ces animations ne sont pas posées du tout —
+ * il reste l'écrit, qui disait déjà tout. Le garde-fou ci-dessous reste en
+ * place pour ce qui passerait au travers.
+ */
+
+/* La brique tombe — du côté d'où le coup n'est pas venu. */
+@keyframes rempart-chute-d {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+    opacity: 1;
+  }
+  25% {
+    transform: translate(1px, -3px) rotate(5deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(11px, 56px) rotate(28deg);
+    opacity: 0;
+  }
+}
+
+@keyframes rempart-chute-g {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+    opacity: 1;
+  }
+  25% {
+    transform: translate(-1px, -3px) rotate(-5deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-11px, 56px) rotate(-28deg);
+    opacity: 0;
+  }
+}
+
+/* La carte se retourne : elle arrive sur sa tranche. */
+@keyframes rempart-retourne {
+  0% {
+    transform: perspective(600px) rotateY(84deg);
+  }
+  70% {
+    transform: perspective(600px) rotateY(-8deg);
+  }
+  100% {
+    transform: perspective(600px) rotateY(0deg);
+  }
+}
+
+/* La carte posée frémit : « c'est parti, on attend les autres ». */
+@keyframes rempart-fremis {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  35% {
+    transform: translateY(-3px) rotate(-0.9deg);
+  }
+  65% {
+    transform: translateY(-1px) rotate(0.9deg);
+  }
+}
+
+/* La carte de manche entre en grand. */
+@keyframes rempart-manche {
+  0% {
+    transform: scale(1.16);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* … et l'écran reprend sa peau ensuite. */
+@keyframes rempart-peau {
+  0% {
+    opacity: 1;
+  }
+  55% {
+    opacity: 0.55;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Les briques se recomptent : chaque chiffre bascule. */
+@keyframes rempart-bascule {
+  0% {
+    transform: translateY(-6px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+/* La bulle sort de son auteur : elle monte, grandit et s'estompe. */
+@keyframes rempart-bulle {
+  0% {
+    transform: translateY(8px) scale(0.6);
+    opacity: 0;
+  }
+  14% {
+    transform: translateY(2px) scale(1);
+    opacity: 1;
+  }
+  60% {
+    transform: translateY(-20px) scale(1.08);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-40px) scale(1.16);
+    opacity: 0;
+  }
+}
+
+/* La feuille de conversation monte du bas de l'écran. */
+@keyframes rempart-feuille {
+  0% {
+    transform: translateY(100%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+/* L'éventail s'ouvre, emoji par emoji. */
+@keyframes rempart-eventail {
+  0% {
+    transform: translateY(-10px) scale(0.5);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}

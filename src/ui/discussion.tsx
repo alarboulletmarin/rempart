@@ -1,0 +1,523 @@
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react'
+import { R, TEXTE, TITRE } from '../theme'
+import {
+  EMOJI_PROPOSE,
+  EVENTAIL,
+  LONGUEUR_MAX,
+  VIE_BULLE_MS,
+  bullesVivantes,
+  estReaction,
+  type Emoji,
+  type Message,
+} from '../net/discussion'
+import { Etiquette, Forme, Texte } from './atoms'
+import { DUREE, anime, useMouvement } from './mouvement'
+import { useTheme } from './theme'
+
+/**
+ * Se parler — la feuille du salon, l'éventail de la partie, la bulle.
+ *
+ * Une seule conversation, deux formes selon le temps qu'on a :
+ *
+ *  - **dans le salon**, la feuille s'ouvre et se lit : c'est le seul moment de
+ *    la partie où l'on attend ;
+ *  - **en partie**, six emoji au bout d'un éventail, dans la barre du haut. Un
+ *    appui ouvre, un appui envoie. Le jeu ne s'interrompt pas, et la feuille de
+ *    conversation ne s'ouvre jamais — trois secondes pour lire quatre murs et
+ *    choisir une carte, ce n'est pas le moment de lire un fil.
+ *
+ * L'accès passe par un contexte et non par des propriétés d'écran : la
+ * conversation traverse le salon, le tour de jeu et la révélation, alors que
+ * ces trois écrans n'ont rien d'autre en commun — et la galerie de contrôle,
+ * elle, les rend sans aucune session.
+ */
+
+export type Auteur = { id: string; nom: string; ci: 0 | 1 | 2 | 3 }
+
+export type Salle = {
+  moi: string
+  /** Les sièges, pour mettre un nom et une forme sur un message. */
+  auteurs: readonly Auteur[]
+  messages: readonly Message[]
+  /** Rend `false` si rien n'est parti (repos entre deux envois non écoulé). */
+  envoyer: (texte: string) => boolean
+}
+
+const SalleCtx = createContext<Salle | null>(null)
+
+export function DiscussionProvider({ valeur, children }: { valeur: Salle | null; children: ReactNode }) {
+  return <SalleCtx.Provider value={valeur}>{children}</SalleCtx.Provider>
+}
+
+/** La conversation de la table, ou `null` hors d'une session. */
+export function useSalle(): Salle | null {
+  return useContext(SalleCtx)
+}
+
+/** Ce que chaque emoji veut dire, pour qui ne voit pas l'écran. */
+const NOM_EMOJI: Record<Emoji, string> = {
+  '😂': 'rire',
+  '😱': 'aïe',
+  '🎉': 'bravo',
+  '👏': 'bien joué',
+  '😤': 'grr',
+  '🙏': 'pitié',
+}
+
+/* ------------------------------------------------------------- les bulles */
+
+/**
+ * Les messages encore à l'écran, et le battement qui les efface.
+ *
+ * Le minuteur ne tourne que tant qu'il reste une bulle : une table silencieuse
+ * ne réveille pas React toutes les six images pour rien.
+ */
+function useVivantes(messages: readonly Message[]): Map<string, Message[]> {
+  const [maintenant, setMaintenant] = useState(() => Date.now())
+  const vivantes = bullesVivantes(messages, maintenant)
+
+  useEffect(() => {
+    // Un message qui vient d'arriver n'est pas encore dans `maintenant` : on
+    // repart de l'horloge, puis on bat jusqu'à ce que la dernière soit montée.
+    setMaintenant(Date.now())
+    if (messages.length === 0) return
+    const dernier = messages[messages.length - 1]
+    if (Date.now() - dernier.at >= VIE_BULLE_MS) return
+    const id = setInterval(() => setMaintenant(Date.now()), 150)
+    return () => clearInterval(id)
+  }, [messages])
+
+  return vivantes
+}
+
+/**
+ * Les bulles d'un joueur, posées sur son jeton.
+ *
+ * Trois au plus se croisent — c'est le frein du récepteur — et elles se
+ * décalent pour ne pas se recouvrir.
+ */
+export function Bulles({ de }: { de: string }) {
+  const salle = useSalle()
+  const t = useTheme()
+  const bouge = useMouvement()
+  const vivantes = useVivantes(salle?.messages ?? [])
+  if (!salle) return null
+  const miennes = vivantes.get(de)
+  if (!miennes || miennes.length === 0) return null
+  const nom = salle.auteurs.find((a) => a.id === de)?.nom ?? ''
+
+  return (
+    <div
+      role="status"
+      aria-live="polite"
+      style={{ position: 'absolute', left: 10, top: 2, pointerEvents: 'none', zIndex: 4 }}
+    >
+      {miennes.map((m, i) => {
+        const reaction = estReaction(m.texte)
+        return (
+          <div
+            key={m.id}
+            style={{
+              position: 'absolute',
+              left: i * 30,
+              top: 0,
+              background: t.panel,
+              borderRadius: R.pastille,
+              boxShadow: `0 3px 0 ${t.edge}`,
+              padding: reaction ? '4px 8px' : '6px 10px',
+              maxWidth: 190,
+              whiteSpace: reaction ? 'nowrap' : 'normal',
+              animation: anime(bouge, 'rempart-bulle', DUREE.bulle, { courbe: 'ease-out' }),
+            }}
+          >
+            <span aria-hidden="true" style={{ font: reaction ? '22px/1 serif' : `600 12px/1.3 ${TEXTE}`, color: t.ink }}>
+              {m.texte}
+            </span>
+            <span style={SR_ONLY}>{`${nom} : ${reaction ? NOM_EMOJI[m.texte as Emoji] : m.texte}`}</span>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
+const SR_ONLY = {
+  position: 'absolute',
+  width: 1,
+  height: 1,
+  overflow: 'hidden',
+  clip: 'rect(0 0 0 0)',
+  whiteSpace: 'nowrap',
+} as const
+
+/* ----------------------------------------------------------- l'éventail */
+
+/**
+ * Six emoji au bout d'un éventail, dans la barre du haut.
+ *
+ * Un appui ouvre, un appui envoie, trois secondes sans choix referment. La
+ * feuille de conversation, elle, ne s'ouvre jamais en partie.
+ *
+ * `propose` est l'ouverture que la table offre : quand ton mur vient d'être
+ * frappé, l'éventail s'ouvre seul deux secondes avec 😱 entouré. Une
+ * proposition, jamais une interruption — rien n'est envoyé sans un doigt, et
+ * elle ne se déclenche jamais pendant ton propre choix de carte.
+ */
+export function Eventail({ propose }: { propose?: boolean }) {
+  const salle = useSalle()
+  const t = useTheme()
+  const bouge = useMouvement()
+  const [ouvert, setOuvert] = useState(false)
+  const [offert, setOffert] = useState(false)
+
+  useEffect(() => {
+    if (!propose) return
+    setOuvert(true)
+    setOffert(true)
+    const id = setTimeout(() => {
+      setOuvert(false)
+      setOffert(false)
+    }, 2000)
+    return () => clearTimeout(id)
+  }, [propose])
+
+  useEffect(() => {
+    if (!ouvert || offert) return
+    const id = setTimeout(() => setOuvert(false), 3000)
+    return () => clearTimeout(id)
+  }, [ouvert, offert])
+
+  if (!salle) return null
+
+  const envoyer = (e: Emoji) => {
+    salle.envoyer(e)
+    setOuvert(false)
+    setOffert(false)
+  }
+
+  return (
+    // L'éventail se pose AU-DESSUS du plateau : il s'ouvre depuis la barre du
+    // haut et retombe sur la première ligne de mur. Sans cet étage, les
+    // pastilles de cette ligne-là se dessineraient par-dessus les cartes.
+    <div style={{ position: 'relative', flex: '0 0 auto', zIndex: 20 }}>
+      <button
+        type="button"
+        onClick={() => {
+          setOffert(false)
+          setOuvert((o) => !o)
+        }}
+        aria-expanded={ouvert}
+        aria-label={ouvert ? 'Fermer les réactions' : 'Réagir'}
+        style={{
+          width: 38,
+          height: 34,
+          borderRadius: R.pastille,
+          background: ouvert ? t.selBg : t.cardOff,
+          boxShadow: ouvert ? `0 3px 0 ${t.selEdge}` : undefined,
+          border: 'none',
+          font: '17px/1 serif',
+          cursor: 'pointer',
+          WebkitTapHighlightColor: 'transparent',
+        }}
+      >
+        <span aria-hidden="true">😀</span>
+      </button>
+
+      {ouvert && (
+        <div
+          style={{
+            position: 'absolute',
+            top: 'calc(100% + 8px)',
+            right: 0,
+            display: 'flex',
+            gap: 4,
+            zIndex: 20,
+          }}
+        >
+          {EVENTAIL.map((e, i) => {
+            const angle = (i - (EVENTAIL.length - 1) / 2) * 6
+            const mis = offert && e === EMOJI_PROPOSE
+            return (
+              <div
+                key={e}
+                style={{ transform: `rotate(${angle}deg) translateY(${Math.abs(angle) * 0.2}px)` }}
+              >
+                <button
+                  type="button"
+                  onClick={() => envoyer(e)}
+                  aria-label={`Envoyer ${NOM_EMOJI[e]}`}
+                  style={{
+                    width: 42,
+                    height: 44,
+                    borderRadius: R.carte,
+                    background: mis ? t.selBg : t.cardBg,
+                    boxShadow: `0 4px 0 ${mis ? t.selEdge : t.cardEdge}`,
+                    border: 'none',
+                    font: '21px/1 serif',
+                    cursor: 'pointer',
+                    WebkitTapHighlightColor: 'transparent',
+                    animation: anime(bouge, 'rempart-eventail', 180, { delai: i * 35 }),
+                  }}
+                >
+                  <span aria-hidden="true">{e}</span>
+                </button>
+              </div>
+            )
+          })}
+        </div>
+      )}
+    </div>
+  )
+}
+
+/* ------------------------------------------------------------ la feuille */
+
+/** Le bouton qui ouvre la conversation, au salon. */
+export function BoutonConversation({ nonLus, onOuvrir }: { nonLus: number; onOuvrir: () => void }) {
+  const t = useTheme()
+  return (
+    <button
+      type="button"
+      onClick={onOuvrir}
+      style={{
+        height: 48,
+        flex: '0 0 48px',
+        borderRadius: 16,
+        background: t.cardOff,
+        border: 'none',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 10,
+        padding: '0 16px',
+        font: `600 12px/1 ${TEXTE}`,
+        letterSpacing: '0.08em',
+        color: t.ink2,
+        textTransform: 'uppercase',
+        cursor: 'pointer',
+        WebkitTapHighlightColor: 'transparent',
+      }}
+    >
+      Conversation
+      <span
+        style={{
+          marginLeft: 'auto',
+          font: `600 11px/1 ${TEXTE}`,
+          letterSpacing: '0.08em',
+          color: nonLus > 0 ? t.clayText : t.ink2,
+        }}
+      >
+        {nonLus > 0 ? `${nonLus} nouveau${nonLus > 1 ? 'x' : ''}` : 'on a le temps'}
+      </span>
+    </button>
+  )
+}
+
+/**
+ * La feuille de conversation du salon.
+ *
+ * Elle monte du bas et se ferme par sa croix — pas au premier doigt posé à
+ * côté : on écrit à quatre, et un retour de clavier ne doit pas refermer ce
+ * qu'on est en train de lire.
+ */
+export function FeuilleDiscussion({ onFermer }: { onFermer: () => void }) {
+  const salle = useSalle()
+  const t = useTheme()
+  const bouge = useMouvement()
+  const [texte, setTexte] = useState('')
+  const bas = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    bas.current?.scrollIntoView({ block: 'end', behavior: bouge ? 'smooth' : 'auto' })
+  }, [salle?.messages.length, bouge])
+
+  if (!salle) return null
+
+  const envoyer = (t2: string) => {
+    if (salle.envoyer(t2)) setTexte('')
+  }
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="false"
+      aria-label="Conversation de la table"
+      style={{
+        position: 'absolute',
+        left: 0,
+        right: 0,
+        bottom: 0,
+        maxHeight: '78%',
+        background: t.panel,
+        borderRadius: '26px 26px 30px 30px',
+        boxShadow: `0 -3px 0 ${t.edge}`,
+        padding: '16px 16px calc(16px + env(safe-area-inset-bottom))',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 12,
+        zIndex: 8,
+        animation: anime(bouge, 'rempart-feuille', DUREE.feuille, { courbe: 'ease-out' }),
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{ font: `700 21px/1 ${TITRE}`, color: t.ink }}>Conversation</div>
+        <Etiquette size={10} style={{ letterSpacing: '0.1em' }}>
+          pendant qu’on attend
+        </Etiquette>
+        <button
+          type="button"
+          onClick={onFermer}
+          aria-label="Fermer la conversation"
+          style={{
+            marginLeft: 'auto',
+            width: 38,
+            height: 38,
+            borderRadius: R.pastille,
+            background: t.cardOff,
+            border: 'none',
+            font: `600 15px/1 ${TEXTE}`,
+            color: t.ink2,
+            cursor: 'pointer',
+            WebkitTapHighlightColor: 'transparent',
+          }}
+        >
+          <span aria-hidden="true">✕</span>
+        </button>
+      </div>
+
+      <div
+        style={{
+          flex: 1,
+          minHeight: 120,
+          overflowY: 'auto',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 8,
+        }}
+      >
+        {salle.messages.length === 0 ? (
+          <Texte size={13} style={{ padding: '6px 2px' }}>
+            Personne n’a rien dit. C’est le seul moment de la partie où l’on a le temps.
+          </Texte>
+        ) : (
+          salle.messages.map((m) => <Ligne key={m.id} message={m} salle={salle} />)
+        )}
+        <div ref={bas} />
+      </div>
+
+      <div style={{ display: 'flex', gap: 6 }}>
+        {EVENTAIL.map((e) => (
+          <button
+            key={e}
+            type="button"
+            onClick={() => envoyer(e)}
+            aria-label={`Envoyer ${NOM_EMOJI[e]}`}
+            style={{
+              flex: 1,
+              height: 40,
+              borderRadius: 13,
+              background: t.cardBg,
+              boxShadow: `0 3px 0 ${t.cardEdge}`,
+              border: 'none',
+              font: '19px/1 serif',
+              cursor: 'pointer',
+              WebkitTapHighlightColor: 'transparent',
+            }}
+          >
+            <span aria-hidden="true">{e}</span>
+          </button>
+        ))}
+      </div>
+
+      <form
+        onSubmit={(ev) => {
+          ev.preventDefault()
+          envoyer(texte)
+        }}
+        style={{ display: 'flex', gap: 8 }}
+      >
+        <input
+          value={texte}
+          onChange={(ev) => setTexte(ev.target.value)}
+          maxLength={LONGUEUR_MAX}
+          enterKeyHint="send"
+          aria-label="Ton message"
+          placeholder="Dis quelque chose…"
+          style={{
+            flex: 1,
+            minWidth: 0,
+            height: 48,
+            borderRadius: 14,
+            background: t.panel2,
+            border: 'none',
+            padding: '0 14px',
+            font: `500 15px/1 ${TEXTE}`,
+            color: t.ink,
+          }}
+        />
+        <button
+          type="submit"
+          disabled={texte.trim().length === 0}
+          style={{
+            flex: '0 0 auto',
+            height: 48,
+            borderRadius: 14,
+            background: t.selBg,
+            boxShadow: `0 3px 0 ${t.selEdge}`,
+            border: 'none',
+            padding: '0 18px',
+            font: `700 14px/1 ${TITRE}`,
+            color: t.selFg,
+            opacity: texte.trim().length === 0 ? 0.55 : 1,
+            cursor: texte.trim().length === 0 ? 'default' : 'pointer',
+            WebkitTapHighlightColor: 'transparent',
+          }}
+        >
+          Envoyer
+        </button>
+      </form>
+    </div>
+  )
+}
+
+/** Une ligne de la feuille : qui, et quoi. Une réaction y tient sa place. */
+function Ligne({ message, salle }: { message: Message; salle: Salle }) {
+  const t = useTheme()
+  const auteur = salle.auteurs.find((a) => a.id === message.de)
+  const moi = message.de === salle.moi
+  const reaction = estReaction(message.texte)
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 9,
+        background: moi ? t.panel2 : 'transparent',
+        borderRadius: 13,
+        padding: moi ? '8px 10px' : '8px 2px',
+      }}
+    >
+      {auteur && <Forme ci={auteur.ci} size={16} />}
+      <span style={{ font: `700 13px/1 ${TITRE}`, color: t.ink, flex: '0 0 auto' }}>
+        {moi ? 'toi' : (auteur?.nom ?? '?')}
+      </span>
+      <span
+        style={{
+          font: reaction ? '20px/1 serif' : `500 14px/1.35 ${TEXTE}`,
+          color: t.ink,
+          textWrap: 'pretty',
+          minWidth: 0,
+        }}
+      >
+        <span aria-hidden={reaction}>{message.texte}</span>
+        {reaction && <span style={SR_ONLY}>{NOM_EMOJI[message.texte as Emoji]}</span>}
+      </span>
+    </div>
+  )
+}

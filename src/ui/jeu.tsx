@@ -3,6 +3,7 @@ import { R, TEXTE, TITRE } from '../theme'
 import { CARD_LABEL, type CardKey, type Player, type Slot } from '../game/types'
 import { Pictogramme } from './Pictogramme'
 import { Etiquette, Forme, Mur, MurAccessible, Pastille } from './atoms'
+import { DUREE, anime, useMouvement } from './mouvement'
 import { useTheme } from './theme'
 
 /**
@@ -23,13 +24,24 @@ export function CarteMain({
   etat,
   onClick,
   height = 126,
+  fremis,
 }: {
   card: CardKey
   etat: EtatCarte
   onClick?: () => void
   height?: number
+  /**
+   * La carte posée frémit tant qu'on attend les autres.
+   *
+   * C'est la seule boucle de l'app, et elle dit quelque chose qu'aucun texte
+   * ne disait aussi vite : « c'est parti, on attend ». Elle s'arrête à la
+   * seconde où la table est complète — une boucle qui ne s'arrête jamais
+   * cesse d'être une information et devient du décor.
+   */
+  fremis?: boolean
 }) {
   const t = useTheme()
+  const bouge = useMouvement()
   const choisie = etat === 'choisie'
   const interdite = etat === 'interdite'
   const bg = choisie ? t.selBg : interdite ? t.cardOff : t.cardBg
@@ -59,6 +71,9 @@ export function CarteMain({
         justifyContent: 'space-between',
         cursor: interdite ? 'default' : 'pointer',
         WebkitTapHighlightColor: 'transparent',
+        animation: fremis
+          ? anime(bouge, 'rempart-fremis', DUREE.fremis, { courbe: 'ease-in-out', boucle: true })
+          : undefined,
       }}
     >
       <Pictogramme card={card} size={40} color={pictoColor} />
@@ -82,16 +97,26 @@ export function Main({
   etat,
   onPick,
   height,
+  fremis,
 }: {
   cards: readonly CardKey[]
   etat: (c: CardKey) => EtatCarte
   onPick?: (c: CardKey) => void
   height?: number
+  /** La carte posée frémit : le choix est parti, on attend les autres. */
+  fremis?: boolean
 }) {
   return (
     <div style={{ display: 'flex', gap: 9 }}>
       {cards.map((c) => (
-        <CarteMain key={c} card={c} etat={etat(c)} height={height} onClick={() => onPick?.(c)} />
+        <CarteMain
+          key={c}
+          card={c}
+          etat={etat(c)}
+          height={height}
+          fremis={fremis && etat(c) === 'choisie'}
+          onClick={() => onPick?.(c)}
+        />
       ))}
     </div>
   )
@@ -158,6 +183,9 @@ export function LigneJoueur({
   nu = false,
   bandeau,
   dessous,
+  compte,
+  bulles,
+  chute,
   onClick,
   ariaLabel,
 }: {
@@ -184,6 +212,18 @@ export function LigneJoueur({
   bandeau?: ReactNode
   /** Ce qui se glisse entre l'identité et le mur (la carte jouée, à la révélation). */
   dessous?: ReactNode
+  /** Le compte de briques, là où le verrou se tient le reste du temps. */
+  compte?: ReactNode
+  /**
+   * Les bulles de ce joueur.
+   *
+   * Elles sortent de son jeton, et non du milieu de l'écran : une réaction dit
+   * autant QUI que QUOI, et une bulle au centre aurait obligé à lire un nom
+   * pour comprendre ce qu'un coup d'œil doit donner.
+   */
+  bulles?: ReactNode
+  /** La brique qui tombe, à la révélation. */
+  chute?: { slots: readonly number[]; sens: 1 | -1; avant: Slot[]; delai?: number }
   onClick?: () => void
   ariaLabel?: string
 }) {
@@ -214,6 +254,7 @@ export function LigneJoueur({
       }}
     >
       <MurAccessible nom={player.name} wall={w} />
+      {bulles}
       <div style={{ display: 'flex', alignItems: 'center', gap: 9, flexWrap: 'nowrap' }}>
         <Forme ci={player.ci} size={nu ? 17 : 20} />
         <span
@@ -226,6 +267,7 @@ export function LigneJoueur({
           {player.name}
         </span>
         {verrou && <Verrou locked={player.locked} chipBg={chipBg} petit={nu} />}
+        {compte}
         {tag && (
           <Etiquette size={10} color={tagColor ?? t.ink2} style={{ marginLeft: 'auto', letterSpacing: '0.08em' }}>
             {tag}
@@ -234,7 +276,16 @@ export function LigneJoueur({
       </div>
       {bandeau}
       {dessous}
-      <Mur wall={w} ci={player.ci} height={hauteurMur} chant={chant} />
+      <Mur
+        wall={w}
+        ci={player.ci}
+        height={hauteurMur}
+        chant={chant}
+        tombees={chute?.slots}
+        avant={chute?.avant}
+        sens={chute?.sens}
+        delai={chute?.delai}
+      />
     </Tag>
   )
 }

@@ -28,7 +28,6 @@ export function narrate(
   /** « tu » quand c'est le lecteur, le prénom sinon. */
   const isMe = (id: PlayerId) => id === viewerId
   const subject = (id: PlayerId) => (isMe(id) ? 'Tu' : name(id))
-  const poss = (id: PlayerId) => (isMe(id) ? 'ta' : `la`)
   const ofWhom = (id: PlayerId) => (isMe(id) ? '' : ` de ${name(id)}`)
 
   const ev = outcome.events
@@ -83,10 +82,15 @@ export function narrate(
     const e = onMe ?? landed[0]
     const total = landed.filter((x) => x.to === e.to).reduce((n, x) => n + x.amount, 0)
     return {
+      // `onMe` ne vaut que pour une frappe reçue : la cible, ici, c'est le
+      // lecteur. Le possessif s'accorde donc avec le nombre de briques, et non
+      // avec la personne — « ta briques » était la faute que l'écran affichait.
       headline: onMe
-        ? `${subject(e.from)} ${isMe(e.from) ? 'as' : 'a'} cassé ${poss(e.to)} ${total > 1 ? 'briques' : 'brique'}.`
+        ? `${subject(e.from)} ${isMe(e.from) ? 'as' : 'a'} cassé ${total > 1 ? 'tes briques' : 'ta brique'}.`
         : `${subject(e.from)} ${isMe(e.from) ? 'as' : 'a'} frappé ${name(e.to)}.`,
-      detail: `${name(e.to)} perd ${briques(total)}.${lockLine(e.from)}`,
+      // Et le détail se dit au lecteur, comme tout le reste de ce fichier :
+      // « Tu perds » quand c'est son mur, le prénom quand c'est celui d'un autre.
+      detail: `${isMe(e.to) ? 'Tu perds' : `${name(e.to)} perd`} ${briques(total)}.${lockLine(e.from)}`,
       tone: 'clay',
     }
   }
@@ -131,4 +135,51 @@ export function playedLabel(state: GameState, playerId: PlayerId, outcome: Round
       return target ? `${label} sur ${target.name}` : label
     })
     .join(' + ')
+}
+
+/**
+ * Ce qui tombe sur un mur, et de quel côté.
+ *
+ * La brique qui tombe est le seul mouvement de la révélation qui porte deux
+ * informations à la fois : **sur quel mur** le coup atterrit — c'est
+ * l'emplacement qui bascule — et **d'où il vient** — c'est le sens de la
+ * chute. Une brique frappée par quelqu'un d'assis avant soi tombe vers la
+ * droite, et l'inverse : le regard remonte au coupable sans qu'on ait à
+ * l'écrire.
+ *
+ * Dérivé des faits de la manche, comme le récit : le moteur ne sait rien de
+ * l'écran, et deux joueurs qui regardent la même manche voient tomber les
+ * mêmes briques.
+ */
+export function chute(
+  state: GameState,
+  outcome: RoundOutcome,
+  playerId: PlayerId,
+): { slots: number[]; sens: 1 | -1 } {
+  const o = outcome.outcomes.find((x) => x.playerId === playerId)
+  const apres = state.players.find((p) => p.id === playerId)?.wall
+  const slots: number[] = []
+  if (o && apres) {
+    for (let i = 0; i < apres.length; i++) {
+      if (apres[i] === 'broken' && o.wallBefore[i] !== 'broken') slots.push(i)
+    }
+  }
+
+  // D'où vient le coup : la frappe reçue, ou — pour qui s'est fait retourner sa
+  // propre frappe — le piège qui la lui a renvoyée.
+  const frappe = outcome.events.find(
+    (e): e is Extract<RoundEvent, { t: 'frappe' }> => e.t === 'frappe' && e.to === playerId,
+  )
+  const retournee = outcome.events.find(
+    (e): e is Extract<RoundEvent, { t: 'retournee' }> => e.t === 'retournee' && e.from === playerId,
+  )
+  const depuis = frappe?.from ?? retournee?.to
+  const place = (id?: PlayerId) => state.players.find((p) => p.id === id)?.seat
+
+  const dOu = place(depuis)
+  const ici = place(playerId)
+  // Sans coupable identifié — une carte de manche qui rogne les murs — la
+  // brique tombe vers la droite, comme un objet qu'on pousse.
+  const sens: 1 | -1 = dOu === undefined || ici === undefined || dOu < ici ? 1 : -1
+  return { slots, sens }
 }

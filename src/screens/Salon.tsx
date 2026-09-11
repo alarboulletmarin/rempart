@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { SAFE_TOP, TEXTE, TITRE } from '../theme'
 import { NIVEAUX_BOT, NIVEAU_DEFAUT, NOM_NIVEAU, type NiveauBot } from '../game/bot'
 import { MAX_SIEGES } from '../net/room'
 import type { VueSession } from '../net/session'
 import { Etiquette, Forme, Panneau, Scribble, Texte, shapeName, usePanneauEncre } from '../ui/atoms'
+import { BoutonConversation, FeuilleDiscussion, useSalle } from '../ui/discussion'
 import { Ecran } from '../ui/shell'
 import { useTheme } from '../ui/theme'
 
@@ -50,6 +51,22 @@ export function Salon({
   const t = useTheme()
   const encre = usePanneauEncre()
   const [copie, setCopie] = useState(false)
+
+  /*
+   * La conversation.
+   *
+   * Elle est ouverte ICI et nulle part ailleurs : le salon est le seul moment
+   * de la partie où l'on a du temps. Trois secondes pour lire quatre murs et
+   * choisir une carte, ce n'est pas le moment de lire un fil — en partie il
+   * reste l'éventail, six emoji au bout d'un doigt.
+   */
+  const salle = useSalle()
+  const [conversation, setConversation] = useState(false)
+  const [lu, setLu] = useState(salle?.messages.length ?? 0)
+  const recus = salle?.messages.length ?? 0
+  useEffect(() => {
+    if (conversation) setLu(recus)
+  }, [conversation, recus])
 
   const { salon, moi, hote, lien, demandes, statutDemande } = etat
   const joueurs = salon.joueurs
@@ -325,6 +342,11 @@ export function Salon({
 
         {/* Le bas de l'écran : un seul geste possible. */}
         <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {/* Parler à quelqu'un suppose que quelqu'un soit là : un bot ne
+              répond pas, et un salon d'une personne n'a pas de conversation. */}
+          {salle && (joueurs.filter((j) => !j.bot).length > 1 || recus > 0) && !conversation && (
+            <BoutonConversation nonLus={recus - lu} onOuvrir={() => setConversation(true)} />
+          )}
           {hote ? (
             <BoutonLancer onClick={onLancer} disabled={!peutLancer} note={noteLancer(salon.format, joueurs.length, assez)}>
               Lancer
@@ -373,6 +395,8 @@ export function Salon({
           </button>
         </div>
       </div>
+
+      {conversation && <FeuilleDiscussion onFermer={() => setConversation(false)} />}
     </Ecran>
   )
 }

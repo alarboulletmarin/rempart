@@ -19,7 +19,7 @@ suivante** : c'est le verrou, et c'est lui qui porte tout le jeu.
 ```bash
 npm install
 npm run dev          # l'app, sur http://localhost:5173
-npm test             # moteur, bots, table, admission, secret des choix
+npm test             # moteur, bots, table, admission, secret des choix, conversation
 npm run typecheck
 npm run build        # dist/ prêt à servir en statique
 npm run icons        # régénère les icônes depuis scripts/icone.py
@@ -175,9 +175,12 @@ src/
     vue.ts          Ce que chaque joueur a le droit de voir de l'état.
     table.ts        L'autorité de la partie, côté hôte — sans réseau.
     session.ts      Ce qui relie les deux : règne, accusés, battement.
+    discussion.ts   La conversation et ses deux freins. Pur, et sans horloge.
     presence.ts     Les durées, séparées pour être vérifiables.
     turn.ts         Lecture des réglages TURN.
   ui/               Les primitives : brique, mur, pictogrammes, carte, panneau.
+    mouvement.ts    Les cinq durées, et la règle du mouvement réduit.
+    discussion.tsx  La feuille du salon, l'éventail, la bulle.
   screens/          Un fichier par écran de la planche.
   store/palmares.ts Le palmarès local (localStorage).
 design/             La planche, ses gabarits et les transcriptions d'origine.
@@ -204,13 +207,75 @@ Les gribouillages (`public/assets/scribble-*.svg`, d'illustrations.run) ne
 paraissent que dans les temps morts — salon, fin de partie, pause. Jamais pendant
 une manche : le joueur y lit quatre murs et quatre cartes en trois secondes.
 
+## Le mouvement, et ce qu'il dit
+
+Cinq mouvements, et chacun porte une information que l'écran fixe ne donnait
+pas. Rien ne décore : le fond de l'app ne bouge pas, et aucune image ne tourne
+en boucle sur un écran qu'on lit. Les durées vivent toutes dans
+`ui/mouvement.ts`.
+
+| | Durée | Ce qu'il dit |
+|---|---|---|
+| **La brique tombe** | 0,45 s | D'où vient le coup — elle bascule du côté opposé à l'attaquant — et sur quel mur il atterrit. |
+| **La révélation en cascade** | 0,5 s par carte | Le seul moment de la manche où l'on ne sait pas encore. Chaque carte se retourne seule, avec un temps mort avant la suivante. |
+| **La carte posée frémit** | boucle, 2 s | « C'est parti, on attend les autres », sans texte. S'arrête dès que la table est complète. |
+| **La carte de manche entre en grand** | 1,2 s | Cette manche ne suit pas les règles des autres. L'écran reprend sa peau ensuite. |
+| **Les briques se recomptent** | 0,8 s | Ce qu'on vient de gagner ou de perdre, chiffre par chiffre — pas seulement le total. |
+
+Le **fond vivant** a été écarté : c'était le seul de la liste qui prenait de
+l'attention sans rien dire.
+
+**La cascade est le vrai correctif.** Le jeu n'était pas plat par manque
+d'effets : la révélation montrait un résultat déjà acquis — les murs portaient
+les dégâts avant que la moindre carte ne se retourne, et le retournement ne
+faisait que confirmer. Les lignes partent désormais du mur d'**avant** la
+manche (`PlayerOutcome.wallBefore`, produit par le moteur), et rien ne bouge
+sur une ligne tant que sa carte est face cachée.
+
+Sous `prefers-reduced-motion`, **rien ne se crée** : pas d'animation ralentie ni
+de transition raccourcie — la cascade dévoile tout d'un coup, la brique est déjà
+tombée, le compte affiche son total. Il reste l'écrit, qui disait déjà tout.
+
+## Se parler — dans le salon, et en partie
+
+**Un seul canal.** Une réaction EST un message de conversation, avec un emoji
+pour texte : même canal, même auteur, même ligne dans l'historique. Deux canaux
+auraient donné deux ordres d'arrivée pour une seule conversation.
+
+- **Dans le salon**, la feuille s'ouvre et se lit : c'est le seul moment de la
+  partie où l'on a du temps. Elle monte du bas, et se ferme par sa croix.
+- **En partie, un doigt** : six emoji au bout d'un éventail, dans la barre du
+  haut. Un appui ouvre, un appui envoie, trois secondes sans choix referment. Le
+  jeu ne s'interrompt pas, et la feuille ne s'ouvre jamais — trois secondes pour
+  lire quatre murs et choisir une carte, ce n'est pas le moment de lire un fil.
+- **La bulle sort de son auteur**, sur son jeton et non au milieu de l'écran :
+  une réaction dit autant *qui* que *quoi*. Elle monte, grandit et s'estompe en
+  1,8 s.
+- **La table propose** : quand ton mur vient d'être frappé, l'éventail s'ouvre
+  seul deux secondes avec 😱 entouré. Une proposition, jamais une interruption —
+  et jamais pendant ton propre choix de carte.
+
+**Deux freins.** 0,7 s entre deux envois chez l'émetteur ; 3 bulles simultanées
+au plus par joueur chez le récepteur. Le premier vit chez quelqu'un d'autre — un
+client bricolé l'enlèverait — donc c'est le second qui fait foi, et il est posé
+là où le tort serait fait. Ce qui dépasse n'est **ni montré ni archivé** : un
+message refusé n'entre pas dans l'historique, sans quoi l'inondation se verrait
+quand même à la réouverture de la feuille.
+
+La conversation **ne passe pas par l'arbitre** : elle part à la cantonade, et
+chacun la reçoit directement de son auteur. La partie a besoin d'une autorité —
+un état contradictoire casse le jeu ; une conversation, non. La faire transiter
+par l'hôte n'aurait rien garanti de plus qu'un aller-retour de latence sur un
+emoji. Seule règle d'entrée : **on parle depuis un siège**, et un pair qui a le
+code sans avoir de place à la table n'a pas de voix.
+
 ## Les écrans
 
 Les 28 cadres de la planche sont tous implémentés : 14 écrans clairs (01–12,
 08 bis, 11 bis), 4 en veillée (01, 05, 08, 11), les 8 chapitres de règles (R0–R7)
 et les 2 écrans de cartes de manche (C1, C2).
 
-Six écrans que la planche ne pouvait pas prévoir s'y ajoutent, parce qu'ils
+Sept écrans que la planche ne pouvait pas prévoir s'y ajoutent, parce qu'ils
 naissent du réseau et non du jeu — tous dessinés avec les seules pièces de la
 planche :
 
@@ -221,6 +286,8 @@ planche :
 - **Salon · des bots à la table**, la place libre qui se remplit d'un geste et
   le niveau posé sous chaque bot — sans quoi l'hôte n'a rien d'autre à faire
   qu'attendre ;
+- **Salon · la conversation**, la feuille qui monte pendant qu'on attend, et
+  l'éventail de six emoji posé dans la barre du haut en partie ;
 - le **nom du joueur**, demandé à la création et à l'arrivée plutôt qu'au salon :
   la planche du salon ne porte que le code, les joueurs et les identités, et un
   champ de saisie de plus y aurait chassé les pastilles d'identité.
@@ -240,7 +307,7 @@ Deux écarts assumés, en plus :
 **La poignée de main WebRTC.** Les relais de signalisation sont injoignables
 depuis l'environnement de développement utilisé (politique réseau). Le moteur,
 les bots et l'écart entre leurs niveaux, l'autorité de l'hôte, l'admission, le
-secret des choix et une partie complète de bout en bout sont couverts par 135
-tests — et une partie contre des
+secret des choix, les deux freins de la conversation et une partie complète de
+bout en bout sont couverts par 157 tests — et une partie contre des
 bots, elle, se joue sans réseau du tout ; **l'établissement de la connexion
 entre deux appareils reste à valider sur un réseau ouvert.**

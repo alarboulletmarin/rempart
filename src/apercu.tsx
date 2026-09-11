@@ -29,6 +29,7 @@ import { ReglesRapides } from './screens/ReglesRapides'
 import { Rejoindre } from './screens/Rejoindre'
 import { Revelation } from './screens/Revelation'
 import { Salon } from './screens/Salon'
+import { DiscussionProvider, FeuilleDiscussion } from './ui/discussion'
 
 const SEATS = [
   { id: 'a', name: 'Léa', ci: 0 as const },
@@ -86,8 +87,37 @@ function vueSalon(over: Partial<VueSession> = {}): VueSession {
     demandes: [],
     absentsDepuis: SANS_ABSENT,
     relaisActifs: 8,
+    messages: [],
     ...over,
   }
+}
+
+/**
+ * Une conversation figée, pour rendre la feuille hors de toute session.
+ *
+ * `at` est daté loin devant : sans cela les bulles seraient déjà retombées au
+ * moment où la galerie s'affiche. Les cadres rendent un écran arrêté — les
+ * mouvements, eux, se regardent dans l'app.
+ */
+const CONVERSATION = [
+  { id: 'b:1', de: 'b', texte: 'je prends le carré', at: Date.now() + 1e6 },
+  { id: 'a:1', de: 'a', texte: 'on lance dès que Nour est là', at: Date.now() + 1e6 },
+  { id: 'c:1', de: 'c', texte: '🙏', at: Date.now() + 1e6 },
+]
+
+function AvecSalle({ children }: { children: ReactNode }) {
+  return (
+    <DiscussionProvider
+      valeur={{
+        moi: 'a',
+        auteurs: JOUEURS_SALON.map((j) => ({ id: j.clientId, nom: j.nom, ci: j.ci })),
+        messages: CONVERSATION,
+        envoyer: () => true,
+      }}
+    >
+      {children}
+    </DiscussionProvider>
+  )
 }
 
 function Cadre({ titre, theme = 'etabli', children }: { titre: string; theme?: ThemeName; children: ReactNode }) {
@@ -266,6 +296,23 @@ function Galerie() {
             onLancer={noop}
             onQuitter={noop}
           />
+        </Cadre>
+        <Cadre titre="03 quinquies · Salon · la conversation">
+          <AvecSalle>
+            <Salon
+              etat={vueSalon({ messages: CONVERSATION })}
+              onIdentite={noop}
+              onPret={noop}
+              onAdmettre={noop}
+              onRefuser={noop}
+              onAjouterBot={noop}
+              onRetirerBot={noop}
+              onNiveauBot={noop}
+              onLancer={noop}
+              onQuitter={noop}
+            />
+            <FeuilleDiscussion onFermer={noop} />
+          </AvecSalle>
         </Cadre>
         <Cadre titre="03 bis · Salon · une demande à la porte">
           <Salon
