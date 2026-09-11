@@ -157,7 +157,29 @@ export const TITRE = "'Bricolage Grotesque', Helvetica, sans-serif"
 export const TEXTE = 'Outfit, Helvetica, sans-serif'
 
 /**
- * Zone sûre en haut de chaque écran : laisse passer la Dynamic Island quand
- * l'app est installée en PWA plein écran. 44 px, plus l'inset réel du device.
+ * Zone sûre en haut de chaque écran : ce que l'appareil impose de laisser
+ * libre, et rien de plus.
+ *
+ * Installée en PWA plein écran sur un iPhone, l'app passe sous la Dynamic
+ * Island : `env(safe-area-inset-top)` vaut alors une quarantaine de pixels et
+ * il ne doit rien y avoir. Partout ailleurs — navigateur de bureau, Android,
+ * Safari avec sa barre d'adresse — cette bande existe déjà au-dessus de l'app
+ * et l'inset vaut zéro.
+ *
+ * Réserver 44 px en dur, comme on le faisait, revenait donc à dessiner une
+ * seconde barre d'état sur des écrans qui en avaient déjà une : c'était le
+ * grand vide en haut de tous les écrans. L'air au-dessus du premier élément
+ * n'est pas ici, il est dans la marge propre de chaque écran.
  */
-export const SAFE_TOP = 44
+export const SAFE_TOP = 'env(safe-area-inset-top, 0px)'
+
+/**
+ * La barre d'état dessinée sur la planche.
+ *
+ * Les hauteurs d'en-tête reprises de la planche (90 à 106) la comprennent : le
+ * cadre de design dessinait un téléphone entier. On la retranche à l'affichage
+ * et on lui substitue la zone sûre réelle — la géométrie de la planche est
+ * ainsi tenue au pixel sur l'appareil qu'elle dessinait, sans laisser un trou
+ * sur tous les autres.
+ */
+export const BANDEAU_PLANCHE = 44

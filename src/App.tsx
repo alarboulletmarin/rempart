@@ -201,6 +201,9 @@ export function App() {
             onPret={(p) => sessionRef.current?.sePreparer(p)}
             onAdmettre={(id) => sessionRef.current?.admettre(id)}
             onRefuser={(id) => sessionRef.current?.refuser(id)}
+            onAjouterBot={() => sessionRef.current?.ajouterBot()}
+            onRetirerBot={(id) => sessionRef.current?.retirerBot(id)}
+            onNiveauBot={(id, niveau) => sessionRef.current?.reglerNiveauBot(id, niveau)}
             onLancer={() => sessionRef.current?.lancer()}
             onQuitter={quitterSalon}
           />

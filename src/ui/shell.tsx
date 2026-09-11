@@ -1,14 +1,14 @@
 import type { CSSProperties, ReactNode } from 'react'
-import { R, SAFE_TOP, TEXTE, TITRE } from '../theme'
+import { BANDEAU_PLANCHE, R, SAFE_TOP, TEXTE, TITRE } from '../theme'
 import { useTheme } from './theme'
 
 /**
  * Le cadre d'un écran. Écran de référence 390 × 844, mais l'app s'étire à la
  * hauteur réelle du téléphone.
  *
- * La zone sûre du haut (44 px, ou l'inset réel du device s'il est plus grand)
- * est réservée : installée en PWA plein écran, l'app passe sous la Dynamic
- * Island et il ne doit rien y avoir.
+ * La zone sûre du haut est réservée quand l'appareil en impose une — une PWA
+ * plein écran passe sous la Dynamic Island et il ne doit rien y avoir. Ailleurs
+ * elle vaut zéro : voir `SAFE_TOP`.
  */
 export function Ecran({
   children,
@@ -99,6 +99,11 @@ export function Retour({ onClick, bg, fg }: { onClick?: () => void; bg?: string;
 /**
  * La barre d'en-tête. Elle monte jusqu'en haut du cadre et absorbe la zone
  * sûre : pas de fausse barre de statut, l'app commence tout de suite.
+ *
+ * `hauteur` est la mesure de la planche, barre d'état comprise. C'est cette
+ * bande-là qu'on retranche pour lui substituer la zone sûre réelle, sans quoi
+ * l'en-tête porterait sur un écran de bureau une bande vide que rien
+ * n'occupe.
  */
 export function EnTete({
   titre,
@@ -130,12 +135,12 @@ export function EnTete({
     <div
       style={{
         flex: `0 0 auto`,
-        minHeight: hauteur,
+        minHeight: `calc(${SAFE_TOP} + ${Math.max(0, hauteur - BANDEAU_PLANCHE)}px)`,
         background: bg ?? t.panel,
         display: 'flex',
         alignItems: 'center',
         gap: 12,
-        padding: `max(${SAFE_TOP}px, env(safe-area-inset-top)) ${pad}px 0 ${pad}px`,
+        padding: `${SAFE_TOP} ${pad}px 0 ${pad}px`,
       }}
     >
       {onRetour && <Retour onClick={onRetour} bg={retourBg} fg={retourFg} />}

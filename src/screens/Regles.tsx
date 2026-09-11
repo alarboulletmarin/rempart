@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { TEXTE, TITRE } from '../theme'
+import { SAFE_TOP, TEXTE, TITRE } from '../theme'
 import {
   CARD_DETAIL,
   CHAPITRE_TITRE,
@@ -466,12 +466,13 @@ export function CartesDeManche({
       <div
         style={{
           flex: '0 0 auto',
-          minHeight: 94,
+          // 94 sur la planche, barre d'état comprise : voir `EnTete`.
+          minHeight: `calc(${SAFE_TOP} + 50px)`,
           background: t.ochre,
           display: 'flex',
           alignItems: 'center',
           gap: 12,
-          padding: `max(44px, env(safe-area-inset-top)) 18px 0 18px`,
+          padding: `${SAFE_TOP} 18px 0 18px`,
         }}
       >
         <Retour onClick={onRetour} bg={t.panel} fg={t.ochreInk} />

@@ -13,6 +13,7 @@
  */
 
 import { getRelaySockets, joinRoom, selfId } from 'trystero/nostr'
+import type { NiveauBot } from '../game/bot.ts'
 import type { Choice, Format, GameState } from '../game/types.ts'
 import { turnServers } from './turn.ts'
 
@@ -48,6 +49,33 @@ export type JoueurSalon = {
   hote: boolean
   pret: boolean
   connecte: boolean
+  /**
+   * Un siège tenu par un bot, et non par un appareil.
+   *
+   * Il voyage avec le salon parce que tout le monde a besoin de le savoir :
+   * l'écran, pour l'écrire sur la ligne plutôt que de laisser croire qu'un ami
+   * est arrivé ; l'arbitre, parce que c'est lui qui joue les cartes de ce
+   * siège-là ; et le battement, qui ne doit pas déclarer absent un joueur qui
+   * n'a jamais eu de téléphone. Optionnel : un salon publié par une version
+   * plus ancienne n'en porte pas, et n'a alors aucun bot à la table.
+   */
+  bot?: boolean
+  /**
+   * Le niveau de ce bot (voir `game/bot.ts`).
+   *
+   * **Par siège, et non par table.** À quatre, on veut souvent un adversaire
+   * sérieux et deux qui laissent respirer ; un réglage unique l'interdirait.
+   *
+   * Il vit dans le salon et non dans `GameConfig`, qui ne porte que des RÈGLES
+   * et voyage dans l'état de la partie : le niveau d'un bot n'est pas une règle
+   * du jeu, et il n'a rien à faire dans ce que le moteur reçoit. Comme le bot ne
+   * joue que chez l'arbitre, ce champ n'a jamais besoin d'être exact ailleurs —
+   * il n'y sert qu'à être lu sur la ligne du salon.
+   *
+   * Optionnel, comme `bot` : une version plus ancienne publie un salon qui ne le
+   * porte pas, et chaque lecture retombe alors sur `NIVEAU_DEFAUT`.
+   */
+  niveau?: NiveauBot
 }
 
 export type Salon = {
