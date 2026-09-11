@@ -82,7 +82,7 @@ export function Salon({
         style={{
           flex: 1,
           minHeight: 0,
-          padding: `calc(max(${SAFE_TOP}px, env(safe-area-inset-top)) + 20px) 20px 20px 20px`,
+          padding: `calc(${SAFE_TOP} + 20px) 20px 20px 20px`,
           display: 'flex',
           flexDirection: 'column',
           gap: 18,

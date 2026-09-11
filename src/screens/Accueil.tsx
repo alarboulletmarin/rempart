@@ -42,7 +42,7 @@ export function Accueil({
         style={{
           flex: 1,
           minHeight: 0,
-          padding: `calc(max(${SAFE_TOP}px, env(safe-area-inset-top)) + 26px) 22px 22px 22px`,
+          padding: `calc(${SAFE_TOP} + 26px) 22px 22px 22px`,
           display: 'flex',
           flexDirection: 'column',
           gap: 20,
