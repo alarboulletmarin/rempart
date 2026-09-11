@@ -1,0 +1,79 @@
+/*
+ * Rempart — feuille de base.
+ *
+ * Tout le reste du style vit dans les composants, à partir des jetons de
+ * `theme.ts` : il n'y a pas de couleur écrite en dur ici.
+ */
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  /* Le fond est posé par le thème ; ce repli évite un flash blanc au démarrage. */
+  background: #e4d7be;
+  font-family: Outfit, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  /* Mobile first : rien ne se sélectionne par accident pendant une manche. */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  /* Pas de rebond élastique : le plateau ne bouge pas sous le doigt. */
+  overscroll-behavior: none;
+}
+
+#root {
+  height: 100%;
+  display: flex;
+}
+
+/* L'écran de référence est 390 × 844 ; au-delà, l'app reste centrée. */
+.rempart-cadre {
+  position: relative;
+  flex: 1;
+  width: 100%;
+  max-width: 430px;
+  margin: 0 auto;
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Le texte des écrans de lecture reste sélectionnable. */
+input,
+textarea {
+  -webkit-user-select: text;
+  user-select: text;
+  font-family: inherit;
+}
+
+button {
+  font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:focus-visible,
+input:focus-visible,
+[role='button']:focus-visible {
+  /* Le focus clavier se voit — un chant, pas un halo. */
+  outline: 3px solid currentColor;
+  outline-offset: 2px;
+}
+
+/* Une barre de défilement discrète quand un écran de lecture déborde. */
+* {
+  scrollbar-width: thin;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
