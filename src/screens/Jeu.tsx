@@ -19,7 +19,9 @@ import {
   type PlayerId,
 } from '../game/types'
 import { Etiquette, Panneau, Texte } from '../ui/atoms'
+import { Bulles, Eventail } from '../ui/discussion'
 import { BandeauCible, BandeauManche, LigneJoueur, Main, type EtatCarte } from '../ui/jeu'
+import { DUREE, anime, useMouvement } from '../ui/mouvement'
 import { Pictogramme } from '../ui/Pictogramme'
 import { CompteurManche, Corps, Ecran, EnTete, Jauge } from '../ui/shell'
 import { useTheme } from '../ui/theme'
@@ -251,6 +253,7 @@ export function Jeu({
         key={p.id}
         player={p}
         moi={p.id === moi}
+        bulles={<Bulles de={p.id} />}
         nu={nu}
         verrou={!deconnecte}
         tag={tag}
@@ -321,7 +324,14 @@ export function Jeu({
             <CompteurManche round={state.round} />
           )
         }
-        droite={droite}
+        droite={
+          <>
+            {droite}
+            {/* Un doigt, dans la barre du haut : le jeu ne s'interrompt pas, et
+                la feuille de conversation ne s'ouvre jamais en partie. */}
+            <Eventail />
+          </>
+        }
         hauteur={state.activeRoundCard ? 98 : 104}
         pad={18}
       />
@@ -388,6 +398,10 @@ export function Jeu({
                 etat={etatCarte}
                 onPick={choisirCarte}
                 height={cadre.carte}
+                // « C'est parti, on attend les autres », sans texte. Le
+                // frémissement s'arrête dès que la table est complète : ce
+                // qu'il disait n'est alors plus vrai.
+                fremis={envoye && played < total}
               />
               {pied}
             </>
@@ -517,6 +531,12 @@ function Equipes({
 /**
  * C2 · La fiche d'une carte de manche telle qu'elle tombe en jeu.
  * Elle est annoncée AVANT les choix : tout le monde la lit, puis on joue.
+ *
+ * **Elle entre en grand.** L'ocre couvre l'écran, la carte arrive trop grande
+ * et se repose à sa taille : c'est une rupture, et elle doit se lire comme
+ * telle — cette manche ne suit pas les règles des autres. L'écran reprend sa
+ * peau ensuite, en une seconde et deux dixièmes, et plus rien ne bouge : la
+ * fiche est un écran de lecture.
  */
 export function FicheCarteManche({
   state,
@@ -526,11 +546,25 @@ export function FicheCarteManche({
   onCompris: () => void
 }) {
   const t = useTheme()
+  const bouge = useMouvement()
   const carte = state.activeRoundCard
   if (!carte) return null
 
   return (
     <Ecran>
+      {bouge && (
+        <div
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background: t.ochre,
+            pointerEvents: 'none',
+            zIndex: 5,
+            animation: anime(bouge, 'rempart-peau', DUREE.manche, { courbe: 'ease-in' }),
+          }}
+        />
+      )}
       <EnTete
         gauche={<CompteurManche round={state.round} />}
         droite={
@@ -550,6 +584,10 @@ export function FicheCarteManche({
             display: 'flex',
             flexDirection: 'column',
             gap: 10,
+            zIndex: 6,
+            animation: anime(bouge, 'rempart-manche', DUREE.manche, {
+              courbe: 'cubic-bezier(.16,1,.3,1)',
+            }),
           }}
         >
           <Etiquette size={11} color={t.ochreInk} style={{ letterSpacing: '0.12em' }}>

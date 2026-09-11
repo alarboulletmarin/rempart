@@ -1,6 +1,7 @@
 import type { CSSProperties, ReactNode } from 'react'
 import { R, TEXTE, TITRE } from '../theme'
 import type { Slot } from '../game/types'
+import { DUREE, anime, useMouvement } from './mouvement'
 import { useTheme } from './theme'
 
 /* ------------------------------------------------------------- identités */
@@ -53,6 +54,10 @@ export function Mur({
   gap = 6,
   radius = R.brique,
   chant = 5,
+  tombees,
+  avant,
+  sens = 1,
+  delai = 0,
 }: {
   wall: Slot[]
   ci: number
@@ -61,18 +66,37 @@ export function Mur({
   radius?: number
   /** L'épaisseur du chant sombre en bas de brique. */
   chant?: number
+  /**
+   * Les emplacements dont la brique vient d'être cassée : elle tombe.
+   *
+   * Le mur rendu est déjà celui d'après — l'emplacement est creux, et la
+   * brique qui bascule par-dessus n'est qu'un calque. À la fin de sa chute il
+   * ne reste donc rien à remettre en place, et une animation interrompue ne
+   * laisse pas un mur faux à l'écran.
+   */
+  tombees?: readonly number[]
+  /** Le mur d'avant : il donne sa matière à la brique qui tombe. */
+  avant?: Slot[]
+  /** Le sens de la chute — du côté opposé à celui d'où le coup est venu. */
+  sens?: 1 | -1
+  /** Le temps qu'on laisse à la carte de se retourner avant que ça tombe. */
+  delai?: number
 }) {
   const t = useTheme()
   const crackW = Math.round(height * 0.38)
+  const bouge = useMouvement()
   return (
     <div style={{ display: 'flex', gap, height }} aria-hidden="true">
       {wall.map((slot, i) => {
         const fill = slot === 'broken' ? t.off : slot === 'repaired' ? t.green : t.pc[ci as 0]
         const edge = slot === 'broken' ? t.offEdge : slot === 'repaired' ? t.greenEdge : t.pe[ci as 0]
+        const tombe = bouge && tombees?.includes(i)
+        const avantSlot = avant?.[i] ?? 'intact'
         return (
           <div
             key={i}
             style={{
+              position: 'relative',
               flex: 1,
               borderRadius: radius,
               background: fill,
@@ -82,6 +106,23 @@ export function Mur({
               justifyContent: 'center',
             }}
           >
+            {tombe && (
+              <div
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  borderRadius: radius,
+                  background: avantSlot === 'repaired' ? t.green : t.pc[ci as 0],
+                  boxShadow: `inset 0 -${chant}px 0 ${avantSlot === 'repaired' ? t.greenEdge : t.pe[ci as 0]}`,
+                  animation: anime(
+                    bouge,
+                    sens > 0 ? 'rempart-chute-d' : 'rempart-chute-g',
+                    DUREE.chute,
+                    { delai, courbe: 'cubic-bezier(.5,0,.9,.45)' },
+                  ),
+                }}
+              />
+            )}
             {slot === 'broken' && (
               // Le trait de fracture : c'est lui qui dit « cassée », pas l'opacité.
               <div

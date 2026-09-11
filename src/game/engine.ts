@@ -315,6 +315,9 @@ export function resolveRound(state: GameState): GameState {
   const players = state.players.map((p) => ({ ...p, wall: [...p.wall] }))
   const byId = new Map(players.map((p) => [p.id, p]))
   const before = new Map(players.map((p) => [p.id, bricks(p)]))
+  // Le mur d'avant, emplacement par emplacement : c'est de là que part la
+  // révélation, et c'est lui qui dit quelle brique tombe.
+  const murAvant = new Map(players.map((p) => [p.id, [...p.wall]]))
   const events: RoundEvent[] = []
 
   const acting = new Set(playersToAct(state).map((p) => p.id))
@@ -408,7 +411,14 @@ export function resolveRound(state: GameState): GameState {
   const outcomes: PlayerOutcome[] = players.map((p) => {
     const delta = bricks(p) - (before.get(p.id) ?? 0)
     const { tag, hot } = tagFor(p.id, events, delta, p.connected)
-    return { playerId: p.id, played: state.choices[p.id] ?? [], tag, hot, delta }
+    return {
+      playerId: p.id,
+      played: state.choices[p.id] ?? [],
+      wallBefore: murAvant.get(p.id) ?? [...p.wall],
+      tag,
+      hot,
+      delta,
+    }
   })
 
   // « Cartes sur table » : on révèle du mur le plus bas au plus haut.

@@ -109,6 +109,16 @@ export interface PlayerOutcome {
   playerId: PlayerId
   /** La ou les cartes qu'il a jouées (deux avec « Dernier mur »). */
   played: Choice[]
+  /**
+   * Son mur tel qu'il était AVANT la résolution.
+   *
+   * Sans lui, la révélation n'a rien à révéler : elle s'ouvrait sur des murs
+   * portant déjà les dégâts, et les cartes se retournaient sur un résultat que
+   * l'écran avait déjà donné. Les lignes partent donc de ce mur-là, et la
+   * brique ne tombe qu'au moment où la carte se retourne (voir
+   * `ui/mouvement.ts`).
+   */
+  wallBefore: Slot[]
   /** L'étiquette qui résume son sort : « annulé », « retourné −1 », « +1 brique »… */
   tag: string
   /** L'étiquette est-elle marquante (terre cuite pleine) ou discrète ? */

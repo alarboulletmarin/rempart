@@ -176,6 +176,22 @@ export type Recu = { nonce: string; ok: boolean; erreur?: ErreurIntention }
 export type ErreurIntention = 'refuse' | 'pasDePartie' | 'lienPerdu'
 
 /**
+ * Un message de conversation, ou une réaction — c'est la même chose.
+ *
+ * Il ne passe **pas** par l'arbitre : il part à la cantonade, et chacun le
+ * reçoit directement de son auteur. La partie, elle, a besoin d'une autorité —
+ * un état contradictoire casserait le jeu ; une conversation, non. La faire
+ * transiter par l'hôte n'aurait rien garanti de plus qu'un aller-retour de
+ * latence sur un emoji, et aurait donné à l'arbitre un pouvoir qu'il n'a aucune
+ * raison d'avoir sur ce que les autres se disent.
+ *
+ * Ni accusé de réception, ni réémission : un emoji perdu est un emoji perdu.
+ * `id` rend tout de même la réception idempotente, le transport pouvant doubler
+ * une livraison.
+ */
+export type MessageChat = { id: string; de: string; texte: string }
+
+/**
  * Battement de l'hôte. `at` revient tel quel dans le `pong` : l'hôte mesure
  * ainsi un aller-retour sur sa seule horloge, sans jamais avoir à la comparer à
  * celle des autres.
@@ -192,6 +208,7 @@ type Messages = {
   ack: Recu
   tick: Tic
   pong: Pong
+  chat: MessageChat
 }
 
 export type Canal = {
@@ -268,6 +285,7 @@ export function ouvrirCanal(code: string, onErreur?: (message: string) => void):
     ack: action('ack'),
     tick: action('tick'),
     pong: action('pong'),
+    chat: action('chat'),
   }
 
   return {

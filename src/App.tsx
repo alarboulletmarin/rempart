@@ -15,6 +15,7 @@ import { ReglesRapides } from './screens/ReglesRapides'
 import { Rejoindre } from './screens/Rejoindre'
 import { Revelation } from './screens/Revelation'
 import { Salon } from './screens/Salon'
+import { DiscussionProvider, type Salle } from './ui/discussion'
 import { ThemeProvider, useThemePref } from './ui/theme'
 
 type Vue =
@@ -131,6 +132,28 @@ export function App() {
     for (const c of choix) compterCarte(c.card)
     sessionRef.current?.jouer(choix)
   }
+
+  /*
+   * La conversation de la table, offerte aux écrans par un contexte.
+   *
+   * Elle traverse le salon, le tour de jeu et la révélation, qui n'ont rien
+   * d'autre en commun : la faire descendre en propriétés aurait ajouté quatre
+   * paramètres à trois écrans pour un usage qui n'est celui d'aucun des trois.
+   * Hors session, le contexte vaut `null` et l'app n'affiche ni feuille ni
+   * éventail — c'est aussi ce qui permet à la galerie de rendre ces écrans
+   * sans monter de réseau.
+   *
+   * Les sièges viennent du SALON et non de la partie : au salon, la partie
+   * n'existe pas encore, et c'est là qu'on se parle le plus.
+   */
+  const salle: Salle | null = etat
+    ? {
+        moi: etat.moi,
+        auteurs: etat.salon.joueurs.map((j) => ({ id: j.clientId, nom: j.nom, ci: j.ci })),
+        messages: etat.messages,
+        envoyer: (texte: string) => sessionRef.current?.envoyerMessage(texte) ?? false,
+      }
+    : null
 
   const contenu = () => {
     switch (vue.v) {
@@ -294,7 +317,9 @@ export function App() {
 
   return (
     <ThemeProvider name={themeName}>
-      <div className="rempart-cadre">{contenu()}</div>
+      <DiscussionProvider valeur={salle}>
+        <div className="rempart-cadre">{contenu()}</div>
+      </DiscussionProvider>
     </ThemeProvider>
   )
 }
