@@ -275,9 +275,15 @@ input:focus-visible,
   /* Un `fieldset` se donne d'office `min-width: min-content` : sans cela, une
      description longue élargit le groupe au-delà du cadre. */
   min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  /*
+   * En bloc, et pas en flexbox.
+   *
+   * Un `<legend>` n'est pas un enfant ordinaire : le navigateur le sort du
+   * flux normal pour le poser dans la bordure du `fieldset`, donc il n'aurait
+   * pas été un élément flex et le `gap` ne l'aurait pas concerné. L'écart sous
+   * l'en-tête se pose donc sur la légende elle-même, où il est sûr.
+   */
+  display: block;
 }
 
 /* La légende porte l'en-tête de section : le titre visible EST le nom du
@@ -286,6 +292,8 @@ input:focus-visible,
   display: block;
   float: none;
   padding: 0;
+  /* Le même écart que celui qui sépare deux cartes de la section. */
+  margin-bottom: 8px;
 }
 
 .rempart-segmente,
