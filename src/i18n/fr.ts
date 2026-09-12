@@ -120,7 +120,13 @@ export const fr = {
   'reglages.effacer.annuler': 'Annuler',
   'reglages.effacer.confirmer': 'Effacer',
   'reglages.effacer.fait': 'C’est effacé. L’app est comme au premier jour.',
-  'reglages.pied': 'Rempart · 2–4 joueurs · 10 manches · 4 minutes',
+  'reglages.propos.titre': 'À propos',
+  'reglages.propos.version': 'Version {v}',
+  'reglages.propos.changelog': 'Journal des versions',
+  'reglages.propos.depot': 'Code source',
+  'reglages.propos.installer': 'Installer l’app',
+  'reglages.propos.installerDetail':
+    'Elle démarre plus vite, tient hors ligne et n’a plus de barre d’adresse.',
 
   /* ------------------------------------------------ le récit de la manche
    *

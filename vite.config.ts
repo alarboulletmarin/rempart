@@ -1,11 +1,20 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
+import pkg from './package.json'
 
 // Rempart — PWA front-only : aucun backend, aucun compte, aucun tracking.
 // Le service worker met en cache l'app entière pour un fonctionnement hors ligne.
 export default defineConfig({
   base: './',
+  /*
+   * Le numéro de version, injecté depuis `package.json`.
+   *
+   * L'écran Réglages l'affiche : écrit une seconde fois dans le code, il
+   * aurait divergé dès la première publication et c'est l'écran qui aurait
+   * menti.
+   */
+  define: { __APP_VERSION__: JSON.stringify(pkg.version) },
   plugins: [
     react(),
     VitePWA({

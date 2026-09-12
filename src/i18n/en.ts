@@ -97,7 +97,13 @@ export const en: Catalogue = {
   'reglages.effacer.annuler': 'Cancel',
   'reglages.effacer.confirmer': 'Erase',
   'reglages.effacer.fait': 'Erased. The app is as it was on day one.',
-  'reglages.pied': 'Rempart · 2–4 players · 10 rounds · 4 minutes',
+  'reglages.propos.titre': 'About',
+  'reglages.propos.version': 'Version {v}',
+  'reglages.propos.changelog': 'Release notes',
+  'reglages.propos.depot': 'Source code',
+  'reglages.propos.installer': 'Install the app',
+  'reglages.propos.installerDetail':
+    'It starts faster, works offline and drops the address bar.',
 
   /* ------------------------------------------------ le récit de la manche */
 

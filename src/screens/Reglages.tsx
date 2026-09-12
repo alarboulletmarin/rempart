@@ -2,9 +2,11 @@ import { Fragment, useEffect, useId, useState, type CSSProperties, type ReactNod
 import { TEXTE, TITRE } from '../theme'
 import { useT, type Cle, type LanguePref } from '../i18n'
 import { Icone } from '../ui/Icone'
-import { Etiquette, Panneau, Segmente, Texte } from '../ui/atoms'
+import { Bouton, Etiquette, Panneau, Segmente, Texte } from '../ui/atoms'
 import { Corps, Ecran, EnTete } from '../ui/shell'
 import { useTheme, type ThemePref } from '../ui/theme'
+import { useInstallation } from '../ui/installation'
+import { CHANGELOG, DEPOT, VERSION } from '../version'
 
 /**
  * L'espace qui fait les groupes.
@@ -135,7 +137,7 @@ export function Reglages({
            * là où elle prétendait mener : la section des règles qui montre les
            * neuf cartes.
            */}
-          <LigneNav
+          <Ligne
             libelle={tr('reglages.jeu.cartesManche.titre')}
             detail={tr('reglages.jeu.cartesManche.detail')}
             onClick={onCartesManche}
@@ -210,9 +212,12 @@ export function Reglages({
           </Panneau>
         </div>
 
-        <Texte size={11} style={{ textAlign: 'center', marginTop: 'auto', lineHeight: 1.5 }}>
-          {tr('reglages.pied')}
-        </Texte>
+        {/*
+         * « Rempart · 2–4 joueurs · 10 manches · 4 minutes » répétait
+         * l'accroche de l'accueil, en bas de l'écran où l'on vient chercher
+         * les informations de l'app. C'est leur place naturelle.
+         */}
+        <APropos />
       </Corps>
 
       {effacementDemande && (
@@ -387,51 +392,106 @@ function ChampNom({
 }
 
 /**
- * Une ligne qui mène ailleurs : un libellé, une précision, un chevron.
+ * Une ligne qui mène ailleurs : un libellé, une précision, et l'icône de sa
+ * destination.
  *
- * Visuellement distincte des cartes de choix — pas d'anneau à gauche, un
- * chevron à droite — parce qu'elle ne fait pas la même chose : elle ne retient
- * rien, elle ouvre un autre écran.
+ * Visuellement distincte des cartes de choix — pas d'anneau à gauche, une
+ * icône à droite — parce qu'elle ne fait pas la même chose : elle ne retient
+ * rien, elle ouvre autre chose. Le chevron reste dans l'app, le cadre ouvert
+ * en sort : deux destinations différentes ne peuvent pas porter le même
+ * dessin.
  */
-function LigneNav({
+function Ligne({
   libelle,
   detail,
   onClick,
+  href,
 }: {
   libelle: string
-  detail: string
-  onClick: () => void
+  detail?: string
+  onClick?: () => void
+  /** Une adresse hors de l'app : la ligne devient un vrai lien. */
+  href?: string
 }) {
   const t = useTheme()
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      style={{
-        background: t.panel,
-        borderRadius: RAYON,
-        boxShadow: `0 3px 0 ${t.edge}`,
-        border: 'none',
-        minHeight: 56,
-        padding: '12px 14px',
-        display: 'flex',
-        alignItems: 'center',
-        gap: 12,
-        textAlign: 'left',
-        cursor: 'pointer',
-        WebkitTapHighlightColor: 'transparent',
-      }}
-    >
+  const style: CSSProperties = {
+    background: t.panel,
+    borderRadius: RAYON,
+    boxShadow: `0 3px 0 ${t.edge}`,
+    border: 'none',
+    minHeight: 56,
+    padding: '12px 14px',
+    display: 'flex',
+    alignItems: 'center',
+    gap: 12,
+    textAlign: 'left',
+    textDecoration: 'none',
+    color: 'inherit',
+    cursor: 'pointer',
+    WebkitTapHighlightColor: 'transparent',
+  }
+  const contenu = (
+    <>
       <span style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 3 }}>
         <span style={{ font: `700 16px/1.25 ${TITRE}`, color: t.ink }}>{libelle}</span>
-        <span
-          style={{ font: `400 12px/${LIGNE} ${TEXTE}`, color: t.ink2, textWrap: 'pretty' }}
-        >
-          {detail}
-        </span>
+        {detail && (
+          <span
+            style={{ font: `400 12px/${LIGNE} ${TEXTE}`, color: t.ink2, textWrap: 'pretty' }}
+          >
+            {detail}
+          </span>
+        )}
       </span>
-      <Icone nom="chevron" size={18} color={t.ink2} />
+      <Icone nom={href ? 'lienExterne' : 'chevron'} size={href ? 16 : 18} color={t.ink2} />
+    </>
+  )
+  if (href) {
+    return (
+      <a href={href} target="_blank" rel="noreferrer" style={style}>
+        {contenu}
+      </a>
+    )
+  }
+  return (
+    <button type="button" onClick={onClick} style={style}>
+      {contenu}
     </button>
+  )
+}
+
+/**
+ * À propos : la version, où lire ce qui a changé, où lire le code, et
+ * l'installation.
+ *
+ * « Installer l'app » n'apparaît qu'en navigateur et qu'une fois que celui-ci
+ * a offert une invite — voir `ui/installation.ts`. En app installée, il n'y a
+ * rien à proposer, et le proposer quand même ferait douter du reste de
+ * l'écran.
+ */
+function APropos() {
+  const tr = useT()
+  const { possible, installer } = useInstallation()
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: DANS_SECTION }}>
+      <EnTeteSection>{tr('reglages.propos.titre')}</EnTeteSection>
+      {/* En texte et non en ligne cliquable : il ne mène nulle part, donc il
+          n'a pas à ressembler à ce qui mène quelque part. */}
+      <Texte size={12} weight={500}>
+        {tr('reglages.propos.version', { v: VERSION })}
+      </Texte>
+      <Ligne libelle={tr('reglages.propos.changelog')} href={CHANGELOG} />
+      <Ligne libelle={tr('reglages.propos.depot')} href={DEPOT} />
+      {possible && (
+        <>
+          <Bouton ton="panel" height={52} size={16} onClick={installer}>
+            {tr('reglages.propos.installer')}
+          </Bouton>
+          <Texte size={12} weight={400} style={{ lineHeight: LIGNE }}>
+            {tr('reglages.propos.installerDetail')}
+          </Texte>
+        </>
+      )}
+    </div>
   )
 }
 
