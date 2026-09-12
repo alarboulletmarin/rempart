@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
 import { SAFE_TOP, TEXTE, TITRE } from '../theme'
-import { NIVEAUX_BOT, NIVEAU_DEFAUT, NOM_NIVEAU, type NiveauBot } from '../game/bot'
+import { NIVEAUX_BOT, NIVEAU_DEFAUT, type NiveauBot } from '../game/bot'
 import { MAX_SIEGES } from '../net/room'
 import type { VueSession } from '../net/session'
+import { useT, type Cle, type T } from '../i18n'
 import { Etiquette, Forme, Panneau, Scribble, Texte, usePanneauEncre, useShapeName } from '../ui/atoms'
 import { BoutonConversation, FeuilleDiscussion, useSalle } from '../ui/discussion'
 import { Ecran } from '../ui/shell'
@@ -49,6 +50,7 @@ export function Salon({
   onQuitter: () => void
 }) {
   const t = useTheme()
+  const tr = useT()
   const encre = usePanneauEncre()
   const nomForme = useShapeName()
   const [copie, setCopie] = useState(false)
@@ -88,7 +90,7 @@ export function Salon({
   }
 
   const partager = async () => {
-    const texte = `Rejoins ma partie de Rempart avec le code ${salon.code}.`
+    const texte = tr('salon.code.invitation', { code: salon.code })
     try {
       if (navigator.share) await navigator.share({ title: 'Rempart', text: texte })
       else await copier()
@@ -124,7 +126,7 @@ export function Salon({
           }}
         >
           <Etiquette size={11} color={encre.sub} style={{ letterSpacing: '0.14em' }}>
-            Code à partager
+            {tr('salon.code.titre')}
           </Etiquette>
           <div
             style={{
@@ -133,7 +135,7 @@ export function Salon({
               color: encre.fg,
               textAlign: 'center',
             }}
-            aria-label={`Code de la partie : ${salon.code.split('').join(' ')}`}
+            aria-label={tr('salon.code.aria', { lettres: salon.code.split('').join(' ') })}
           >
             {salon.code}
           </div>
@@ -142,8 +144,10 @@ export function Salon({
               serait un code que personne ne peut joindre. */}
           {lien === 'lie' ? (
             <div style={{ display: 'flex', gap: 10, width: '100%', marginTop: 4 }}>
-              <BoutonEncre onClick={copier}>{copie ? 'Copié' : 'Copier'}</BoutonEncre>
-              <BoutonEncre onClick={partager}>Partager</BoutonEncre>
+              <BoutonEncre onClick={copier}>
+                {tr(copie ? 'salon.code.copie' : 'salon.code.copier')}
+              </BoutonEncre>
+              <BoutonEncre onClick={partager}>{tr('salon.code.partager')}</BoutonEncre>
             </div>
           ) : (
             <div
@@ -160,8 +164,8 @@ export function Salon({
               }}
             >
               {lien === 'perdu'
-                ? (avis ?? 'La mise en relation n’a pas abouti.')
-                : 'Mise en relation…'}
+                ? (avis ?? tr('salon.lien.perdu'))
+                : tr('salon.lien.recherche')}
             </div>
           )}
         </div>
@@ -169,7 +173,7 @@ export function Salon({
         {/* Qui est là. */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-            <Etiquette>Joueurs connectés</Etiquette>
+            <Etiquette>{tr('salon.joueurs.titre')}</Etiquette>
             <span style={{ font: `600 12px/1 ${TEXTE}`, color: t.ink }}>
               {joueurs.length} / {salon.places}
             </span>
@@ -191,7 +195,9 @@ export function Salon({
                   }
                   style={{ letterSpacing: '0.1em', marginLeft: 'auto' }}
                 >
-                  {j.bot ? 'bot' : etiquetteJoueur(j.clientId === moi, j.hote, j.pret, j.connecte)}
+                  {j.bot
+                    ? tr('salon.joueur.bot')
+                    : tr(etiquetteJoueur(j.clientId === moi, j.hote, j.pret, j.connecte))}
                 </Etiquette>
                 {/* Un bot se relève tant que la partie n'a pas commencé :
                     un ami arrive toujours à la dernière seconde. */}
@@ -199,7 +205,7 @@ export function Salon({
                   <button
                     type="button"
                     onClick={() => onRetirerBot(j.clientId)}
-                    aria-label={`Retirer le bot ${j.nom}`}
+                    aria-label={tr('salon.bot.retirer.aria', { nom: j.nom })}
                     style={{
                       background: 'none',
                       border: 'none',
@@ -214,7 +220,7 @@ export function Salon({
                       WebkitTapHighlightColor: 'transparent',
                     }}
                   >
-                    Retirer
+                    {tr('salon.bot.retirer')}
                   </button>
                 )}
               </div>
@@ -244,15 +250,15 @@ export function Salon({
                 <Scribble nom="wait" width={34} height={26} />
                 <span style={{ font: `700 17px/1 ${TITRE}`, color: t.ink }}>{d.nom}</span>
                 <Etiquette size={10} style={{ letterSpacing: '0.1em', marginLeft: 'auto' }}>
-                  veut jouer
+                  {tr('salon.demande.veutJouer')}
                 </Etiquette>
               </div>
               <div style={{ display: 'flex', gap: 10 }}>
                 <BoutonPorte ton="ink" onClick={() => onAdmettre(d.clientId)} disabled={complet}>
-                  {complet ? 'Table pleine' : 'Ouvrir'}
+                  {tr(complet ? 'salon.demande.pleine' : 'salon.demande.ouvrir')}
                 </BoutonPorte>
                 <BoutonPorte ton="creux" onClick={() => onRefuser(d.clientId)}>
-                  Refuser
+                  {tr('salon.demande.refuser')}
                 </BoutonPorte>
               </div>
             </Panneau>
@@ -275,7 +281,7 @@ export function Salon({
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 <Scribble nom="wait" width={58} height={40} />
                 <Texte size={13} style={{ lineHeight: 1.3 }}>
-                  {placeLibre(salon.places - joueurs.length, assez, joueurs.length)}
+                  {placeLibre(tr, salon.places - joueurs.length, assez, joueurs.length)}
                 </Texte>
               </div>
               {/* Personne n'est encore là, et il faut être deux : sans ce
@@ -285,7 +291,7 @@ export function Salon({
                 // et dans une colonne ce même flex lui mangerait sa hauteur.
                 <div style={{ display: 'flex' }}>
                   <BoutonPorte ton="ink" onClick={onAjouterBot}>
-                    Ajouter un bot
+                    {tr('salon.bot.ajouter')}
                   </BoutonPorte>
                 </div>
               )}
@@ -296,7 +302,7 @@ export function Salon({
         {/* Mon identité : la forme autant que la couleur. */}
         {jeSuis && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            <Etiquette>Mon identité</Etiquette>
+            <Etiquette>{tr('salon.identite.titre')}</Etiquette>
             <div style={{ display: 'flex', gap: 10 }}>
               {([0, 1, 2, 3] as const).map((ci) => {
                 const pris = joueurs.find((j) => j.ci === ci)
@@ -309,7 +315,10 @@ export function Salon({
                     onClick={() => libre && onIdentite(ci)}
                     disabled={!libre}
                     aria-pressed={amoi}
-                    aria-label={`${nomForme(ci)} — ${amoi ? 'à moi' : pris ? 'pris' : 'libre'}`}
+                    aria-label={tr('salon.identite.aria', {
+                      forme: nomForme(ci),
+                      etat: tr(etatIdentite(amoi, !!pris)),
+                    })}
                     style={{
                       flex: 1,
                       height: 70,
@@ -332,7 +341,7 @@ export function Salon({
                   >
                     <Forme ci={ci} size={24} />
                     <Etiquette size={9} style={{ letterSpacing: '0.08em' }}>
-                      {amoi ? 'à moi' : pris ? 'pris' : 'libre'}
+                      {tr(etatIdentite(amoi, !!pris))}
                     </Etiquette>
                   </button>
                 )
@@ -349,16 +358,20 @@ export function Salon({
             <BoutonConversation nonLus={recus - lu} onOuvrir={() => setConversation(true)} />
           )}
           {hote ? (
-            <BoutonLancer onClick={onLancer} disabled={!peutLancer} note={noteLancer(salon.format, joueurs.length, assez)}>
-              Lancer
+            <BoutonLancer
+              onClick={onLancer}
+              disabled={!peutLancer}
+              note={noteLancer(tr, salon.format, joueurs.length, assez)}
+            >
+              {tr('salon.lancer')}
             </BoutonLancer>
           ) : jeSuis ? (
             <BoutonLancer
               onClick={() => onPret(!jeSuis.pret)}
               ton={jeSuis.pret ? 'ink' : 'clay'}
-              note={jeSuis.pret ? 'on attend l’hôte' : undefined}
+              note={jeSuis.pret ? tr('salon.pret.note') : undefined}
             >
-              {jeSuis.pret ? 'Je ne suis plus prêt' : 'Je suis prêt'}
+              {tr(jeSuis.pret ? 'salon.pret.non' : 'salon.pret.oui')}
             </BoutonLancer>
           ) : (
             <div
@@ -376,7 +389,7 @@ export function Salon({
                 textAlign: 'center',
               }}
             >
-              {attente(statutDemande, lien)}
+              {attente(tr, statutDemande, lien)}
             </div>
           )}
           <button
@@ -392,7 +405,7 @@ export function Salon({
               cursor: 'pointer',
             }}
           >
-            Quitter le salon
+            {tr('salon.quitter')}
           </button>
         </div>
       </div>
@@ -402,11 +415,16 @@ export function Salon({
   )
 }
 
-function etiquetteJoueur(moi: boolean, hote: boolean, pret: boolean, connecte: boolean): string {
-  if (!connecte) return 'absent'
-  if (moi) return hote ? 'toi · hôte' : 'toi'
-  if (hote) return 'hôte'
-  return pret ? 'prêt' : 'choisit…'
+/** L'état d'un joueur, rendu en CLÉ : c'est l'écran qui met les mots. */
+function etiquetteJoueur(moi: boolean, hote: boolean, pret: boolean, connecte: boolean): Cle {
+  if (!connecte) return 'salon.joueur.absent'
+  if (moi) return hote ? 'salon.joueur.moiHote' : 'salon.joueur.moi'
+  if (hote) return 'salon.joueur.hote'
+  return pret ? 'salon.joueur.pret' : 'salon.joueur.choisit'
+}
+
+function etatIdentite(amoi: boolean, pris: boolean): Cle {
+  return amoi ? 'salon.identite.aMoi' : pris ? 'salon.identite.pris' : 'salon.identite.libre'
 }
 
 function etiquetteCouleur(
@@ -423,26 +441,29 @@ function etiquetteCouleur(
   return pret ? vert : ink2
 }
 
-function placeLibre(restantes: number, assez: boolean, presents: number): string {
-  const debut = restantes === 1 ? 'Une place libre' : `${restantes} places libres`
-  return assez
-    ? `${debut} — on peut lancer à ${presents}.`
-    : `${debut} — il faut être deux au minimum.`
+function placeLibre(tr: T, restantes: number, assez: boolean, presents: number): string {
+  return tr.n(assez ? 'salon.place.assez' : 'salon.place.pasAssez', restantes, { presents })
 }
 
-function noteLancer(format: string, presents: number, assez: boolean): string {
+function noteLancer(tr: T, format: string, presents: number, assez: boolean): string {
   if (format === 'equipes') {
-    return presents === MAX_SIEGES ? 'deux contre deux' : 'il faut être quatre'
+    return tr(
+      presents === MAX_SIEGES
+        ? 'salon.lancer.note.deuxContreDeux'
+        : 'salon.lancer.note.fautQuatre',
+    )
   }
-  return assez ? `${presents} joueurs suffisent` : 'il faut être deux'
+  return assez
+    ? tr('salon.lancer.note.suffisent', { n: presents })
+    : tr('salon.lancer.note.fautDeux')
 }
 
-function attente(statut: VueSession['statutDemande'], lien: VueSession['lien']): string {
-  if (statut === 'refuse') return 'L’hôte n’a pas ouvert la porte.'
-  if (statut === 'spectateur') return 'La table est complète ou la partie a commencé.'
-  if (lien === 'perdu') return 'On ne trouve pas cette partie.'
-  if (statut === 'attente') return 'On a frappé — l’hôte doit ouvrir.'
-  return 'On cherche la partie…'
+function attente(tr: T, statut: VueSession['statutDemande'], lien: VueSession['lien']): string {
+  if (statut === 'refuse') return tr('salon.attente.refuse')
+  if (statut === 'spectateur') return tr('salon.attente.spectateur')
+  if (lien === 'perdu') return tr('salon.attente.introuvable')
+  if (statut === 'attente') return tr('salon.attente.frappe')
+  return tr('salon.attente.cherche')
 }
 
 /**
@@ -472,8 +493,13 @@ function Niveau({
   onNiveau: (n: NiveauBot) => void
 }) {
   const t = useTheme()
+  const tr = useT()
   return (
-    <div style={{ display: 'flex', gap: 6 }} role="group" aria-label={`Niveau de ${nom}`}>
+    <div
+      style={{ display: 'flex', gap: 6 }}
+      role="group"
+      aria-label={tr('salon.bot.niveau.aria', { nom })}
+    >
       {NIVEAUX_BOT.map((n) => {
         const choisi = n === niveau
         return (
@@ -483,7 +509,10 @@ function Niveau({
             onClick={() => reglable && !choisi && onNiveau(n)}
             disabled={!reglable}
             aria-pressed={choisi}
-            aria-label={`${nom} : niveau ${NOM_NIVEAU[n]}`}
+            aria-label={tr('salon.bot.niveau.choix.aria', {
+              nom,
+              niveau: tr(`salon.niveau.${n}` as const),
+            })}
             style={{
               flex: 1,
               height: 32,
@@ -499,7 +528,7 @@ function Niveau({
               WebkitTapHighlightColor: 'transparent',
             }}
           >
-            {NOM_NIVEAU[n]}
+            {tr(`salon.niveau.${n}` as const)}
           </button>
         )
       })}

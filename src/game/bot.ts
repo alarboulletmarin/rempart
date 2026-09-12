@@ -67,13 +67,6 @@ export const NIVEAU_DEFAUT: NiveauBot = 'normal'
 export const estNiveauBot = (v: unknown): v is NiveauBot =>
   typeof v === 'string' && (NIVEAUX_BOT as readonly string[]).includes(v)
 
-/** Le libellé du niveau, tel qu'il s'écrit sur la ligne du salon. */
-export const NOM_NIVEAU: Record<NiveauBot, string> = {
-  tranquille: 'tranquille',
-  normal: 'normal',
-  redoutable: 'redoutable',
-}
-
 /**
  * Ce qu'un niveau voit, et ce qu'il laisse passer.
  *
