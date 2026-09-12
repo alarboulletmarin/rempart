@@ -1,5 +1,6 @@
 import { TEXTE, TITRE } from '../theme'
 import type { Format } from '../game/types'
+import { useT } from '../i18n'
 import { Bouton, Etiquette, Texte } from '../ui/atoms'
 import { Corps, Ecran, EnTete } from '../ui/shell'
 import { useTheme } from '../ui/theme'
@@ -29,22 +30,23 @@ export function Creation({
   onRetour: () => void
 }) {
   const t = useTheme()
+  const tr = useT()
 
   return (
     <Ecran>
-      <EnTete titre="Nouvelle partie" onRetour={onRetour} hauteur={102} />
+      <EnTete titre={tr('creation.titre')} onRetour={onRetour} hauteur={102} />
       <Corps pad={20} gap={22} scroll>
         {/* Le nom se donne ici plutôt qu'au salon : la planche du salon ne
             porte que le code, les joueurs et les identités, et un champ de
             saisie de plus y aurait chassé les pastilles d'identité. */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <Etiquette>Ton nom</Etiquette>
+          <Etiquette>{tr('creation.nom.titre')}</Etiquette>
           <input
             value={nom}
             onChange={(e) => onNom(e.target.value)}
             maxLength={14}
-            placeholder="Léa"
-            aria-label="Ton nom dans la partie"
+            placeholder={tr('creation.nom.exemple')}
+            aria-label={tr('creation.nom.aria')}
             style={{
               height: 60,
               borderRadius: 16,
@@ -60,7 +62,7 @@ export function Creation({
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <Etiquette>Nombre de joueurs</Etiquette>
+          <Etiquette>{tr('creation.joueurs.titre')}</Etiquette>
           <div style={{ display: 'flex', gap: 10 }}>
             {[2, 3, 4].map((n) => {
               const choisi = n === places
@@ -95,7 +97,7 @@ export function Creation({
                   </span>
                   {choisi && (
                     <Etiquette size={9} color={t.ink2} style={{ letterSpacing: '0.1em' }}>
-                      choisi
+                      {tr('creation.choisi')}
                     </Etiquette>
                   )}
                 </button>
@@ -105,16 +107,16 @@ export function Creation({
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <Etiquette>Format</Etiquette>
+          <Etiquette>{tr('creation.format.titre')}</Etiquette>
           <OptionFormat
-            titre="Chacun pour soi"
-            detail="Quatre murs, quatre scores. Le plus de briques debout gagne."
+            titre={tr('creation.format.chacun.titre')}
+            detail={tr('creation.format.chacun.detail')}
             choisi={format === 'chacun'}
             onClick={() => onFormat('chacun')}
           />
           <OptionFormat
-            titre="Équipes 2 contre 2"
-            detail="Score commun. On peut bloquer ou réparer pour son coéquipier."
+            titre={tr('creation.format.equipes.titre')}
+            detail={tr('creation.format.equipes.detail')}
             choisi={format === 'equipes'}
             onClick={() => {
               onFormat('equipes')
@@ -124,7 +126,7 @@ export function Creation({
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <Etiquette>Cartes de manche</Etiquette>
+          <Etiquette>{tr('creation.cartesManche.titre')}</Etiquette>
           <button
             type="button"
             onClick={() => onCartesManche(!cartesManche)}
@@ -144,7 +146,7 @@ export function Creation({
             }}
           >
             <span style={{ font: `500 13px/1.4 ${TEXTE}`, color: '#2E2418', flex: 1 }}>
-              Toutes les trois manches, une règle tirée au sort pour tout le monde.
+              {tr('creation.cartesManche.detail')}
             </span>
             <span
               style={{
@@ -167,7 +169,7 @@ export function Creation({
         </div>
 
         <Bouton onClick={onOuvrir} style={{ marginTop: 'auto' }}>
-          Ouvrir le salon
+          {tr('creation.ouvrir')}
         </Bouton>
       </Corps>
     </Ecran>
@@ -186,6 +188,7 @@ function OptionFormat({
   onClick: () => void
 }) {
   const t = useTheme()
+  const tr = useT()
   return (
     <button
       type="button"
@@ -219,7 +222,7 @@ function OptionFormat({
         <span style={{ font: `700 16px/1 ${TITRE}`, color: choisi ? t.selFg : t.ink }}>{titre}</span>
         {choisi && (
           <Etiquette size={9} color={t.ink2} style={{ letterSpacing: '0.1em', marginLeft: 'auto' }}>
-            choisi
+            {tr('creation.choisi')}
           </Etiquette>
         )}
       </span>

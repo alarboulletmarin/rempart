@@ -316,4 +316,104 @@ export const fr = {
   'salon.attente.introuvable': 'On ne trouve pas cette partie.',
   'salon.attente.frappe': 'On a frappé — l’hôte doit ouvrir.',
   'salon.attente.cherche': 'On cherche la partie…',
+
+  /* ------------------------------------------------------------ l'accueil */
+
+  'accueil.baseline':
+    'Chacun choisit en secret une carte parmi quatre. La carte jouée est interdite la manche suivante.',
+  'accueil.format': '2–4 joueurs · 10 manches · 4 minutes',
+  'accueil.cartes.titre': 'Tout le jeu tient dans ces quatre cartes',
+  'accueil.derniere.titre': 'Ta dernière partie',
+  'accueil.derniere.gagnee': 'Gagnée contre {adversaire} · {quand}',
+  'accueil.derniere.perdue': 'Perdue contre {adversaire} · {quand}',
+  'accueil.creer': 'Créer une partie',
+  'accueil.rejoindre': 'Rejoindre',
+  'accueil.rejoindre.note': 'code à {n}',
+  'accueil.regles': 'Règles',
+  'accueil.palmares': 'Palmarès',
+  'accueil.reglages': 'Réglages',
+  'accueil.pied': 'Sans compte · sans pub · sans tracking · fonctionne hors ligne',
+
+  /* ----------------------------------------------------------- la création */
+
+  'creation.titre': 'Nouvelle partie',
+  'creation.nom.titre': 'Ton nom',
+  'creation.nom.aria': 'Ton nom dans la partie',
+  'creation.nom.exemple': 'Léa',
+  'creation.joueurs.titre': 'Nombre de joueurs',
+  'creation.choisi': 'choisi',
+  'creation.format.titre': 'Format',
+  'creation.format.chacun.titre': 'Chacun pour soi',
+  'creation.format.chacun.detail':
+    'Quatre murs, quatre scores. Le plus de briques debout gagne.',
+  'creation.format.equipes.titre': 'Équipes 2 contre 2',
+  'creation.format.equipes.detail':
+    'Score commun. On peut bloquer ou réparer pour son coéquipier.',
+  'creation.cartesManche.titre': 'Cartes de manche',
+  'creation.cartesManche.detail':
+    'Toutes les trois manches, une règle tirée au sort pour tout le monde.',
+  'creation.ouvrir': 'Ouvrir le salon',
+
+  /* ----------------------------------------------------------- rejoindre */
+
+  'rejoindre.titre': 'Rejoindre',
+  'rejoindre.aide':
+    'Demande son code à la personne qui a créé la partie. {n} caractères, sans les lettres qu’on confond à l’oral.',
+  'rejoindre.code.titre': 'Code de la partie',
+  'rejoindre.code.aria': 'Code de la partie, {n} caractères',
+  'rejoindre.nom.exemple': 'Malo',
+  'rejoindre.bouton': 'Rejoindre',
+  'rejoindre.pied':
+    'La partie passe directement d’un téléphone à l’autre. L’hôte ouvre la porte.',
+
+  /* -------------------------------------------------------- la déconnexion */
+
+  'pause.titre': '{nom} a perdu la connexion.',
+  'pause.aria': '{nom} a perdu la connexion',
+  'pause.detail':
+    'La manche est mise en pause. Si la connexion ne revient pas, son mur reste en place et ses cartes ne sont plus jouées — la partie continue.',
+  'pause.compte': 'avant de continuer sans {nom}',
+  'pause.continuer': 'Continuer sans {nom}',
+  'pause.attendre': 'Attendre',
+  'pause.quitter': 'Quitter',
+  'pause.garde': 'on garde sa place aussi longtemps qu’il faut',
+
+  /* ------------------------------------------------------ la conversation */
+
+  'chat.bouton': 'Conversation',
+  'chat.nonLus_un': '{n} nouveau',
+  'chat.nonLus_autre': '{n} nouveaux',
+  'chat.calme': 'on a le temps',
+  'chat.titre': 'Conversation',
+  'chat.aria': 'Conversation de la table',
+  'chat.surtitre': 'pendant qu’on attend',
+  'chat.fermer': 'Fermer la conversation',
+  'chat.vide': 'Personne n’a rien dit. C’est le seul moment de la partie où l’on a le temps.',
+  'chat.champ.aria': 'Ton message',
+  'chat.champ.exemple': 'Dis quelque chose…',
+  'chat.envoyer': 'Envoyer',
+  'chat.moi': 'toi',
+  'chat.reaction.envoyer': 'Envoyer {nom}',
+  'chat.reaction.ouvrir': 'Réagir',
+  'chat.reaction.fermer': 'Fermer les réactions',
+  'chat.reaction.rire': 'rire',
+  'chat.reaction.aie': 'aïe',
+  'chat.reaction.bravo': 'bravo',
+  'chat.reaction.bienJoue': 'bien joué',
+  'chat.reaction.grr': 'grr',
+  'chat.reaction.pitie': 'pitié',
+  'chat.dit': '{nom} : {texte}',
+
+  /* --------------------------------------------------- les avis du réseau */
+
+  'avis.lienEchoue': 'La mise en relation n’a pas abouti. Vérifie ta connexion.',
+  'avis.lienBloque':
+    'Ton réseau bloque la connexion directe. Un partage de connexion, ou un autre Wi-Fi, passe souvent mieux.',
+  'avis.lienPerdu': 'Le lien avec l’hôte est coupé.',
+  'avis.refuse': 'L’hôte n’a pas ouvert la porte.',
+  'avis.salonPlein': 'Le salon est complet.',
+  'avis.partieEnCours': 'La partie a déjà commencé.',
+  'avis.hotePris':
+    'Quelqu’un d’autre arbitre la table : tu redeviens invité, ton mur reste intact.',
+  'avis.gestRefuse': 'Ce coup n’est pas jouable.',
 } as const

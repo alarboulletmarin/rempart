@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { TEXTE, TITRE } from '../theme'
 import type { Player } from '../game/types'
 import { resteAvantAbsence } from '../net/presence'
+import { useT } from '../i18n'
 import { Etiquette, Scribble, Texte } from '../ui/atoms'
 import { useTheme } from '../ui/theme'
 
@@ -25,6 +26,7 @@ export function FeuilleDeconnexion({
   onQuitter: () => void
 }) {
   const t = useTheme()
+  const tr = useT()
   const debut = depuis ?? Date.now()
   const [reste, setReste] = useState(() => resteAvantAbsence(debut, Date.now()))
   const [attend, setAttend] = useState(true)
@@ -43,7 +45,7 @@ export function FeuilleDeconnexion({
       <div
         role="dialog"
         aria-modal="true"
-        aria-label={`${joueur.name} a perdu la connexion`}
+        aria-label={tr('pause.aria', { nom: joueur.name })}
         style={{
           position: 'absolute',
           left: 0,
@@ -64,13 +66,12 @@ export function FeuilleDeconnexion({
               tromper sur quelqu'un de réel. La phrase garde la place et le ton
               de la planche, sans accord à faire. */}
           <div style={{ font: `700 24px/1.1 ${TITRE}`, color: t.ink, textWrap: 'pretty' }}>
-            {joueur.name} a perdu la connexion.
+            {tr('pause.titre', { nom: joueur.name })}
           </div>
         </div>
 
         <Texte size={14}>
-          La manche est mise en pause. Si la connexion ne revient pas, son mur reste en place et
-          ses cartes ne sont plus jouées — la partie continue.
+          {tr('pause.detail')}
         </Texte>
 
         {attend && (
@@ -88,7 +89,7 @@ export function FeuilleDeconnexion({
               {minutes}:{secondes}
             </span>
             <Texte size={12} style={{ flex: 1, lineHeight: 1.35 }}>
-              avant de continuer sans {joueur.name}
+              {tr('pause.compte', { nom: joueur.name })}
             </Texte>
           </div>
         )}
@@ -109,7 +110,7 @@ export function FeuilleDeconnexion({
               cursor: 'pointer',
             }}
           >
-            Continuer sans {joueur.name}
+            {tr('pause.continuer', { nom: joueur.name })}
           </button>
           <button
             type="button"
@@ -127,13 +128,13 @@ export function FeuilleDeconnexion({
               cursor: 'pointer',
             }}
           >
-            {attend ? 'Attendre' : 'Quitter'}
+            {tr(attend ? 'pause.attendre' : 'pause.quitter')}
           </button>
         </div>
 
         {!attend && (
           <Etiquette size={10} style={{ textAlign: 'center', letterSpacing: '0.08em' }}>
-            on garde sa place aussi longtemps qu’il faut
+            {tr('pause.garde')}
           </Etiquette>
         )}
       </div>

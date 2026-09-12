@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { bricks, standings } from './game/engine'
 import type { Choice, Format } from './game/types'
 import type { ChapitreId } from './game/content'
@@ -16,7 +16,7 @@ import { Rejoindre } from './screens/Rejoindre'
 import { Revelation } from './screens/Revelation'
 import { Salon } from './screens/Salon'
 import { DiscussionProvider, type Salle } from './ui/discussion'
-import { LangueProvider, useLanguePref } from './i18n'
+import { LangueProvider, traducteur, useLanguePref, type Cle } from './i18n'
 import { ThemeProvider, useThemePref } from './ui/theme'
 
 type Vue =
@@ -33,26 +33,31 @@ type Vue =
   | { v: 'reglages' }
 
 /**
- * Les phrases des avis.
+ * Les avis, gardés sous leur MOTIF et non sous leur phrase.
  *
  * La couche réseau transmet un motif, jamais une phrase : elle n'a pas à
  * connaître la langue du joueur, et une même cause doit se dire pareil partout.
+ * Le motif reste donc tel quel dans l'état de l'écran, et la phrase se
+ * fabrique au rendu — un changement de langue en cours de partie retourne
+ * ainsi l'avis affiché avec le reste.
  */
-const PHRASES: Record<Avis['code'], string> = {
-  lienEchoue: 'La mise en relation n’a pas abouti. Vérifie ta connexion.',
-  lienBloque:
-    'Ton réseau bloque la connexion directe. Un partage de connexion, ou un autre Wi-Fi, passe souvent mieux.',
-  lienPerdu: 'Le lien avec l’hôte est coupé.',
-  refuse: 'L’hôte n’a pas ouvert la porte.',
-  salonPlein: 'Le salon est complet.',
-  partieEnCours: 'La partie a déjà commencé.',
-  hotePris: 'Quelqu’un d’autre arbitre la table : tu redeviens invité, ton mur reste intact.',
-  gestRefuse: 'Ce coup n’est pas jouable.',
+const CLE_AVIS: Record<Avis['code'], Cle> = {
+  lienEchoue: 'avis.lienEchoue',
+  lienBloque: 'avis.lienBloque',
+  lienPerdu: 'avis.lienPerdu',
+  refuse: 'avis.refuse',
+  salonPlein: 'avis.salonPlein',
+  partieEnCours: 'avis.partieEnCours',
+  hotePris: 'avis.hotePris',
+  gestRefuse: 'avis.gestRefuse',
 }
 
 export function App() {
   const [pref, setPref, themeName] = useThemePref()
   const [languePref, setLanguePref, langue] = useLanguePref()
+  /* Le traducteur se fabrique ici plutôt que par `useT()` : `App` monte le
+     fournisseur de langue, donc elle est au-dessus de son propre contexte. */
+  const tr = useMemo(() => traducteur(langue), [langue])
   const [vue, setVue] = useState<Vue>({ v: 'accueil' })
 
   /* Réglages de la partie à créer, avant que le salon existe. */
@@ -63,12 +68,12 @@ export function App() {
 
   const sessionRef = useRef<Session | null>(null)
   const [etat, setEtat] = useState<VueSession | null>(null)
-  const [avis, setAvis] = useState<string | undefined>()
+  const [motifAvis, setMotifAvis] = useState<Avis['code'] | undefined>()
 
   const ecouteurs = useCallback(
     () => ({
       onChange: () => setEtat(sessionRef.current?.vue() ?? null),
-      onAvis: (a: Avis) => setAvis(PHRASES[a.code]),
+      onAvis: (a: Avis) => setMotifAvis(a.code),
     }),
     [],
   )
@@ -77,7 +82,7 @@ export function App() {
     sessionRef.current?.quitter()
     sessionRef.current = null
     setEtat(null)
-    setAvis(undefined)
+    setMotifAvis(undefined)
     setVue({ v: 'accueil' })
   }, [])
 
@@ -130,6 +135,8 @@ export function App() {
     if (!etat.salon.lancee && vue.v === 'partie') setVue({ v: 'salon' })
   }, [etat, vue.v])
 
+  const avis = motifAvis ? tr(CLE_AVIS[motifAvis]) : undefined
+
   const jouer = (choix: Choice[]) => {
     for (const c of choix) compterCarte(c.card)
     sessionRef.current?.jouer(choix)
@@ -164,7 +171,7 @@ export function App() {
           <Accueil
             onCreer={() => setVue({ v: 'creation' })}
             onRejoindre={() => {
-              setAvis(undefined)
+              setMotifAvis(undefined)
               setVue({ v: 'rejoindre' })
             }}
             onRegles={() => setVue({ v: 'regles' })}
@@ -186,7 +193,7 @@ export function App() {
             onCartesManche={setCartesManche}
             onRetour={() => setVue({ v: 'accueil' })}
             onOuvrir={() => {
-              setAvis(undefined)
+              setMotifAvis(undefined)
               const session = Session.creer(monNom, ecouteurs())
               sessionRef.current = session
               session.reglerPlaces(places)
@@ -206,7 +213,7 @@ export function App() {
             erreur={avis}
             onRetour={() => setVue({ v: 'accueil' })}
             onRejoindre={(code, nom) => {
-              setAvis(undefined)
+              setMotifAvis(undefined)
               setMonNom(nom)
               const session = Session.rejoindre(code, nom, ecouteurs())
               sessionRef.current = session

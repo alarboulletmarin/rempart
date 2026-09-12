@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { TEXTE, TITRE } from '../theme'
 import { ALPHABET_CODE, LONGUEUR_CODE, codeValide } from '../net/room'
+import { useT } from '../i18n'
 import { Bouton, Etiquette, Panneau, Texte } from '../ui/atoms'
 import { Corps, Ecran, EnTete } from '../ui/shell'
 import { useTheme } from '../ui/theme'
@@ -27,6 +28,7 @@ export function Rejoindre({
   erreur?: string
 }) {
   const t = useTheme()
+  const tr = useT()
   const [code, setCode] = useState('')
   const [nom, setNom] = useState(nomInitial)
   const pret = codeValide(code)
@@ -38,15 +40,14 @@ export function Rejoindre({
 
   return (
     <Ecran>
-      <EnTete titre="Rejoindre" onRetour={onRetour} hauteur={102} />
+      <EnTete titre={tr('rejoindre.titre')} onRetour={onRetour} hauteur={102} />
       <Corps pad={20} gap={20} scroll>
         <Texte size={15} style={{ lineHeight: 1.5 }}>
-          Demande son code à la personne qui a créé la partie. Huit caractères, sans les lettres
-          qu’on confond à l’oral.
+          {tr('rejoindre.aide', { n: LONGUEUR_CODE })}
         </Texte>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <Etiquette>Code de la partie</Etiquette>
+          <Etiquette>{tr('rejoindre.code.titre')}</Etiquette>
           <div style={{ position: 'relative' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }} aria-hidden="true">
               {[0, 1].map((rangee) => (
@@ -92,7 +93,7 @@ export function Rejoindre({
               autoCapitalize="characters"
               autoCorrect="off"
               spellCheck={false}
-              aria-label={`Code de la partie, ${LONGUEUR_CODE} caractères`}
+              aria-label={tr('rejoindre.code.aria', { n: LONGUEUR_CODE })}
               style={{
                 position: 'absolute',
                 inset: 0,
@@ -107,13 +108,13 @@ export function Rejoindre({
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <Etiquette>Ton nom</Etiquette>
+          <Etiquette>{tr('creation.nom.titre')}</Etiquette>
           <input
             value={nom}
             onChange={(e) => majNom(e.target.value)}
             maxLength={14}
-            placeholder="Malo"
-            aria-label="Ton nom dans la partie"
+            placeholder={tr('rejoindre.nom.exemple')}
+            aria-label={tr('creation.nom.aria')}
             style={{
               height: 60,
               borderRadius: 16,
@@ -141,10 +142,10 @@ export function Rejoindre({
           disabled={!pret}
           style={{ marginTop: 'auto' }}
         >
-          Rejoindre
+          {tr('rejoindre.bouton')}
         </Bouton>
         <Texte size={11} style={{ textAlign: 'center', lineHeight: 1.5 }}>
-          La partie passe directement d’un téléphone à l’autre. L’hôte ouvre la porte.
+          {tr('rejoindre.pied')}
         </Texte>
       </Corps>
     </Ecran>

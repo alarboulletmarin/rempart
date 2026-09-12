@@ -284,4 +284,102 @@ export const en: Catalogue = {
   'salon.attente.introuvable': 'That game cannot be found.',
   'salon.attente.frappe': 'We knocked — the host has to open.',
   'salon.attente.cherche': 'Looking for the game…',
+
+  /* ------------------------------------------------------------ l'accueil */
+
+  'accueil.baseline':
+    'Everyone secretly picks one of four cards. The card you play is locked next round.',
+  'accueil.format': '2–4 players · 10 rounds · 4 minutes',
+  'accueil.cartes.titre': 'The whole game fits in these four cards',
+  'accueil.derniere.titre': 'Your last game',
+  'accueil.derniere.gagnee': 'Won against {adversaire} · {quand}',
+  'accueil.derniere.perdue': 'Lost against {adversaire} · {quand}',
+  'accueil.creer': 'Create a game',
+  'accueil.rejoindre': 'Join',
+  'accueil.rejoindre.note': '{n}-letter code',
+  'accueil.regles': 'Rules',
+  'accueil.palmares': 'Record',
+  'accueil.reglages': 'Settings',
+  'accueil.pied': 'No account · no ads · no tracking · works offline',
+
+  /* ----------------------------------------------------------- la création */
+
+  'creation.titre': 'New game',
+  'creation.nom.titre': 'Your name',
+  'creation.nom.aria': 'Your name in the game',
+  'creation.nom.exemple': 'Lea',
+  'creation.joueurs.titre': 'Number of players',
+  'creation.choisi': 'chosen',
+  'creation.format.titre': 'Format',
+  'creation.format.chacun.titre': 'Every wall for itself',
+  'creation.format.chacun.detail':
+    'Four walls, four scores. The most bricks left standing wins.',
+  'creation.format.equipes.titre': 'Teams, two against two',
+  'creation.format.equipes.detail':
+    'Shared score. You can block or repair for your teammate.',
+  'creation.cartesManche.titre': 'Round cards',
+  'creation.cartesManche.detail': 'Every three rounds, one rule drawn at random for everyone.',
+  'creation.ouvrir': 'Open the room',
+
+  /* ----------------------------------------------------------- rejoindre */
+
+  'rejoindre.titre': 'Join',
+  'rejoindre.aide':
+    'Ask the person who created the game for their code. {n} characters, with none of the letters people mishear.',
+  'rejoindre.code.titre': 'Game code',
+  'rejoindre.code.aria': 'Game code, {n} characters',
+  'rejoindre.nom.exemple': 'Malo',
+  'rejoindre.bouton': 'Join',
+  'rejoindre.pied': 'The game goes straight from one phone to another. The host opens the door.',
+
+  /* -------------------------------------------------------- la déconnexion */
+
+  'pause.titre': '{nom} lost the connection.',
+  'pause.aria': '{nom} lost the connection',
+  'pause.detail':
+    'The round is paused. If the connection does not come back, that wall stays put and those cards are no longer played — the game goes on.',
+  'pause.compte': 'before going on without {nom}',
+  'pause.continuer': 'Go on without {nom}',
+  'pause.attendre': 'Wait',
+  'pause.quitter': 'Leave',
+  'pause.garde': 'that seat is kept for as long as it takes',
+
+  /* ------------------------------------------------------ la conversation */
+
+  'chat.bouton': 'Chat',
+  'chat.nonLus_un': '{n} new',
+  'chat.nonLus_autre': '{n} new',
+  'chat.calme': 'there’s time',
+  'chat.titre': 'Chat',
+  'chat.aria': 'Table chat',
+  'chat.surtitre': 'while we wait',
+  'chat.fermer': 'Close the chat',
+  'chat.vide': 'Nobody has said anything. This is the only moment of the game with time to spare.',
+  'chat.champ.aria': 'Your message',
+  'chat.champ.exemple': 'Say something…',
+  'chat.envoyer': 'Send',
+  'chat.moi': 'you',
+  'chat.reaction.envoyer': 'Send {nom}',
+  'chat.reaction.ouvrir': 'React',
+  'chat.reaction.fermer': 'Close the reactions',
+  'chat.reaction.rire': 'laughing',
+  'chat.reaction.aie': 'ouch',
+  'chat.reaction.bravo': 'well done',
+  'chat.reaction.bienJoue': 'nice one',
+  'chat.reaction.grr': 'grr',
+  'chat.reaction.pitie': 'mercy',
+  'chat.dit': '{nom}: {texte}',
+
+  /* --------------------------------------------------- les avis du réseau */
+
+  'avis.lienEchoue': 'The connection did not go through. Check your network.',
+  'avis.lienBloque':
+    'Your network is blocking the direct connection. A phone hotspot, or another Wi-Fi, often gets through.',
+  'avis.lienPerdu': 'The link with the host is down.',
+  'avis.refuse': 'The host did not open the door.',
+  'avis.salonPlein': 'The room is full.',
+  'avis.partieEnCours': 'The game has already started.',
+  'avis.hotePris':
+    'Someone else is refereeing the table: you are a guest again, and your wall is untouched.',
+  'avis.gestRefuse': 'That move is not playable.',
 }
