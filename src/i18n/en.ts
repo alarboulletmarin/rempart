@@ -79,12 +79,24 @@ export const en: Catalogue = {
   'reglages.jeu.cartesManche.titre': 'See the nine cards',
   'reglages.jeu.cartesManche.detail':
     'The ones from rounds 3, 6 and 9. You switch them on when you create the game.',
-  'reglages.garde.titre': 'What the app keeps',
+  'reglages.garde.titre': 'Privacy',
   'reglages.garde.quoi': 'Your record, your theme and your language, on this device only.',
   'reglages.garde.rien':
     'No account, no ads, no analytics. Games go straight from one phone to another: there is no game server, and a matchmaking service only helps establish the connection — it never sees the game.',
   'reglages.garde.horsLigne':
     'Once the app is installed it works offline. Multiplayer, though, needs a connection.',
+  'reglages.garde.plus': 'Learn more',
+  'reglages.effacer.bouton': 'Erase my data',
+  'reglages.effacer.titre': 'Erase your data?',
+  'reglages.effacer.avant': 'What goes:',
+  'reglages.effacer.palmares': 'Your record: games, wins, bricks, cards played',
+  'reglages.effacer.theme': 'Your theme',
+  'reglages.effacer.langue': 'Your language',
+  'reglages.effacer.nom': 'Your default name',
+  'reglages.effacer.irreversible': 'It happens at once, and nothing is kept anywhere else.',
+  'reglages.effacer.annuler': 'Cancel',
+  'reglages.effacer.confirmer': 'Erase',
+  'reglages.effacer.fait': 'Erased. The app is as it was on day one.',
   'reglages.pied': 'Rempart · 2–4 players · 10 rounds · 4 minutes',
 
   /* ------------------------------------------------ le récit de la manche */

@@ -4,7 +4,7 @@ import type { Choice, Format } from './game/types'
 import type { ChapitreId } from './game/content'
 import { Session, type Avis, type VueSession } from './net/session'
 import { compterCarte, enregistrerPartie } from './store/palmares'
-import { ecrireNom, lireNom } from './store/preferences'
+import { ecrireNom, effacerTout, lireNom } from './store/preferences'
 import { Accueil } from './screens/Accueil'
 import { Creation } from './screens/Creation'
 import { Fin } from './screens/Fin'
@@ -153,6 +153,22 @@ export function App() {
     setSortieDemandee(false)
     setVue({ v: 'accueil' })
   }, [])
+
+  /**
+   * Tout effacer, et revenir à l'état du premier lancement.
+   *
+   * Sans rechargement, et c'est le point : la page se rechargerait en rompant
+   * une partie en cours (le lien est direct entre les téléphones), alors qu'il
+   * suffit de remettre l'état en mémoire là où il était au démarrage. Le
+   * thème et la langue repassent donc par leurs propres `set`, qui réécrivent
+   * aussitôt la préférence — d'où l'ordre : le disque est nettoyé en dernier.
+   */
+  const effacerDonnees = useCallback(() => {
+    setPref('systeme')
+    setLanguePref('systeme')
+    setMonNom('')
+    effacerTout()
+  }, [setPref, setLanguePref])
 
   useEffect(() => () => sessionRef.current?.quitter(), [])
 
@@ -403,6 +419,7 @@ export function App() {
               setMonNom(n)
               ecrireNom(n)
             }}
+            onEffacer={effacerDonnees}
             onCartesManche={() => setVue({ v: 'cartes-manche' })}
             onRetour={() => setVue({ v: 'accueil' })}
           />

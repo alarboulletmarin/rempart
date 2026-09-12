@@ -51,6 +51,7 @@ export function Reglages({
   onLanguePref,
   nomDefaut,
   onNomDefaut,
+  onEffacer,
   onCartesManche,
   onRetour,
 }: {
@@ -61,11 +62,18 @@ export function Reglages({
   /** Le nom mémorisé, celui qui pré-remplit « Nouvelle partie ». */
   nomDefaut: string
   onNomDefaut: (n: string) => void
+  /** Efface tout ce que la section confidentialité annonce garder. */
+  onEffacer: () => void
   onCartesManche: () => void
   onRetour: () => void
 }) {
   const t = useTheme()
   const tr = useT()
+
+  /** La feuille de confirmation est ouverte. */
+  const [effacementDemande, setEffacementDemande] = useState(false)
+  /** L'effacement a eu lieu ; le message reste tant qu'on est sur l'écran. */
+  const [efface, setEfface] = useState(false)
 
   const themes: ThemePref[] = ['systeme', 'etabli', 'veillee']
   const langues: LanguePref[] = ['systeme', 'fr', 'en']
@@ -136,16 +144,69 @@ export function Reglages({
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: DANS_SECTION }}>
           <EnTeteSection>{tr('reglages.garde.titre')}</EnTeteSection>
-          <Panneau radius={16} pad="14px 16px" gap={8}>
+          <Panneau radius={RAYON} pad="14px 16px" gap={12}>
+            {/* La phrase qui répond à la question reste visible ; les deux
+                paragraphes qui la détaillent se lisent une fois et tenaient
+                autant de hauteur que toute la section Thème. */}
             <Texte size={14} color={t.ink}>
               {tr('reglages.garde.quoi')}
             </Texte>
-            <Texte size={13} weight={400}>
-              {tr('reglages.garde.rien')}
-            </Texte>
-            <Texte size={13} weight={400}>
-              {tr('reglages.garde.horsLigne')}
-            </Texte>
+
+            <details
+              className="rempart-repli"
+              style={{ '--choix-police': TEXTE, '--repli-encre': t.ink2 } as CSSProperties}
+            >
+              <summary>
+                <span>{tr('reglages.garde.plus')}</span>
+                <span className="rempart-repli-chevron">
+                  <Icone nom="chevron" size={14} color={t.ink2} />
+                </span>
+              </summary>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, paddingBottom: 2 }}>
+                <Texte size={13} weight={400}>
+                  {tr('reglages.garde.rien')}
+                </Texte>
+                <Texte size={13} weight={400}>
+                  {tr('reglages.garde.horsLigne')}
+                </Texte>
+              </div>
+            </details>
+
+            {/*
+             * Sortir doit coûter aussi peu qu'entrer.
+             *
+             * La section annonçait ce que l'app garde sans donner le moyen de
+             * l'effacer : la promesse « sans compte, sans tracking » n'était
+             * tenue qu'à moitié. Le bouton est en contour et non en aplat —
+             * c'est une issue, pas l'action principale de l'écran.
+             */}
+            <button
+              type="button"
+              onClick={() => setEffacementDemande(true)}
+              style={{
+                minHeight: 48,
+                borderRadius: RAYON,
+                background: 'transparent',
+                border: `2px solid ${t.clayText}`,
+                font: `700 15px/1 ${TITRE}`,
+                color: t.clayText,
+                cursor: 'pointer',
+                WebkitTapHighlightColor: 'transparent',
+              }}
+            >
+              {tr('reglages.effacer.bouton')}
+            </button>
+
+            {/* Court, et à sa place : dans la section qui vient de changer,
+                pas en travers de l'écran. */}
+            {efface && (
+              <div role="status" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <Icone nom="coche" size={15} color={t.greenText} />
+                <Texte size={13} weight={500} color={t.greenText}>
+                  {tr('reglages.effacer.fait')}
+                </Texte>
+              </div>
+            )}
           </Panneau>
         </div>
 
@@ -153,7 +214,125 @@ export function Reglages({
           {tr('reglages.pied')}
         </Texte>
       </Corps>
+
+      {effacementDemande && (
+        <FeuilleEffacer
+          onAnnuler={() => setEffacementDemande(false)}
+          onEffacer={() => {
+            onEffacer()
+            setEffacementDemande(false)
+            setEfface(true)
+          }}
+        />
+      )}
     </Ecran>
+  )
+}
+
+/**
+ * La confirmation d'effacement.
+ *
+ * Elle **liste ce qui part avant que ça parte**, plutôt que de demander
+ * « êtes-vous sûr ? » — la question ne renseigne personne, et il n'y a aucune
+ * sauvegarde ailleurs pour rattraper un oui de trop.
+ *
+ * « Annuler » est le bouton fort, comme « Rester » sur la feuille de départ :
+ * cette feuille s'ouvre parfois par erreur, jamais l'inverse, donc c'est le
+ * choix sûr qui tombe sous le pouce. L'action irréversible reste en contour.
+ */
+function FeuilleEffacer({
+  onAnnuler,
+  onEffacer,
+}: {
+  onAnnuler: () => void
+  onEffacer: () => void
+}) {
+  const t = useTheme()
+  const tr = useT()
+  const quoi: Cle[] = [
+    'reglages.effacer.palmares',
+    'reglages.effacer.theme',
+    'reglages.effacer.langue',
+    'reglages.effacer.nom',
+  ]
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label={tr('reglages.effacer.titre')}
+      style={{
+        position: 'absolute',
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: t.panel,
+        borderRadius: '26px 26px 30px 30px',
+        boxShadow: `0 -3px 0 ${t.edge}`,
+        padding: '22px 20px 24px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 14,
+      }}
+    >
+      <div style={{ font: `700 24px/1.1 ${TITRE}`, color: t.ink, textWrap: 'pretty' }}>
+        {tr('reglages.effacer.titre')}
+      </div>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <Etiquette size={10}>{tr('reglages.effacer.avant')}</Etiquette>
+        {/* Une vraie liste : le lecteur d'écran annonce « 4 éléments », donc on
+            sait qu'on a tout entendu. */}
+        <ul style={{ margin: 0, paddingLeft: 18, display: 'flex', flexDirection: 'column', gap: 4 }}>
+          {quoi.map((cle) => (
+            <li key={cle} style={{ font: `500 13px/${LIGNE} ${TEXTE}`, color: t.ink }}>
+              {tr(cle)}
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <Texte size={13} weight={500} color={t.clayText}>
+        {tr('reglages.effacer.irreversible')}
+      </Texte>
+
+      <div style={{ display: 'flex', gap: 10 }}>
+        <button
+          type="button"
+          onClick={onAnnuler}
+          style={{
+            flex: 1,
+            height: 56,
+            borderRadius: 16,
+            background: t.clayText,
+            boxShadow: `0 4px 0 ${t.clayTextEdge}`,
+            border: 'none',
+            font: `700 15px/1 ${TITRE}`,
+            color: t.panel,
+            cursor: 'pointer',
+          }}
+        >
+          {tr('reglages.effacer.annuler')}
+        </button>
+        <button
+          type="button"
+          onClick={onEffacer}
+          style={{
+            flex: 1,
+            height: 56,
+            borderRadius: 16,
+            background: 'transparent',
+            border: `2px solid ${t.clayText}`,
+            font: `600 12px/1 ${TEXTE}`,
+            letterSpacing: '0.06em',
+            color: t.clayText,
+            textTransform: 'uppercase',
+            cursor: 'pointer',
+          }}
+        >
+          {tr('reglages.effacer.confirmer')}
+        </button>
+      </div>
+    </div>
   )
 }
 

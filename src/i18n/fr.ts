@@ -100,12 +100,26 @@ export const fr = {
   'reglages.jeu.cartesManche.titre': 'Voir les neuf cartes',
   'reglages.jeu.cartesManche.detail':
     'Celles des manches 3, 6 et 9. Elles s’activent à la création de la partie.',
-  'reglages.garde.titre': 'Ce que l’app garde',
+  'reglages.garde.titre': 'Confidentialité',
   'reglages.garde.quoi': 'Ton palmarès, ton thème et ta langue, sur cet appareil uniquement.',
   'reglages.garde.rien':
     'Aucun compte, aucune publicité, aucune mesure d’audience. Les parties passent directement d’un téléphone à l’autre : il n’y a pas de serveur de jeu, et un service de mise en relation sert seulement à établir la connexion — il ne voit jamais la partie.',
   'reglages.garde.horsLigne':
     'Une fois l’app installée, elle fonctionne hors ligne. Le multijoueur, lui, demande une connexion.',
+  'reglages.garde.plus': 'En savoir plus',
+  'reglages.effacer.bouton': 'Effacer mes données',
+  'reglages.effacer.titre': 'Effacer mes données ?',
+  // Ce qui part est listé AVANT de partir : « êtes-vous sûr ? » ne renseigne
+  // personne, et il n'y a aucune sauvegarde ailleurs.
+  'reglages.effacer.avant': 'Ce qui part :',
+  'reglages.effacer.palmares': 'Ton palmarès : parties, victoires, briques, cartes jouées',
+  'reglages.effacer.theme': 'Ton thème',
+  'reglages.effacer.langue': 'Ta langue',
+  'reglages.effacer.nom': 'Ton nom par défaut',
+  'reglages.effacer.irreversible': 'C’est immédiat, et rien n’en est gardé ailleurs.',
+  'reglages.effacer.annuler': 'Annuler',
+  'reglages.effacer.confirmer': 'Effacer',
+  'reglages.effacer.fait': 'C’est effacé. L’app est comme au premier jour.',
   'reglages.pied': 'Rempart · 2–4 joueurs · 10 manches · 4 minutes',
 
   /* ------------------------------------------------ le récit de la manche

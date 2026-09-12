@@ -794,6 +794,7 @@ function Galerie() {
             onLanguePref={noop}
             nomDefaut="Léa"
             onNomDefaut={noop}
+            onEffacer={noop}
             onCartesManche={noop}
             onRetour={noop}
           />
@@ -953,6 +954,7 @@ function Galerie() {
             onLanguePref={noop}
             nomDefaut="Léa"
             onNomDefaut={noop}
+            onEffacer={noop}
             onCartesManche={noop}
             onRetour={noop}
           />
