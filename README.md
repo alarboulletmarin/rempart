@@ -138,11 +138,23 @@ liste de ceux qui ont joué — le « 3 / 4 ont joué » de l'écran 07. Sans ç
 suffirait d'ouvrir la console pour lire la carte des autres.
 
 **Le code amène à la porte, l'hôte l'ouvre.** Huit caractères sur un alphabet de
-32 sans les lettres ambiguës à l'oral (ni I, ni O, ni 0, ni 1). Le code est à la
-fois l'adresse du rendez-vous sur les relais publics et le seul secret du salon —
-une case de trop pour un seul objet, l'identifiant d'app étant public. L'accord de
-l'hôte sépare enfin les deux rôles : un code deviné ne donne plus une place,
-seulement une demande à refuser (`net/admission.ts`).
+22 où aucune paire n'est confondable : les DEUX membres de chaque paire sont
+écartés (B et 8, G et 6, S et 5, Z et 2, I, L, O, U, 0, 1), plutôt qu'un seul
+qu'on rattraperait à la saisie — rattraper O → 0 ne dit rien de 6 contre G. Le
+code est à la fois l'adresse du rendez-vous sur les relais publics et le seul
+secret du salon — une case de trop pour un seul objet, l'identifiant d'app étant
+public. 22⁸ ≈ 5 × 10¹⁰ : hors de portée d'un balayage, et de toute façon
+l'accord de l'hôte sépare les deux rôles — un code deviné ne donne plus une
+place, seulement une demande à refuser (`net/admission.ts`).
+
+Ce nouvel alphabet est un **sous-ensemble** de l'ancien, donc une version déjà
+installée accepte encore les codes fabriqués par celle-ci.
+
+**Et le code se scanne.** Le salon affiche un QR sous lui : il encode l'adresse
+de l'app avec `?partie=CODE`, donc un téléphone qui le scanne s'ouvre
+directement sur « Rejoindre », code rempli. Autour d'une table — et une partie
+de quatre minutes se joue surtout là — c'est plus rapide et plus sûr que de
+dicter huit caractères.
 
 **Un joueur qui a déjà un siège rentre chez lui sans rien demander.**
 Rechargement de page, tunnel, batterie : son identité d'appareil (`clientId`)

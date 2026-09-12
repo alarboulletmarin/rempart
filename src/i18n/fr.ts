@@ -267,6 +267,9 @@ export const fr = {
   'salon.code.copier': 'Copier',
   'salon.code.copie': 'Copié',
   'salon.code.partager': 'Partager',
+
+  'salon.qr.aide': 'Ou fais-le scanner : l’app s’ouvre avec le code déjà rempli.',
+  'salon.code.copier.aria': 'Copier le code {code}',
   'salon.code.invitation': 'Rejoins ma partie de Rempart avec le code {code}.',
   'salon.lien.recherche': 'Mise en relation…',
   'salon.lien.perdu': 'La mise en relation n’a pas abouti.',

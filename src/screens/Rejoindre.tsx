@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { TEXTE, TITRE } from '../theme'
-import { ALPHABET_CODE, LONGUEUR_CODE, codeValide } from '../net/room'
+import { LONGUEUR_CODE, codeValide, normaliserCode } from '../net/room'
 import { useT } from '../i18n'
 import { Bouton, Etiquette, Panneau, Texte } from '../ui/atoms'
 import { Corps, Ecran, EnTete } from '../ui/shell'
@@ -16,12 +16,15 @@ import { useTheme } from '../ui/theme'
  */
 export function Rejoindre({
   nom: nomInitial,
+  codeInitial,
   onNom,
   onRejoindre,
   onRetour,
   erreur,
 }: {
   nom: string
+  /** Le code lu dans l'adresse, quand on arrive par un QR scanné. */
+  codeInitial?: string
   onNom: (n: string) => void
   onRejoindre: (code: string, nom: string) => void
   onRetour: () => void
@@ -29,7 +32,7 @@ export function Rejoindre({
 }) {
   const t = useTheme()
   const tr = useT()
-  const [code, setCode] = useState('')
+  const [code, setCode] = useState(() => normaliserCode(codeInitial ?? ''))
   const [nom, setNom] = useState(nomInitial)
   const pret = codeValide(code)
 
@@ -79,16 +82,7 @@ export function Rejoindre({
             </div>
             <input
               value={code}
-              onChange={(e) =>
-                setCode(
-                  e.target.value
-                    .toUpperCase()
-                    .split('')
-                    .filter((c) => ALPHABET_CODE.includes(c))
-                    .slice(0, LONGUEUR_CODE)
-                    .join(''),
-                )
-              }
+              onChange={(e) => setCode(normaliserCode(e.target.value))}
               inputMode="text"
               autoCapitalize="characters"
               autoCorrect="off"

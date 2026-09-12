@@ -84,11 +84,11 @@ const SANS_ABSENT: ReadonlyMap<string, number> = new Map()
 /** Un salon figé, pour rendre l'écran 03 hors de toute session. */
 function vueSalon(over: Partial<VueSession> = {}): VueSession {
   return {
-    code: 'K7P2M9XR',
+    code: 'K7P3M9XR',
     moi: 'a',
     hote: true,
     salon: {
-      code: 'K7P2M9XR',
+      code: 'K7P3M9XR',
       hoteClientId: 'a',
       epoch: 0,
       round: 0,

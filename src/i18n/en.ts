@@ -235,6 +235,9 @@ export const en: Catalogue = {
   'salon.code.copier': 'Copy',
   'salon.code.copie': 'Copied',
   'salon.code.partager': 'Share',
+
+  'salon.qr.aide': 'Or let them scan it: the app opens with the code already filled in.',
+  'salon.code.copier.aria': 'Copy the code {code}',
   'salon.code.invitation': 'Join my game of Rempart with the code {code}.',
   'salon.lien.recherche': 'Connecting…',
   'salon.lien.perdu': 'The connection did not go through.',

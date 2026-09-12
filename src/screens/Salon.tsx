@@ -6,6 +6,7 @@ import type { VueSession } from '../net/session'
 import { useT, type Cle, type T } from '../i18n'
 import { Etiquette, Forme, Panneau, Scribble, Texte, usePanneauEncre, useShapeName } from '../ui/atoms'
 import { BoutonConversation, FeuilleDiscussion, useSalle } from '../ui/discussion'
+import { QR, lienDePartie } from '../ui/QR'
 import { Ecran } from '../ui/shell'
 import { useTheme } from '../ui/theme'
 
@@ -109,7 +110,7 @@ export function Salon({
   }
 
   const partager = async () => {
-    const texte = tr('salon.code.invitation', { code: salon.code })
+    const texte = `${tr('salon.code.invitation', { code: salon.code })} ${lienDePartie(salon.code)}`
     try {
       if (navigator.share) await navigator.share({ title: 'Rempart', text: texte })
       else await copier()
@@ -147,20 +148,66 @@ export function Salon({
           <Etiquette size={11} color={encre.sub} style={{ letterSpacing: '0.14em' }}>
             {tr('salon.code.titre')}
           </Etiquette>
-          <div
+          {/* Le code lui-même copie : c'est la première chose qu'on touche
+              quand on veut le donner, et il ne répondait pas. */}
+          <button
+            type="button"
+            onClick={copier}
+            aria-label={tr('salon.code.copier.aria', {
+              code: salon.code.split('').join(' '),
+            })}
             style={{
-              font: `700 40px/1 ${TITRE}`,
+              background: 'none',
+              border: 'none',
+              padding: '2px 6px',
+              font: `700 40px/1.1 ${TITRE}`,
               letterSpacing: '0.1em',
               color: encre.fg,
               textAlign: 'center',
+              cursor: 'pointer',
+              WebkitTapHighlightColor: 'transparent',
             }}
-            aria-label={tr('salon.code.aria', { lettres: salon.code.split('').join(' ') })}
           >
             {salon.code}
-          </div>
+          </button>
 
           {/* Un code affiché pendant que la mise en relation cherche encore
               serait un code que personne ne peut joindre. */}
+          {/*
+           * Le QR, sous le code.
+           *
+           * Une partie de quatre minutes se joue surtout autour d'une table :
+           * l'autre téléphone est à portée de main, et le scanner va plus vite
+           * que de dicter huit caractères — et plus sûrement.
+           */}
+          {lien === 'lie' && (
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 13,
+                width: '100%',
+                marginTop: 6,
+                background: encre.inner,
+                borderRadius: 16,
+                padding: 12,
+              }}
+            >
+              <QR valeur={lienDePartie(salon.code)} taille={96} />
+              <span
+                style={{
+                  font: `500 12px/1.4 ${TEXTE}`,
+                  color: encre.sub,
+                  flex: 1,
+                  minWidth: 0,
+                  textWrap: 'pretty',
+                }}
+              >
+                {tr('salon.qr.aide')}
+              </span>
+            </div>
+          )}
+
           {lien === 'lie' ? (
             <div style={{ display: 'flex', gap: 10, width: '100%', marginTop: 4 }}>
               <BoutonEncre onClick={copier}>

@@ -364,11 +364,52 @@ export function clientId(): string {
   }
 }
 
-/** Sans I/O/0/1, ambigus quand on dicte un code au téléphone. */
-export const ALPHABET_CODE = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
-
 /** Longueur du code de partie. Voir `fabriquerCode`. */
 export const LONGUEUR_CODE = 8
+
+/**
+ * L'alphabet d'un code de partie : vingt-deux symboles sans une seule paire
+ * qu'on puisse confondre.
+ *
+ * On écartait déjà I, O, 0 et 1. Restaient B contre 8, G contre 6, S contre 5,
+ * Z contre 2, L contre 1 et U contre V — et un code comme `V6DBC39U` se
+ * dictait mal, se lisait mal sur un écran au soleil, et se retapait faux.
+ *
+ * **Les deux membres de chaque paire partent**, plutôt qu'un seul. Garder le
+ * chiffre et renvoyer la lettre dessus (la méthode de Crockford) ne règle que
+ * les paires où l'un des deux est évident : cela rattrape O → 0, mais laisse
+ * entier le problème de 6 contre G, que rien ne départage. Un alphabet où
+ * aucune confusion n'est possible n'a besoin d'aucun rattrapage.
+ *
+ * **C'est un sous-ensemble de l'ancien alphabet**, et ce n'est pas un hasard :
+ * une version déjà installée accepte donc les codes que cette version
+ * fabrique. Une partie entre un téléphone à jour et un téléphone en retard
+ * continue de se joindre.
+ *
+ * Le prix est de l'entropie : 22⁸ ≈ 5,5 × 10¹⁰ au lieu de 32⁸ ≈ 1,1 × 10¹².
+ * Vingt fois moins, et toujours hors de portée d'un balayage des relais
+ * publics — surtout que le code ne donne pas une place, seulement une demande
+ * que l'hôte peut refuser (voir `admission.ts`).
+ */
+export const ALPHABET_CODE = 'ACDEFHJKMNPQRTVWXY3479'
+
+/**
+ * Ce qu'on rattrape à la saisie.
+ *
+ * La casse d'abord, les séparateurs qu'on met en recopiant (« V6DB-C39U »),
+ * et le U — le seul caractère écarté dont le partenaire, lui, est resté.
+ * Les autres écartés ne figurent dans aucun code : les taper ne veut rien
+ * dire, et la case reste vide plutôt que d'accepter une lettre au hasard.
+ */
+export function normaliserCode(saisi: string): string {
+  return saisi
+    .toUpperCase()
+    .replace(/U/g, 'V')
+    .split('')
+    .filter((c) => ALPHABET_CODE.includes(c))
+    .slice(0, LONGUEUR_CODE)
+    .join('')
+}
 
 /**
  * Code de partie, lisible au téléphone et transmissible par SMS.
@@ -377,8 +418,8 @@ export const LONGUEUR_CODE = 8
  * rendez-vous sur les relais publics *et* le seul secret qui protège le salon.
  * L'identifiant d'app est public — le dépôt est libre — donc qui veut peut
  * précalculer le sujet de chaque code possible et repérer les parties en cours.
- * À quatre caractères sur un alphabet de 32, cela fait 32⁴ ≈ un million de
- * possibilités : quelques secondes de calcul. À huit, 32⁸ ≈ 10¹², et le jeu
+ * À quatre caractères sur un alphabet de 22, cela fait 22⁴ ≈ deux cent mille
+ * possibilités : quelques secondes de calcul. À huit, 22⁸ ≈ 5 × 10¹⁰, et le jeu
  * n'en vaut plus la chandelle.
  *
  * Et l'accord de l'hôte reste le vrai verrou : un code deviné ne donne plus une

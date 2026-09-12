@@ -59,13 +59,33 @@ function direAvis(tr: T, avis: Avis): string {
     : tr(CLE_AVIS[avis.code])
 }
 
+/**
+ * Le code lu dans l'adresse, quand on arrive par un QR scanné.
+ *
+ * Lu **une fois, au chargement du module**, et non dans un état de composant :
+ * l'adresse s'efface aussitôt — sans quoi un rechargement renverrait
+ * indéfiniment vers un salon peut-être refermé depuis, et le code resterait
+ * affiché à qui regarde par-dessus l'épaule. Or `StrictMode` rejoue les
+ * initialiseurs d'état, et la seconde lecture tombait sur une adresse déjà
+ * nettoyée : l'app repartait sur l'accueil, le code perdu. Ici, la lecture
+ * précède tout rendu et ne peut pas se rejouer.
+ */
+const CODE_INVITE = lireCodeInvite()
+
+function lireCodeInvite(): string {
+  if (typeof window === 'undefined') return ''
+  const code = new URLSearchParams(window.location.search).get('partie') ?? ''
+  if (code) window.history.replaceState(null, '', window.location.pathname)
+  return code
+}
+
 export function App() {
   const [pref, setPref, themeName] = useThemePref()
   const [languePref, setLanguePref, langue] = useLanguePref()
   /* Le traducteur se fabrique ici plutôt que par `useT()` : `App` monte le
      fournisseur de langue, donc elle est au-dessus de son propre contexte. */
   const tr = useMemo(() => traducteur(langue), [langue])
-  const [vue, setVue] = useState<Vue>({ v: 'accueil' })
+  const [vue, setVue] = useState<Vue>(CODE_INVITE ? { v: 'rejoindre' } : { v: 'accueil' })
 
   /* Réglages de la partie à créer, avant que le salon existe. */
   const [places, setPlaces] = useState(4)
@@ -216,6 +236,7 @@ export function App() {
         return (
           <Rejoindre
             nom={monNom}
+            codeInitial={CODE_INVITE}
             onNom={setMonNom}
             erreur={avis}
             onRetour={() => setVue({ v: 'accueil' })}
