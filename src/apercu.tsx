@@ -18,6 +18,8 @@ import type { CardKey, Choice, GameState, PlayerId, Slot } from './game/types'
 import { LangueScope, type Langue } from './i18n'
 import { Icone } from './ui/Icone'
 import { VueMiseAJour } from './ui/MiseAJour'
+import { FeuilleQuitter } from './screens/Quitter'
+import { salonNeuf } from './net/table'
 import { ThemeScope } from './ui/theme'
 import type { VueSession } from './net/session'
 import type { ThemeName } from './theme'
@@ -148,6 +150,38 @@ function AvecSalle({ children }: { children: ReactNode }) {
  * pastille hors de sa ligne. Se relire dans les deux langues est le seul moyen
  * de le voir sans installer l'app deux fois.
  */
+/** Un salon à plusieurs, et un salon d'un seul : les deux discours du départ. */
+function salonADeux() {
+  const s = salonNeuf('K7P2M9XR', MOI, 'Léa')
+  s.joueurs.push({
+    clientId: 'b',
+    nom: 'Malo',
+    ci: 1,
+    peerId: null,
+    hote: false,
+    pret: true,
+    connecte: true,
+  })
+  s.lancee = true
+  return s
+}
+
+function salonSolo() {
+  const s = salonNeuf('K7P2M9XR', MOI, 'Léa')
+  s.joueurs.push({
+    clientId: 'bot-1',
+    nom: 'Nour',
+    ci: 2,
+    peerId: null,
+    hote: false,
+    pret: true,
+    connecte: true,
+    bot: true,
+  })
+  s.lancee = true
+  return s
+}
+
 function Cadre({
   titre,
   theme = 'etabli',
@@ -420,7 +454,7 @@ function Galerie() {
           <ReglesRapides onCompris={noop} onChapitres={noop} onRetour={noop} />
         </Cadre>
         <Cadre titre="05 · Jeu · état neutre">
-          <Jeu state={base()} moi={MOI} joues={[]} absentsDepuis={SANS_ABSENT} onJouer={noop} onSuite={noop} onQuitter={noop} />
+          <Jeu state={base()} moi={MOI} joues={[]} absentsDepuis={SANS_ABSENT} onJouer={noop} onSuite={noop} onDemanderQuitter={noop} onQuitter={noop} />
         </Cadre>
         {/* Manche 1 : personne n'a encore joué, donc personne n'a de
             contrainte. C'est l'état que la ligne doit dire en toutes lettres
@@ -432,7 +466,7 @@ function Galerie() {
             joues={[]}
             absentsDepuis={SANS_ABSENT}
             onJouer={noop}
-            onSuite={noop}
+            onSuite={noop} onDemanderQuitter={noop}
             onQuitter={noop}
           />
         </Cadre>
@@ -443,7 +477,7 @@ function Galerie() {
             joues={['a', 'b']}
             absentsDepuis={SANS_ABSENT}
             onJouer={noop}
-            onSuite={noop}
+            onSuite={noop} onDemanderQuitter={noop}
             onQuitter={noop}
           />
         </Cadre>
@@ -454,7 +488,7 @@ function Galerie() {
             joues={['a', 'b']}
             absentsDepuis={SANS_ABSENT}
             onJouer={noop}
-            onSuite={noop}
+            onSuite={noop} onDemanderQuitter={noop}
             onQuitter={noop}
           />
         </Cadre>
@@ -466,7 +500,7 @@ function Galerie() {
             absentsDepuis={SANS_ABSENT}
             carteInitiale="frapper"
             onJouer={noop}
-            onSuite={noop}
+            onSuite={noop} onDemanderQuitter={noop}
             onQuitter={noop}
           />
         </Cadre>
@@ -477,7 +511,7 @@ function Galerie() {
             joues={['a', 'b', 'c']}
             absentsDepuis={SANS_ABSENT}
             onJouer={noop}
-            onSuite={noop}
+            onSuite={noop} onDemanderQuitter={noop}
             onQuitter={noop}
           />
         </Cadre>
@@ -488,7 +522,7 @@ function Galerie() {
             joues={[]}
             absentsDepuis={SANS_ABSENT}
             onJouer={noop}
-            onSuite={noop}
+            onSuite={noop} onDemanderQuitter={noop}
             onQuitter={noop}
           />
         </Cadre>
@@ -503,7 +537,7 @@ function Galerie() {
             joues={[]}
             absentsDepuis={SANS_ABSENT}
             onJouer={noop}
-            onSuite={noop}
+            onSuite={noop} onDemanderQuitter={noop}
             onQuitter={noop}
           />
         </Cadre>
@@ -523,12 +557,12 @@ function Galerie() {
             joues={[]}
             absentsDepuis={SANS_ABSENT}
             onJouer={noop}
-            onSuite={noop}
+            onSuite={noop} onDemanderQuitter={noop}
             onQuitter={noop}
           />
         </Cadre>
         <Cadre titre="08 · Révélation (piège retourné)">
-          <Revelation state={revelationPiege()} moi={MOI} onSuivant={noop} />
+          <Revelation state={revelationPiege()} moi={MOI} onSuivant={noop} onDemanderQuitter={noop} />
         </Cadre>
         {/* Une réaction en vol : c'est le seul moment où une forme claire
             passe au-dessus d'une ligne de joueur, donc le seul où l'on peut
@@ -541,13 +575,13 @@ function Galerie() {
               joues={[]}
               absentsDepuis={SANS_ABSENT}
               onJouer={noop}
-              onSuite={noop}
+              onSuite={noop} onDemanderQuitter={noop}
               onQuitter={noop}
             />
           </AvecSalle>
         </Cadre>
         <Cadre titre="08 bis · Révélation (un blocage annule deux frappes)">
-          <Revelation state={revelationBlocage()} moi={MOI} onSuivant={noop} />
+          <Revelation state={revelationBlocage()} moi={MOI} onSuivant={noop} onDemanderQuitter={noop} />
         </Cadre>
         <Cadre titre="11 · Fin de partie">
           <Fin state={finDePartie()} moi={MOI} peutRejouer onRejouer={noop} onPalmares={noop} onQuitter={noop} />
@@ -587,7 +621,7 @@ function Galerie() {
             joues={[]}
             absentsDepuis={SANS_ABSENT}
             onJouer={noop}
-            onSuite={noop}
+            onSuite={noop} onDemanderQuitter={noop}
             onQuitter={noop}
           />
         </Cadre>
@@ -648,16 +682,32 @@ function Galerie() {
         <Cadre titre="C1 · Cartes de manche · les neuf">
           <CartesDeManche onRetour={noop} />
         </Cadre>
+        <Cadre titre="13 · Quitter · à plusieurs, arbitre">
+          <Jeu state={base()} moi={MOI} joues={[]} absentsDepuis={SANS_ABSENT} onJouer={noop} onSuite={noop} onDemanderQuitter={noop} onQuitter={noop} />
+          <FeuilleQuitter salon={salonADeux()} hote onRester={noop} onQuitter={noop} />
+        </Cadre>
+        <Cadre titre="13 bis · Quitter · à plusieurs, invité">
+          <Jeu state={base()} moi={MOI} joues={[]} absentsDepuis={SANS_ABSENT} onJouer={noop} onSuite={noop} onDemanderQuitter={noop} onQuitter={noop} />
+          <FeuilleQuitter salon={salonADeux()} hote={false} onRester={noop} onQuitter={noop} />
+        </Cadre>
+        <Cadre titre="13 ter · Quitter · seul contre des bots">
+          <Jeu state={base()} moi={MOI} joues={[]} absentsDepuis={SANS_ABSENT} onJouer={noop} onSuite={noop} onDemanderQuitter={noop} onQuitter={noop} />
+          <FeuilleQuitter salon={salonSolo()} hote onRester={noop} onQuitter={noop} />
+        </Cadre>
+        <Cadre titre="13 quater · Quitter · anglais" langue="en">
+          <Jeu state={base()} moi={MOI} joues={[]} absentsDepuis={SANS_ABSENT} onJouer={noop} onSuite={noop} onDemanderQuitter={noop} onQuitter={noop} />
+          <FeuilleQuitter salon={salonADeux()} hote onRester={noop} onQuitter={noop} />
+        </Cadre>
         <Cadre titre="M1 · Mise à jour · hors partie">
           <Accueil onCreer={noop} onRejoindre={noop} onRegles={noop} onPalmares={noop} onReglages={noop} />
           <VueMiseAJour enPartie={false} onRecharger={noop} onPlusTard={noop} />
         </Cadre>
         <Cadre titre="M2 · Mise à jour · en partie">
-          <Jeu state={base()} moi={MOI} joues={[]} absentsDepuis={SANS_ABSENT} onJouer={noop} onSuite={noop} onQuitter={noop} />
+          <Jeu state={base()} moi={MOI} joues={[]} absentsDepuis={SANS_ABSENT} onJouer={noop} onSuite={noop} onDemanderQuitter={noop} onQuitter={noop} />
           <VueMiseAJour enPartie onRecharger={noop} onPlusTard={noop} />
         </Cadre>
         <Cadre titre="M3 · Mise à jour · en partie · anglais" langue="en">
-          <Jeu state={base()} moi={MOI} joues={[]} absentsDepuis={SANS_ABSENT} onJouer={noop} onSuite={noop} onQuitter={noop} />
+          <Jeu state={base()} moi={MOI} joues={[]} absentsDepuis={SANS_ABSENT} onJouer={noop} onSuite={noop} onDemanderQuitter={noop} onQuitter={noop} />
           <VueMiseAJour enPartie onRecharger={noop} onPlusTard={noop} />
         </Cadre>
       </Section>
@@ -667,10 +717,10 @@ function Galerie() {
           <Accueil onCreer={noop} onRejoindre={noop} onRegles={noop} onPalmares={noop} onReglages={noop} />
         </Cadre>
         <Cadre titre="05 · Jeu · état neutre · veillée" theme="veillee">
-          <Jeu state={base()} moi={MOI} joues={[]} absentsDepuis={SANS_ABSENT} onJouer={noop} onSuite={noop} onQuitter={noop} />
+          <Jeu state={base()} moi={MOI} joues={[]} absentsDepuis={SANS_ABSENT} onJouer={noop} onSuite={noop} onDemanderQuitter={noop} onQuitter={noop} />
         </Cadre>
         <Cadre titre="08 · Révélation · veillée" theme="veillee">
-          <Revelation state={revelationPiege()} moi={MOI} onSuivant={noop} />
+          <Revelation state={revelationPiege()} moi={MOI} onSuivant={noop} onDemanderQuitter={noop} />
         </Cadre>
         <Cadre titre="11 · Fin de partie · veillée" theme="veillee">
           <Fin state={finDePartie()} moi={MOI} peutRejouer onRejouer={noop} onPalmares={noop} onQuitter={noop} />
@@ -701,8 +751,12 @@ function Galerie() {
         <Cadre titre="C1 · Cartes de manche · veillée" theme="veillee">
           <CartesDeManche onRetour={noop} />
         </Cadre>
+        <Cadre titre="13 · Quitter · veillée" theme="veillee">
+          <Jeu state={base()} moi={MOI} joues={[]} absentsDepuis={SANS_ABSENT} onJouer={noop} onSuite={noop} onDemanderQuitter={noop} onQuitter={noop} />
+          <FeuilleQuitter salon={salonADeux()} hote onRester={noop} onQuitter={noop} />
+        </Cadre>
         <Cadre titre="M2 · Mise à jour · en partie · veillée" theme="veillee">
-          <Jeu state={base()} moi={MOI} joues={[]} absentsDepuis={SANS_ABSENT} onJouer={noop} onSuite={noop} onQuitter={noop} />
+          <Jeu state={base()} moi={MOI} joues={[]} absentsDepuis={SANS_ABSENT} onJouer={noop} onSuite={noop} onDemanderQuitter={noop} onQuitter={noop} />
           <VueMiseAJour enPartie onRecharger={noop} onPlusTard={noop} />
         </Cadre>
         <Cadre titre="11 bis · Palmarès · veillée" theme="veillee">
@@ -727,7 +781,7 @@ function Galerie() {
             joues={[]}
             absentsDepuis={new Map([['c', Date.now()]])}
             onJouer={noop}
-            onSuite={noop}
+            onSuite={noop} onDemanderQuitter={noop}
             onQuitter={noop}
           />
         </Cadre>
@@ -738,7 +792,7 @@ function Galerie() {
             joues={[]}
             absentsDepuis={SANS_ABSENT}
             onJouer={noop}
-            onSuite={noop}
+            onSuite={noop} onDemanderQuitter={noop}
             onQuitter={noop}
           />
         </Cadre>

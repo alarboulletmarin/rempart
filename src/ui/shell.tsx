@@ -72,28 +72,60 @@ export function Corps({
 }
 
 /** La pastille « Retour » : de la matière et un mot, jamais un chevron. */
-export function Retour({ onClick, bg, fg }: { onClick?: () => void; bg?: string; fg?: string }) {
+export function Retour({
+  onClick,
+  bg,
+  fg,
+  libelle,
+}: {
+  onClick?: () => void
+  bg?: string
+  fg?: string
+  /** « Quitter » plutôt que « Retour » : sortir d'une partie n'est pas revenir. */
+  libelle?: ReactNode
+}) {
   const t = useTheme()
   const tr = useT()
+  /*
+   * Le bouton fait 44 px, la pastille garde sa taille.
+   *
+   * Peinte, elle mesure 27 px de haut — une cible que le pouce rate. Plutôt
+   * que de la grossir, ce qui changerait toutes les barres du haut, le bouton
+   * qui la porte est transparent et fait la hauteur réglementaire : l'œil voit
+   * la même pastille, le doigt touche une cible de 44 px.
+   */
   return (
     <button
       type="button"
       onClick={onClick}
       style={{
-        background: bg ?? t.cardOff,
-        borderRadius: R.pastille,
-        padding: '8px 12px',
+        background: 'none',
         border: 'none',
-        font: `600 11px/1 ${TEXTE}`,
-        letterSpacing: '0.08em',
-        color: fg ?? t.ink2,
-        textTransform: 'uppercase',
+        padding: 0,
+        minHeight: 44,
+        minWidth: 44,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'flex-start',
         cursor: 'pointer',
         flex: '0 0 auto',
         WebkitTapHighlightColor: 'transparent',
       }}
     >
-      {tr('commun.retour')}
+      <span
+        style={{
+          background: bg ?? t.cardOff,
+          borderRadius: R.pastille,
+          padding: '8px 12px',
+          font: `600 11px/1 ${TEXTE}`,
+          letterSpacing: '0.08em',
+          color: fg ?? t.ink2,
+          textTransform: 'uppercase',
+          whiteSpace: 'nowrap',
+        }}
+      >
+        {libelle ?? tr('commun.retour')}
+      </span>
     </button>
   )
 }
@@ -111,6 +143,7 @@ export function EnTete({
   titre,
   gauche,
   onRetour,
+  libelleRetour,
   droite,
   bg,
   fg,
@@ -123,6 +156,8 @@ export function EnTete({
   /** Ce qui remplace le titre à gauche : le compteur de manches, par exemple. */
   gauche?: ReactNode
   onRetour?: () => void
+  /** Le mot de la pastille de gauche, quand « Retour » ne convient pas. */
+  libelleRetour?: ReactNode
   /** Ce qui s'aligne à droite : progression, état, pastille de chapitre… */
   droite?: ReactNode
   bg?: string
@@ -145,7 +180,9 @@ export function EnTete({
         padding: `${SAFE_TOP} ${pad}px 0 ${pad}px`,
       }}
     >
-      {onRetour && <Retour onClick={onRetour} bg={retourBg} fg={retourFg} />}
+      {onRetour && (
+        <Retour onClick={onRetour} bg={retourBg} fg={retourFg} libelle={libelleRetour} />
+      )}
       {gauche}
       {titre && (
         <div

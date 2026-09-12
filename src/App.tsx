@@ -14,6 +14,7 @@ import { CartesDeManche, ReglesChapitre, ReglesSommaire } from './screens/Regles
 import { ReglesRapides } from './screens/ReglesRapides'
 import { Rejoindre } from './screens/Rejoindre'
 import { Revelation } from './screens/Revelation'
+import { FeuilleQuitter, consequenceDuDepart } from './screens/Quitter'
 import { Salon } from './screens/Salon'
 import { BandeauLien } from './ui/Bandeau'
 import { MiseAJour } from './ui/MiseAJour'
@@ -115,11 +116,29 @@ export function App() {
     [],
   )
 
+  /** La feuille « Quitter la partie ? » est ouverte. */
+  const [sortieDemandee, setSortieDemandee] = useState(false)
+
   const quitterSalon = useCallback(() => {
+    /*
+     * Le code part avec nous.
+     *
+     * La feuille promet qu'on retrouve sa place « avec le code » : le siège
+     * reste tenu côté arbitre (`net/table.ts`, `sortir`) et le `clientId` le
+     * rouvre sans rien demander. Encore faut-il avoir le code sous la main —
+     * celui qui a scanné un QR ne l'a jamais lu. Il pré-remplit « Rejoindre ».
+     *
+     * Sous la même condition que la promesse, et pas une de plus : seul contre
+     * des bots, la partie meurt en partant, et pré-remplir « Rejoindre » avec
+     * un code mort serait une invitation à frapper à une porte murée.
+     */
+    const v = sessionRef.current?.vue()
+    if (v?.jeu && consequenceDuDepart(v.salon, v.hote).garde) setCodeEssaye(v.code)
     sessionRef.current?.quitter()
     sessionRef.current = null
     setEtat(null)
     setMotifAvis(undefined)
+    setSortieDemandee(false)
     setVue({ v: 'accueil' })
   }, [])
 
@@ -297,6 +316,7 @@ export function App() {
               state={jeu}
               moi={etat.moi}
               onSuivant={() => sessionRef.current?.passerALaSuite()}
+              onDemanderQuitter={() => setSortieDemandee(true)}
             />
           )
         }
@@ -321,6 +341,7 @@ export function App() {
             onJouer={jouer}
             onSuite={() => sessionRef.current?.passerALaSuite()}
             onQuitter={quitterSalon}
+            onDemanderQuitter={() => setSortieDemandee(true)}
           />
         )
       }
@@ -384,6 +405,24 @@ export function App() {
               <BandeauLien lien={etat.lien} lancee={etat.salon.lancee} hote={etat.hote} />
             )}
             {contenu()}
+            {/*
+              La confirmation de départ, tenue ici plutôt que dans chaque écran.
+              Elle couvre le tour de jeu ET la révélation, qui n'ont rien en
+              commun sinon d'être la partie, et elle est la seule à savoir ce
+              que quitter coûte : il faut pour cela le salon et le rôle
+              d'arbitre, que ni l'un ni l'autre écran ne reçoit.
+            */}
+            {/* La partie finie, la question ne se pose plus : l'écran de fin a
+                sa propre sortie, et une feuille par-dessus serait un mur de
+                plus devant un score qu'on veut lire. */}
+            {sortieDemandee && etat && etat.jeu && etat.jeu.phase !== 'fin' && (
+              <FeuilleQuitter
+                salon={etat.salon}
+                hote={etat.hote}
+                onRester={() => setSortieDemandee(false)}
+                onQuitter={quitterSalon}
+              />
+            )}
             {/* En bas, dans le flux : il ne recouvre ni un mur ni un bouton, et
                 il ne se referme que si on le referme. */}
             <MiseAJour enPartie={!!etat?.jeu && etat.salon.lancee} />

@@ -70,6 +70,7 @@ export function Jeu({
   onJouer,
   onSuite,
   onQuitter,
+  onDemanderQuitter,
 }: {
   state: GameState
   moi: PlayerId
@@ -93,7 +94,11 @@ export function Jeu({
   onJouer: (choix: Choice[]) => void
   /** Accuse réception du bandeau de carte de manche. */
   onSuite: () => void
+  /** Partir tout de suite : la feuille de déconnexion a déjà dit ce qu'il en
+   *  coûte, et on y est arrivé en deux gestes. */
   onQuitter: () => void
+  /** Partir depuis la barre du haut — d'où la confirmation, tenue par l'App. */
+  onDemanderQuitter: () => void
 }) {
   const t = useTheme()
   const tr = useT()
@@ -343,6 +348,17 @@ export function Jeu({
   return (
     <Ecran>
       <EnTete
+        /*
+         * La sortie s'efface le temps de choisir une cible.
+         *
+         * Le bandeau « Frapper · choisis une cible » fait à lui seul 212 px :
+         * avec le compteur de manches, la barre est pleine, et la pastille la
+         * ferait déborder. Ce n'est pas un piège — ce geste-là s'annule en
+         * touchant une autre carte — et la barre change déjà entièrement à cet
+         * instant, donc la pastille ne disparaît pas toute seule sous les yeux.
+         */
+        onRetour={carteEnCours ? undefined : onDemanderQuitter}
+        libelleRetour={tr('commun.quitter')}
         gauche={
           state.phase === 'mort-subite' ? (
             <div style={{ font: `700 22px/1 ${TITRE}`, color: t.ink }}>

@@ -42,6 +42,7 @@ export const en: Catalogue = {
   /* ------------------------------------------------------------- le commun */
 
   'commun.retour': 'Back',
+  'commun.quitter': 'Leave',
   'commun.manche': 'Round {n}',
 
   'mur.aria_un': '{nom}’s wall: {n} brick out of {total}.',
@@ -365,6 +366,17 @@ export const en: Catalogue = {
   'pause.attendre': 'Wait',
   'pause.quitter': 'Leave',
   'pause.garde': 'that seat is kept for as long as it takes',
+
+  'quitter.titre': 'Leave the game?',
+  'quitter.aria': 'Leave the game',
+  'quitter.seul': 'The game stops here, and it will not count towards your record.',
+  'quitter.ensemble':
+    'The others carry on without you. Your wall stays up as long as the game lasts.',
+  'quitter.arbitre':
+    'The others carry on without you, and someone else will referee. Your wall stays up as long as the game lasts.',
+  'quitter.garde': 'the code brings you back to your seat',
+  'quitter.rester': 'Stay',
+  'quitter.confirmer': 'Leave the game',
 
   /* ------------------------------------------------------ la conversation */
 

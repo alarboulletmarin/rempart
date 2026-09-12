@@ -6,6 +6,31 @@ publication.
 
 ## Non publié
 
+### Ajouté : on peut quitter une partie en cours
+
+Il n’y avait aucune sortie. Une fois la partie lancée, le seul « Quitter »
+vivait dans la feuille qui s’ouvre quand **quelqu’un d’autre** perd la
+connexion : tant que tout allait bien, il fallait fermer l’app.
+
+- **Une pastille « Quitter » dans la barre du haut**, au tour de jeu et à la
+  révélation — là où se trouve « Retour » partout ailleurs. Elle s’efface le
+  temps de choisir une cible, où la barre porte déjà la consigne.
+- **Elle demande confirmation, et la confirmation dit ce qu’il en coûte** plutôt
+  que « êtes-vous sûr ? » : les autres continuent sans toi, quelqu’un d’autre
+  arbitrera, ou la partie s’arrête là s’il n’y a que des bots en face.
+  « Rester » est le bouton fort : cette feuille s’ouvre parfois par erreur,
+  jamais l’inverse.
+- **Le mur reste debout et le code ramène à sa place.** Le siège était déjà
+  gardé côté arbitre ; il ne manquait que de le dire, et d’emporter le code
+  pour que « Rejoindre » soit déjà rempli — celui qui a scanné un QR ne l’a
+  jamais lu. Rien de tout cela n’est promis quand la place n’est pas gardée.
+
+### Corrigé : les pastilles de la barre du haut se touchent
+
+« Retour » mesurait 27 pixels de haut. Le bouton en fait 44 sans que la
+pastille peinte ne bouge d’un pixel : l’œil voit la même, le pouce ne la rate
+plus. Quarante-huit pastilles étaient concernées.
+
 ### Ajouté : la nouvelle version se propose, elle ne s'impose plus
 
 L'app se mettait à jour toute seule : dès qu'une version finissait de se mettre

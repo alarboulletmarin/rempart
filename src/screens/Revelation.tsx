@@ -35,10 +35,19 @@ export function Revelation({
   state,
   moi,
   onSuivant,
+  onDemanderQuitter,
 }: {
   state: GameState
   moi: PlayerId
   onSuivant: () => void
+  /**
+   * Partir depuis la barre du haut, la confirmation étant tenue par l'App.
+   *
+   * Cet écran attend que tout le monde ait touché « Suivant » : sans sortie,
+   * un joueur que les autres font attendre n'a plus que le bouton d'accueil du
+   * téléphone.
+   */
+  onDemanderQuitter: () => void
 }) {
   const t = useTheme()
   const tr = useT()
@@ -81,6 +90,10 @@ export function Revelation({
       <EnTete
         bg={encre.bg}
         fg={encre.fg}
+        onRetour={onDemanderQuitter}
+        libelleRetour={tr('commun.quitter')}
+        retourBg={encre.inner}
+        retourFg={encre.sub}
         titre={tr('revelation.titre')}
         hauteur={104}
         droite={

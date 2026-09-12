@@ -59,6 +59,7 @@ export const fr = {
   /* ------------------------------------------------------------- le commun */
 
   'commun.retour': 'Retour',
+  'commun.quitter': 'Quitter',
   'commun.manche': 'Manche {n}',
 
   /* Le mur, dit en toutes lettres pour les lecteurs d'écran. */
@@ -400,6 +401,19 @@ export const fr = {
   'pause.attendre': 'Attendre',
   'pause.quitter': 'Quitter',
   'pause.garde': 'on garde sa place aussi longtemps qu’il faut',
+
+  /* ------------------------------------------------------- quitter en partie */
+
+  'quitter.titre': 'Quitter la partie ?',
+  'quitter.aria': 'Quitter la partie',
+  'quitter.seul': 'La partie s’arrête là, et elle ne comptera pas dans ton palmarès.',
+  'quitter.ensemble':
+    'Les autres continuent sans toi. Ton mur reste debout tant que la partie dure.',
+  'quitter.arbitre':
+    'Les autres continuent sans toi, et quelqu’un d’autre arbitrera. Ton mur reste debout tant que la partie dure.',
+  'quitter.garde': 'le code te ramène à ta place',
+  'quitter.rester': 'Rester',
+  'quitter.confirmer': 'Quitter la partie',
 
   /* ------------------------------------------------------ la conversation */
 
