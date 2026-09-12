@@ -296,21 +296,35 @@ input:focus-visible,
   margin-bottom: 8px;
 }
 
-.rempart-segmente,
-.rempart-cartes {
+/*
+ * Une option : son radio, et la pièce qui le montre.
+ *
+ * Le radio se superpose EXACTEMENT à son libellé. Sorti du flux sans position
+ * de repli, il se retrouvait au coin supérieur du groupe, tous les radios
+ * empilés au même endroit : cliquer le troisième segment donnait le focus à un
+ * élément situé tout en haut, et le navigateur remontait l'écran pour l'amener
+ * dans le champ de vision. À chaque changement de langue, l'écran sautait en
+ * haut. Ici, l'amener à l'écran ne déplace rien, puisqu'il y est déjà.
+ */
+.rempart-choix {
   position: relative;
-  margin: 0;
+  display: grid;
+  min-width: 0;
 }
 
-.rempart-segmente > input,
-.rempart-cartes > input {
+.rempart-choix > input {
   position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
   opacity: 0;
+  appearance: none;
+  /* Le clic traverse : c'est le `<label>` dessous qui le reçoit. */
   pointer-events: none;
 }
 
-.rempart-segmente > input:focus-visible + label,
-.rempart-cartes > input:focus-visible + label {
+.rempart-choix > input:focus-visible + label {
   outline: 3px solid var(--choix-focus);
   outline-offset: 3px;
 }
@@ -340,7 +354,7 @@ input:focus-visible,
   box-shadow: inset 0 2px 0 var(--seg-creux);
 }
 
-.rempart-segmente > label {
+.rempart-segmente .rempart-choix > label {
   /* La cible tactile réglementaire, portée par le segment lui-même. */
   min-height: 44px;
   display: grid;
@@ -364,7 +378,7 @@ input:focus-visible,
  * niveaux de gris, et elle ne peut pas se confondre avec la terre cuite des
  * boutons d'action — un segment coché n'est pas un « Lancer ».
  */
-.rempart-segmente > input:checked + label {
+.rempart-segmente .rempart-choix > input:checked + label {
   background: var(--seg-choix);
   color: var(--seg-choix-encre);
   font-weight: 700;

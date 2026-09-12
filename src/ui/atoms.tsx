@@ -1,4 +1,4 @@
-import { Fragment, useId, type CSSProperties, type ReactNode } from 'react'
+import { useId, type CSSProperties, type ReactNode } from 'react'
 import { R, TEXTE, TITRE } from '../theme'
 import type { CardKey, Slot } from '../game/types'
 import { useT, type Cle } from '../i18n'
@@ -481,7 +481,7 @@ export function Segmente<V extends string>({
         {options.map((o) => {
           const id = `${prefixe}-${nom}-${o.valeur}`
           return (
-            <Fragment key={o.valeur}>
+            <div key={o.valeur} className="rempart-choix">
               <input
                 type="radio"
                 id={id}
@@ -493,7 +493,7 @@ export function Segmente<V extends string>({
               <label htmlFor={id} lang={o.langue}>
                 {o.libelle}
               </label>
-            </Fragment>
+            </div>
           )
         })}
       </div>

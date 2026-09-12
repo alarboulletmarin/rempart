@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useId, useState, type CSSProperties, type ReactNode } from 'react'
+import { useEffect, useId, useState, type CSSProperties, type ReactNode } from 'react'
 import { TEXTE, TITRE } from '../theme'
 import { useT, type Cle, type LanguePref } from '../i18n'
 import { Icone } from '../ui/Icone'
@@ -83,7 +83,20 @@ export function Reglages({
   return (
     <Ecran>
       <EnTete titre={tr('reglages.titre')} onRetour={onRetour} hauteur={102} />
-      <Corps pad={20} gap={26} scroll>
+      {/*
+       * Le bas reste atteignable sous la barre du navigateur.
+       *
+       * La zone sûre est déjà réservée par `.rempart-cadre`, mais EN DEHORS du
+       * conteneur qui défile : elle laisse donc de l'air sous l'écran sans
+       * permettre au dernier élément de remonter au-dessus de la barre d'outils
+       * de Safari. Posée ici, elle fait défiler vingt pixels de plus.
+       */}
+      <Corps
+        pad={20}
+        gap={26}
+        scroll
+        style={{ paddingBottom: 'calc(20px + env(safe-area-inset-bottom, 0px))' }}
+      >
         <GroupeCartes
           nom="theme"
           titre={tr('reglages.theme.titre')}
@@ -562,7 +575,7 @@ function GroupeCartes<V extends string>({
           const id = `${prefixe}-${nom}-${o.valeur}`
           const choisi = o.valeur === valeur
           return (
-            <Fragment key={o.valeur}>
+            <div key={o.valeur} className="rempart-choix">
               <input
                 type="radio"
                 id={id}
@@ -622,7 +635,7 @@ function GroupeCartes<V extends string>({
                   {o.detail}
                 </span>
               </label>
-            </Fragment>
+            </div>
           )
         })}
       </div>
