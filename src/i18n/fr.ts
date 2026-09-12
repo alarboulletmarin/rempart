@@ -451,6 +451,13 @@ export const fr = {
   'lien.perdu.salon.detail': 'Ce salon n’existe plus. Essaie un autre code, ou crée ta partie.',
   'lien.repris.titre': 'Connexion rétablie.',
   'lien.autreCode': 'Essayer un autre code',
+
+  /* ------------------------------------------------------- la mise à jour */
+
+  'maj.titre': 'Une nouvelle version est prête.',
+  'maj.enPartie': 'Ta place t’attend : tu la retrouves au rechargement.',
+  'maj.recharger': 'Recharger',
+  'maj.plusTard': 'Plus tard',
   'avis.botLeve': '{humain} rejoint la partie — {nom} laisse sa place.',
 
   /* ------------------------------------------------- les quatre cartes, au long */

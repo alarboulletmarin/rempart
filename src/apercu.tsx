@@ -17,6 +17,7 @@ import { roundCardById } from './game/roundCards'
 import type { CardKey, Choice, GameState, PlayerId, Slot } from './game/types'
 import { LangueScope, type Langue } from './i18n'
 import { Icone } from './ui/Icone'
+import { VueMiseAJour } from './ui/MiseAJour'
 import { ThemeScope } from './ui/theme'
 import type { VueSession } from './net/session'
 import type { ThemeName } from './theme'
@@ -647,6 +648,18 @@ function Galerie() {
         <Cadre titre="C1 · Cartes de manche · les neuf">
           <CartesDeManche onRetour={noop} />
         </Cadre>
+        <Cadre titre="M1 · Mise à jour · hors partie">
+          <Accueil onCreer={noop} onRejoindre={noop} onRegles={noop} onPalmares={noop} onReglages={noop} />
+          <VueMiseAJour enPartie={false} onRecharger={noop} onPlusTard={noop} />
+        </Cadre>
+        <Cadre titre="M2 · Mise à jour · en partie">
+          <Jeu state={base()} moi={MOI} joues={[]} absentsDepuis={SANS_ABSENT} onJouer={noop} onSuite={noop} onQuitter={noop} />
+          <VueMiseAJour enPartie onRecharger={noop} onPlusTard={noop} />
+        </Cadre>
+        <Cadre titre="M3 · Mise à jour · en partie · anglais" langue="en">
+          <Jeu state={base()} moi={MOI} joues={[]} absentsDepuis={SANS_ABSENT} onJouer={noop} onSuite={noop} onQuitter={noop} />
+          <VueMiseAJour enPartie onRecharger={noop} onPlusTard={noop} />
+        </Cadre>
       </Section>
 
       <Section titre="Veillée · les écrans sombres">
@@ -687,6 +700,10 @@ function Galerie() {
         </Cadre>
         <Cadre titre="C1 · Cartes de manche · veillée" theme="veillee">
           <CartesDeManche onRetour={noop} />
+        </Cadre>
+        <Cadre titre="M2 · Mise à jour · en partie · veillée" theme="veillee">
+          <Jeu state={base()} moi={MOI} joues={[]} absentsDepuis={SANS_ABSENT} onJouer={noop} onSuite={noop} onQuitter={noop} />
+          <VueMiseAJour enPartie onRecharger={noop} onPlusTard={noop} />
         </Cadre>
         <Cadre titre="11 bis · Palmarès · veillée" theme="veillee">
           <Palmares onRetour={noop} />

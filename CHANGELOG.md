@@ -6,6 +6,26 @@ publication.
 
 ## Non publié
 
+### Ajouté : la nouvelle version se propose, elle ne s'impose plus
+
+L'app se mettait à jour toute seule : dès qu'une version finissait de se mettre
+en cache, la page se rechargeait. Au milieu d'une manche, sans que personne
+n'ait rien demandé — et comme une partie en ligne est un lien direct entre
+plusieurs téléphones, ce rechargement la rompait aussi pour les autres, qui
+attendaient l'arbitre.
+
+- **Un bandeau le dit, et laisse choisir.** « Recharger » ou « Plus tard », deux
+  boutons de la même taille : le refus est proposé aussi franchement que
+  l'acceptation, sans compte à rebours ni urgence inventée.
+- **« Plus tard » tient sa promesse.** La version attend sans revenir à la
+  charge ; la proposition ne revient qu'au prochain démarrage.
+- **En partie, le bandeau dit ce qu'on veut savoir avant de cliquer** : la place
+  est gardée, et on la retrouve au rechargement.
+- Il se pose **dans le flux**, en bas du cadre, comme le bandeau de lien se pose
+  en haut : il ne recouvre jamais un mur, une carte ni un bouton.
+- Une app installée ne recharge plus de page, donc ne redemandait jamais. Elle
+  redemande maintenant **au retour au premier plan**, et une fois par heure.
+
 ### Changé : un code qu'on peut dicter, et scanner
 
 `V6DBC39U` se dictait mal, se lisait mal au soleil et se retapait faux.

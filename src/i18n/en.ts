@@ -414,6 +414,11 @@ export const en: Catalogue = {
   'lien.perdu.salon.detail': 'This room no longer exists. Try another code, or create your own game.',
   'lien.repris.titre': 'Connection restored.',
   'lien.autreCode': 'Try another code',
+
+  'maj.titre': 'A new version is ready.',
+  'maj.enPartie': 'Your seat is kept: you get it back when the page reloads.',
+  'maj.recharger': 'Reload',
+  'maj.plusTard': 'Later',
   'avis.botLeve': '{humain} joins the game — {nom} gives up their seat.',
 
   /* ------------------------------------------------- les quatre cartes, au long */

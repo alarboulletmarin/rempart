@@ -16,6 +16,7 @@ import { Rejoindre } from './screens/Rejoindre'
 import { Revelation } from './screens/Revelation'
 import { Salon } from './screens/Salon'
 import { BandeauLien } from './ui/Bandeau'
+import { MiseAJour } from './ui/MiseAJour'
 import { DiscussionProvider, type Salle } from './ui/discussion'
 import { LangueProvider, traducteur, useLanguePref, type Cle, type T } from './i18n'
 import { ThemeProvider, useThemePref } from './ui/theme'
@@ -383,6 +384,9 @@ export function App() {
               <BandeauLien lien={etat.lien} lancee={etat.salon.lancee} hote={etat.hote} />
             )}
             {contenu()}
+            {/* En bas, dans le flux : il ne recouvre ni un mur ni un bouton, et
+                il ne se referme que si on le referme. */}
+            <MiseAJour enPartie={!!etat?.jeu && etat.salon.lancee} />
           </div>
         </DiscussionProvider>
       </ThemeProvider>
