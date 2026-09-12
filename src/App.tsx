@@ -16,7 +16,7 @@ import { Rejoindre } from './screens/Rejoindre'
 import { Revelation } from './screens/Revelation'
 import { Salon } from './screens/Salon'
 import { DiscussionProvider, type Salle } from './ui/discussion'
-import { LangueProvider, traducteur, useLanguePref, type Cle } from './i18n'
+import { LangueProvider, traducteur, useLanguePref, type Cle, type T } from './i18n'
 import { ThemeProvider, useThemePref } from './ui/theme'
 
 type Vue =
@@ -41,7 +41,7 @@ type Vue =
  * fabrique au rendu — un changement de langue en cours de partie retourne
  * ainsi l'avis affiché avec le reste.
  */
-const CLE_AVIS: Record<Avis['code'], Cle> = {
+const CLE_AVIS: Record<Exclude<Avis['code'], 'botLeve'>, Cle> = {
   lienEchoue: 'avis.lienEchoue',
   lienBloque: 'avis.lienBloque',
   lienPerdu: 'avis.lienPerdu',
@@ -50,6 +50,13 @@ const CLE_AVIS: Record<Avis['code'], Cle> = {
   partieEnCours: 'avis.partieEnCours',
   hotePris: 'avis.hotePris',
   gestRefuse: 'avis.gestRefuse',
+}
+
+/** L'avis, mis en mots. Seul « un bot s'est levé » nomme quelqu'un. */
+function direAvis(tr: T, avis: Avis): string {
+  return avis.code === 'botLeve'
+    ? tr('avis.botLeve', { nom: avis.nom, humain: avis.humain })
+    : tr(CLE_AVIS[avis.code])
 }
 
 export function App() {
@@ -68,12 +75,12 @@ export function App() {
 
   const sessionRef = useRef<Session | null>(null)
   const [etat, setEtat] = useState<VueSession | null>(null)
-  const [motifAvis, setMotifAvis] = useState<Avis['code'] | undefined>()
+  const [motifAvis, setMotifAvis] = useState<Avis | undefined>()
 
   const ecouteurs = useCallback(
     () => ({
       onChange: () => setEtat(sessionRef.current?.vue() ?? null),
-      onAvis: (a: Avis) => setMotifAvis(a.code),
+      onAvis: (a: Avis) => setMotifAvis(a),
     }),
     [],
   )
@@ -135,7 +142,7 @@ export function App() {
     if (!etat.salon.lancee && vue.v === 'partie') setVue({ v: 'salon' })
   }, [etat, vue.v])
 
-  const avis = motifAvis ? tr(CLE_AVIS[motifAvis]) : undefined
+  const avis = motifAvis ? direAvis(tr, motifAvis) : undefined
 
   const jouer = (choix: Choice[]) => {
     for (const c of choix) compterCarte(c.card)
@@ -236,6 +243,7 @@ export function App() {
             onAjouterBot={() => sessionRef.current?.ajouterBot()}
             onRetirerBot={(id) => sessionRef.current?.retirerBot(id)}
             onNiveauBot={(id, niveau) => sessionRef.current?.reglerNiveauBot(id, niveau)}
+            onNiveauBots={(niveau) => sessionRef.current?.reglerNiveauBots(niveau)}
             onLancer={() => sessionRef.current?.lancer()}
             onQuitter={quitterSalon}
           />

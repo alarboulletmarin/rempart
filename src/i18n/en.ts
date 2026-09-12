@@ -246,7 +246,6 @@ export const en: Catalogue = {
   'salon.joueur.hote': 'host',
   'salon.joueur.pret': 'ready',
   'salon.joueur.choisit': 'choosing…',
-  'salon.joueur.bot': 'bot',
   'salon.bot.retirer': 'Remove',
   'salon.bot.retirer.aria': 'Remove the bot {nom}',
   'salon.bot.ajouter': 'Add a bot',
@@ -272,10 +271,8 @@ export const en: Catalogue = {
   'salon.identite.libre': 'free',
   'salon.identite.aria': '{forme} — {etat}',
 
-  'salon.lancer': 'Start',
   'salon.lancer.note.deuxContreDeux': 'two against two',
   'salon.lancer.note.fautQuatre': 'you need four',
-  'salon.lancer.note.suffisent': '{n} players is enough',
   'salon.lancer.note.fautDeux': 'you need two',
   'salon.pret.oui': 'I’m ready',
   'salon.pret.non': 'I’m not ready any more',
@@ -287,6 +284,23 @@ export const en: Catalogue = {
   'salon.attente.introuvable': 'That game cannot be found.',
   'salon.attente.frappe': 'We knocked — the host has to open.',
   'salon.attente.cherche': 'Looking for the game…',
+
+  'bot_un': '{n} bot',
+  'bot_autre': '{n} bots',
+  'salon.compte': '{joueurs} · {places}',
+  'salon.compte.complet': '{joueurs} · table full',
+  'salon.bot.place': 'Open seat — held by a bot',
+  'salon.niveau.titre': 'Bot level',
+  'salon.niveau.parSiege.ouvrir': 'Set seat by seat',
+  'salon.niveau.parSiege.fermer': 'Fold away',
+  'salon.lancer.titre': 'Start the game',
+  'salon.lancer.note': '{joueurs} · {bots}',
+  'salon.fermer': 'Close the room',
+  'salon.fermer.titre': 'Close the room?',
+  'salon.fermer.detail':
+    'The room closes for everyone, and the code stops leading anywhere. There is no going back.',
+  'salon.fermer.oui': 'Close',
+  'salon.fermer.non': 'Cancel',
 
   /* ------------------------------------------------------------ l'accueil */
 
@@ -385,6 +399,7 @@ export const en: Catalogue = {
   'avis.hotePris':
     'Someone else is refereeing the table: you are a guest again, and your wall is untouched.',
   'avis.gestRefuse': 'That move is not playable.',
+  'avis.botLeve': '{humain} joins the game — {nom} gives up their seat.',
 
   /* ------------------------------------------------- les quatre cartes, au long */
 

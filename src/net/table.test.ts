@@ -38,21 +38,21 @@ describe('le salon', () => {
 
   it('refuse un cinquième joueur', () => {
     const t = table4()
-    expect(t.admettre('e', 'Sam', null)).toBe(false)
+    expect(t.admettre('e', 'Sam', null).admis).toBe(false)
     expect(t.salon.joueurs).toHaveLength(4)
   })
 
   it('refuse d’asseoir quelqu’un une fois la partie lancée', () => {
     const t = table4()
     t.lancer(1)
-    expect(t.admettre('e', 'Sam', null)).toBe(false)
+    expect(t.admettre('e', 'Sam', null).admis).toBe(false)
   })
 
   it('respecte le nombre de places réglé par l’hôte', () => {
     const t = creerTable(salonNeuf('K7P2M9XR', 'a', 'Léa'))
     t.reglerPlaces(2)
-    expect(t.admettre('b', 'Malo', null)).toBe(true)
-    expect(t.admettre('c', 'Nour', null)).toBe(false)
+    expect(t.admettre('b', 'Malo', null).admis).toBe(true)
+    expect(t.admettre('c', 'Nour', null).admis).toBe(false)
   })
 
   it('ne laisse pas voler une forme déjà prise', () => {
@@ -107,7 +107,7 @@ describe('le salon', () => {
     const t = table4()
     t.sortir('d')
     expect(t.salon.joueurs).toHaveLength(3)
-    expect(t.admettre('e', 'Sam', null)).toBe(true)
+    expect(t.admettre('e', 'Sam', null).admis).toBe(true)
   })
 })
 

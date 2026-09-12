@@ -297,6 +297,7 @@ function Galerie() {
             onAjouterBot={noop}
             onRetirerBot={noop}
             onNiveauBot={noop}
+            onNiveauBots={noop}
             onLancer={noop}
             onQuitter={noop}
           />
@@ -330,6 +331,7 @@ function Galerie() {
             onAjouterBot={noop}
             onRetirerBot={noop}
             onNiveauBot={noop}
+            onNiveauBots={noop}
             onLancer={noop}
             onQuitter={noop}
           />
@@ -345,6 +347,7 @@ function Galerie() {
               onAjouterBot={noop}
               onRetirerBot={noop}
               onNiveauBot={noop}
+              onNiveauBots={noop}
               onLancer={noop}
               onQuitter={noop}
             />
@@ -363,6 +366,7 @@ function Galerie() {
             onAjouterBot={noop}
             onRetirerBot={noop}
             onNiveauBot={noop}
+            onNiveauBots={noop}
             onLancer={noop}
             onQuitter={noop}
           />
@@ -385,6 +389,7 @@ function Galerie() {
             onAjouterBot={noop}
             onRetirerBot={noop}
             onNiveauBot={noop}
+            onNiveauBots={noop}
             onLancer={noop}
             onQuitter={noop}
           />
@@ -616,6 +621,7 @@ function Galerie() {
             onAjouterBot={noop}
             onRetirerBot={noop}
             onNiveauBot={noop}
+            onNiveauBots={noop}
             onLancer={noop}
             onQuitter={noop}
           />

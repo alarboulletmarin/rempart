@@ -20,7 +20,14 @@ import {
 } from '../game/engine.ts'
 import { NIVEAU_DEFAUT, NOMS_BOTS, type NiveauBot } from '../game/bot.ts'
 import type { Format, GameState, PlayerId } from '../game/types.ts'
-import { MAX_SIEGES, type Geste, type JoueurSalon, type Salon } from './room.ts'
+import {
+  MAX_SIEGES,
+  bots,
+  placeDisponible,
+  type Geste,
+  type JoueurSalon,
+  type Salon,
+} from './room.ts'
 import { accueilPour, peutAdmettre, type Accueil } from './admission.ts'
 
 /** Les quatre prénoms de la planche d'identité, dans l'ordre des formes. */
@@ -34,14 +41,21 @@ export type Table = {
   adopter(salon: Salon, jeu: GameState | null): void
   /** Applique un geste venu d'un joueur (ou de l'hôte lui-même). */
   appliquer(id: PlayerId, geste: Geste): boolean
-  /** Fait entrer un joueur au salon, une fois l'hôte d'accord. */
-  admettre(id: string, nom: string, peer: string | null): boolean
+  /**
+   * Fait entrer un joueur au salon, une fois l'hôte d'accord.
+   *
+   * Rend le nom du bot délogé, s'il a fallu en lever un : l'écran le dit, sans
+   * quoi une ligne disparaîtrait toute seule pendant qu'une autre apparaît.
+   */
+  admettre(id: string, nom: string, peer: string | null): { admis: boolean; botLeve: string | null }
   /** Assied un bot sur une place libre. Renvoie son identité, ou null. */
   ajouterBot(): string | null
   /** Relève un bot de son siège, avant le lancement. */
   retirerBot(id: string): boolean
   /** Règle le niveau d'un bot, siège par siège. */
   reglerNiveauBot(id: string, niveau: NiveauBot): boolean
+  /** Règle le niveau de tous les bots, et celui des prochains. */
+  reglerNiveauBots(niveau: NiveauBot): boolean
   /** Marque un joueur parti : son mur reste, ses cartes ne sont plus jouées. */
   sortir(id: string): void
   /** Le retour d'un joueur : il retrouve son siège et son mur, sans rien demander. */
@@ -143,8 +157,29 @@ export function creerTable(salonInitial: Salon): Table {
     },
 
     admettre(id, nom, peer) {
-      if (salon.joueurs.some((j) => j.clientId === id)) return false
-      if (salon.lancee || salon.joueurs.length >= salon.places) return false
+      const rien = { admis: false, botLeve: null }
+      if (salon.joueurs.some((j) => j.clientId === id)) return rien
+      if (salon.lancee || !placeDisponible(salon)) return rien
+
+      /*
+       * Un ami passe toujours avant un bot.
+       *
+       * Le salon affichait un grand code à partager et, juste dessous,
+       * « 4 / 4 » — parce que trois bots avaient pris les places. Les deux
+       * instructions se contredisaient, et c'est le code qui se lisait le
+       * premier : la personne partageait, et l'invité trouvait porte close.
+       * Un bot n'occupe donc plus une place, il la réserve, et il se lève
+       * quand quelqu'un arrive.
+       */
+      let botLeve: string | null = null
+      if (salon.joueurs.length >= salon.places) {
+        const assis = bots(salon)
+        const leve = assis[assis.length - 1]
+        if (!leve) return rien
+        botLeve = leve.nom
+        salon.joueurs = salon.joueurs.filter((j) => j.clientId !== leve.clientId)
+      }
+
       const ci = siegeLibre(salon.joueurs)
       salon.joueurs.push({
         clientId: id,
@@ -155,7 +190,7 @@ export function creerTable(salonInitial: Salon): Table {
         pret: false,
         connecte: true,
       })
-      return true
+      return { admis: true, botLeve }
     },
 
     /**
@@ -182,7 +217,9 @@ export function creerTable(salonInitial: Salon): Table {
         pret: true,
         connecte: true,
         bot: true,
-        niveau: NIVEAU_DEFAUT,
+        // Le niveau de la table, et non celui du siège : un bot ajouté prend
+        // le réglage courant plutôt que d'en imposer un autre.
+        niveau: salon.niveauBots ?? NIVEAU_DEFAUT,
       })
       return id
     },
@@ -197,6 +234,21 @@ export function creerTable(salonInitial: Salon): Table {
       const joueur = salon.joueurs.find((j) => j.clientId === id)
       if (!joueur?.bot) return false
       joueur.niveau = niveau
+      return true
+    },
+
+    /**
+     * Le niveau de TOUS les bots, et celui des prochains.
+     *
+     * C'est le réglage que presque tout le monde veut : un cran de difficulté
+     * pour la table. Le réglage siège par siège reste — il est ce qui permet
+     * un adversaire sérieux et deux qui laissent respirer — mais il n'est plus
+     * la seule façon de s'y prendre.
+     */
+    reglerNiveauBots(niveau) {
+      if (salon.lancee) return false
+      salon.niveauBots = niveau
+      for (const j of salon.joueurs) if (j.bot) j.niveau = niveau
       return true
     },
 
@@ -251,8 +303,18 @@ export function creerTable(salonInitial: Salon): Table {
       switch (geste.t) {
         case 'identite': {
           if (salon.lancee) return false
-          // Une forme déjà prise ne peut pas être volée.
-          if (salon.joueurs.some((j) => j.ci === geste.ci && j.clientId !== id)) return false
+          const occupant = salon.joueurs.find((j) => j.ci === geste.ci && j.clientId !== id)
+          // Une forme tenue par quelqu'un ne peut pas être volée.
+          if (occupant && !occupant.bot) return false
+          if (occupant) {
+            /*
+             * Une forme tenue par un bot, si : le bot passe sur celle qu'on
+             * libère. Marquer « PRIS » trois formes sur quatre parce que des
+             * bots les portaient rendait le sélecteur d'identité mort, alors
+             * que rien ne s'y opposait — un bot n'a aucune préférence.
+             */
+            occupant.ci = joueur.ci
+          }
           joueur.ci = geste.ci
           return true
         }

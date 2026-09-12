@@ -278,7 +278,6 @@ export const fr = {
   'salon.joueur.hote': 'hôte',
   'salon.joueur.pret': 'prêt',
   'salon.joueur.choisit': 'choisit…',
-  'salon.joueur.bot': 'bot',
   'salon.bot.retirer': 'Retirer',
   'salon.bot.retirer.aria': 'Retirer le bot {nom}',
   'salon.bot.ajouter': 'Ajouter un bot',
@@ -304,10 +303,8 @@ export const fr = {
   'salon.identite.libre': 'libre',
   'salon.identite.aria': '{forme} — {etat}',
 
-  'salon.lancer': 'Lancer',
   'salon.lancer.note.deuxContreDeux': 'deux contre deux',
   'salon.lancer.note.fautQuatre': 'il faut être quatre',
-  'salon.lancer.note.suffisent': '{n} joueurs suffisent',
   'salon.lancer.note.fautDeux': 'il faut être deux',
   'salon.pret.oui': 'Je suis prêt',
   'salon.pret.non': 'Je ne suis plus prêt',
@@ -319,6 +316,24 @@ export const fr = {
   'salon.attente.introuvable': 'On ne trouve pas cette partie.',
   'salon.attente.frappe': 'On a frappé — l’hôte doit ouvrir.',
   'salon.attente.cherche': 'On cherche la partie…',
+
+  /* Le salon, après la revue : un bot réserve une place, il ne la prend pas. */
+  'bot_un': '{n} bot',
+  'bot_autre': '{n} bots',
+  'salon.compte': '{joueurs} · {places}',
+  'salon.compte.complet': '{joueurs} · table complète',
+  'salon.bot.place': 'Place libre — tenue par un bot',
+  'salon.niveau.titre': 'Niveau des bots',
+  'salon.niveau.parSiege.ouvrir': 'Régler siège par siège',
+  'salon.niveau.parSiege.fermer': 'Replier',
+  'salon.lancer.titre': 'Lancer la partie',
+  'salon.lancer.note': '{joueurs} · {bots}',
+  'salon.fermer': 'Fermer le salon',
+  'salon.fermer.titre': 'Fermer le salon ?',
+  'salon.fermer.detail':
+    'Le salon se referme pour tout le monde, et le code ne mène plus nulle part. C’est sans retour.',
+  'salon.fermer.oui': 'Fermer',
+  'salon.fermer.non': 'Annuler',
 
   /* ------------------------------------------------------------ l'accueil */
 
@@ -419,6 +434,7 @@ export const fr = {
   'avis.hotePris':
     'Quelqu’un d’autre arbitre la table : tu redeviens invité, ton mur reste intact.',
   'avis.gestRefuse': 'Ce coup n’est pas jouable.',
+  'avis.botLeve': '{humain} rejoint la partie — {nom} laisse sa place.',
 
   /* ------------------------------------------------- les quatre cartes, au long */
 

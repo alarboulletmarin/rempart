@@ -78,6 +78,27 @@ export type JoueurSalon = {
   niveau?: NiveauBot
 }
 
+/**
+ * Les sièges tenus par un appareil — par quelqu'un, donc.
+ *
+ * C'est ce compte-là qui dit si la table est pleine : un bot n'occupe pas une
+ * place, il la RÉSERVE. Le salon affichait « 4 / 4 » au-dessus d'un code à
+ * partager parce qu'il comptait les bots comme des joueurs, et l'ami qui
+ * recevait le code se heurtait à un salon complet.
+ */
+export function humains(salon: Salon): JoueurSalon[] {
+  return salon.joueurs.filter((j) => !j.bot)
+}
+
+export function bots(salon: Salon): JoueurSalon[] {
+  return salon.joueurs.filter((j) => j.bot)
+}
+
+/** Reste-t-il de quoi asseoir quelqu'un — fût-ce en délogeant un bot ? */
+export function placeDisponible(salon: Salon): boolean {
+  return humains(salon).length < salon.places
+}
+
 export type Salon = {
   code: string
   hoteClientId: string
@@ -104,6 +125,19 @@ export type Salon = {
   places: number
   joueurs: JoueurSalon[]
   lancee: boolean
+  /**
+   * Le niveau donné aux bots par défaut.
+   *
+   * Un réglage de table, et non de siège : trois rangées de trois pastilles
+   * identiques, c'était neuf décisions posées sur un écran d'attente pour un
+   * choix que presque personne ne veut prendre siège par siège. Celui-ci vaut
+   * pour tous les bots ; l'écran garde de quoi régler un siège en particulier,
+   * mais replié.
+   *
+   * Optionnel : un salon publié par une version plus ancienne n'en porte pas,
+   * et chaque lecture retombe alors sur `NIVEAU_DEFAUT`.
+   */
+  niveauBots?: NiveauBot
 }
 
 export type Hello = { clientId: string; nom: string }

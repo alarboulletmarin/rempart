@@ -74,6 +74,8 @@ export type Avis =
   | { code: 'partieEnCours' }
   | { code: 'hotePris' }
   | { code: 'gestRefuse' }
+  /** Un ami est arrivé, et un bot lui a rendu sa place. */
+  | { code: 'botLeve'; nom: string; humain: string }
 
 export type Ecouteurs = {
   onChange: () => void
@@ -868,7 +870,14 @@ export class Session {
     }
     this.demandesEnAttente = this.demandesEnAttente.filter((d) => d.clientId !== id)
     this.refuses.delete(id)
-    this.table.admettre(id, demande.nom, demande.peer)
+    const { admis, botLeve } = this.table.admettre(id, demande.nom, demande.peer)
+    if (!admis) {
+      this.changer()
+      return
+    }
+    // Une ligne qui disparaît pendant qu'une autre apparaît demande un mot :
+    // sinon l'hôte croit avoir perdu un bot par accident.
+    if (botLeve) this.ecouteurs.onAvis({ code: 'botLeve', nom: botLeve, humain: demande.nom })
     this.vuA.set(id, Date.now())
     this.publierSalon()
     this.changer()
@@ -1225,6 +1234,14 @@ export class Session {
   reglerNiveauBot(id: string, niveau: NiveauBot): void {
     if (!this.estHote) return
     if (!this.table.reglerNiveauBot(id, niveau)) return
+    this.publierSalon()
+    this.changer()
+  }
+
+  /** Le niveau de tous les bots à la fois — le réglage de table. */
+  reglerNiveauBots(niveau: NiveauBot): void {
+    if (!this.estHote) return
+    if (!this.table.reglerNiveauBots(niveau)) return
     this.publierSalon()
     this.changer()
   }
