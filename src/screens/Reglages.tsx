@@ -1,8 +1,35 @@
+import { useEffect, useId, useState, type CSSProperties, type ReactNode } from 'react'
 import { TEXTE, TITRE } from '../theme'
 import { useT, type Cle, type LanguePref } from '../i18n'
-import { Etiquette, Panneau, Texte } from '../ui/atoms'
+import { Icone } from '../ui/Icone'
+import { Bouton, Etiquette, Panneau, Segmente, Texte } from '../ui/atoms'
 import { Corps, Ecran, EnTete } from '../ui/shell'
 import { useTheme, type ThemePref } from '../ui/theme'
+import { useInstallation } from '../ui/installation'
+import { CHANGELOG, DEPOT, VERSION } from '../version'
+
+/**
+ * L'espace qui fait les groupes.
+ *
+ * Les cartes d'une même section se touchent presque — huit pixels —, et
+ * vingt-six séparent une section de la suivante. Trois fois plus, et c'est la
+ * seule chose qui dise « ceci est un groupe » : l'espace au-dessus d'un en-tête
+ * valait le même que celui entre deux cartes, donc le regard ne voyait qu'une
+ * pile, et les deux « Comme le téléphone » de deux sections différentes se
+ * confondaient. Proximité avant bordures : aucun trait de séparation ajouté.
+ */
+const DANS_SECTION = 8
+
+/**
+ * Le rayon des pièces de choix, et la hauteur de leur ligne.
+ *
+ * Les cartes de thème et le contrôle de langue sont deux formes différentes
+ * pour deux natures de choix, mais ils appartiennent au même écran : même
+ * arrondi, même encre d'accent (`choix`), même interligne. Le 14 se retrouve
+ * sur la piste du segmenté, dans `global.css`.
+ */
+const RAYON = 14
+const LIGNE = 1.4
 
 /**
  * Réglages.
@@ -11,14 +38,22 @@ import { useTheme, type ThemePref } from '../ui/theme'
  * profil, pas de notifications. Le thème, la langue, l'accès aux cartes de
  * manche, et ce que l'app garde sur l'appareil.
  *
- * Le thème et la langue se règlent de la même façon parce qu'ils sont la même
- * chose : une préférence à trois états dont le troisième suit le téléphone.
+ * ## Deux contrôles, et c'est volontaire
+ *
+ * Le thème garde des cartes descriptives : « Établi » et « Veillée » ne disent
+ * rien sans leur ligne d'explication. La langue, non — « Français » n'a pas
+ * besoin qu'on précise que le jeu sera en français —, donc elle tient sur une
+ * ligne. La nature du choix décide de la forme du contrôle, pas la symétrie de
+ * l'écran.
  */
 export function Reglages({
   pref,
   onPref,
   languePref,
   onLanguePref,
+  nomDefaut,
+  onNomDefaut,
+  onEffacer,
   onCartesManche,
   onRetour,
 }: {
@@ -26,11 +61,21 @@ export function Reglages({
   onPref: (p: ThemePref) => void
   languePref: LanguePref
   onLanguePref: (p: LanguePref) => void
+  /** Le nom mémorisé, celui qui pré-remplit « Nouvelle partie ». */
+  nomDefaut: string
+  onNomDefaut: (n: string) => void
+  /** Efface tout ce que la section confidentialité annonce garder. */
+  onEffacer: () => void
   onCartesManche: () => void
   onRetour: () => void
 }) {
   const t = useTheme()
   const tr = useT()
+
+  /** La feuille de confirmation est ouverte. */
+  const [effacementDemande, setEffacementDemande] = useState(false)
+  /** L'effacement a eu lieu ; le message reste tant qu'on est sur l'écran. */
+  const [efface, setEfface] = useState(false)
 
   const themes: ThemePref[] = ['systeme', 'etabli', 'veillee']
   const langues: LanguePref[] = ['systeme', 'fr', 'en']
@@ -38,121 +83,596 @@ export function Reglages({
   return (
     <Ecran>
       <EnTete titre={tr('reglages.titre')} onRetour={onRetour} hauteur={102} />
-      <Corps pad={20} gap={20} scroll>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <Etiquette>{tr('reglages.theme.titre')}</Etiquette>
-          {themes.map((id) => (
-            <Option
-              key={id}
-              nom={tr(`reglages.theme.${id}.nom` as Cle)}
-              detail={tr(`reglages.theme.${id}.detail` as Cle)}
-              choisi={pref === id}
-              onClick={() => onPref(id)}
-            />
-          ))}
+      {/*
+       * Le bas reste atteignable sous la barre du navigateur.
+       *
+       * La zone sûre est déjà réservée par `.rempart-cadre`, mais EN DEHORS du
+       * conteneur qui défile : elle laisse donc de l'air sous l'écran sans
+       * permettre au dernier élément de remonter au-dessus de la barre d'outils
+       * de Safari. Posée ici, elle fait défiler vingt pixels de plus.
+       */}
+      <Corps
+        pad={20}
+        gap={26}
+        scroll
+        style={{ paddingBottom: 'calc(20px + env(safe-area-inset-bottom, 0px))' }}
+      >
+        <GroupeCartes
+          nom="theme"
+          titre={tr('reglages.theme.titre')}
+          valeur={pref}
+          onValeur={onPref}
+          options={themes.map((id) => ({
+            valeur: id,
+            libelle: tr(`reglages.theme.${id}.nom` as Cle),
+            detail: tr(`reglages.theme.${id}.detail` as Cle),
+          }))}
+        />
+
+        {/*
+         * La langue tient sur une ligne, et sans description.
+         *
+         * « Le jeu, les règles et le récit des manches en français » sous
+         * « Français » ne disait rien que le libellé ne disait déjà. La seule
+         * ligne qui apporte quelque chose est celle de l'effet réel, et elle
+         * est unique : elle suit la sélection, « Système » compris — c'est là
+         * que se trouve la vraie information, puisque le libellé ne dit pas
+         * quelle langue le système parle.
+         */}
+        <Segmente
+          nom="langue"
+          legende={<EnTeteSection as="legend">{tr('reglages.langue.titre')}</EnTeteSection>}
+          valeur={languePref}
+          onValeur={onLanguePref}
+          options={langues.map((id) => ({
+            valeur: id,
+            libelle: tr(`reglages.langue.${id}.nom` as Cle),
+            /* Le nom de la langue s'écrit dans cette langue-là : « English »
+               reste lisible pour qui ne lit pas le français, et c'est
+               justement cette personne qui cherche ce réglage. */
+            langue: id === 'systeme' ? undefined : id,
+          }))}
+          note={tr('reglages.langue.actuellement', {
+            langue: tr(`reglages.langue.nom.${tr.langue}` as Cle),
+          })}
+        />
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: DANS_SECTION }}>
+          <EnTeteSection>{tr('reglages.jeu.titre')}</EnTeteSection>
+          <ChampNom valeur={nomDefaut} onValider={onNomDefaut} />
+          {/*
+           * Une ligne de navigation, pas une carte.
+           *
+           * « Cartes de manche » avait le même arrondi et le même fond que les
+           * options cliquables, sans contrôle ni chevron : une fausse
+           * affordance devant un texte explicatif, alors que le réglage réel
+           * est ailleurs — à la création de la partie. Elle mène maintenant
+           * là où elle prétendait mener : la section des règles qui montre les
+           * neuf cartes.
+           */}
+          <Ligne
+            libelle={tr('reglages.jeu.cartesManche.titre')}
+            detail={tr('reglages.jeu.cartesManche.detail')}
+            onClick={onCartesManche}
+          />
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <Etiquette>{tr('reglages.langue.titre')}</Etiquette>
-          {langues.map((id) => (
-            <Option
-              key={id}
-              nom={tr(`reglages.langue.${id}.nom` as Cle)}
-              detail={tr(`reglages.langue.${id}.detail` as Cle)}
-              choisi={languePref === id}
-              onClick={() => onLanguePref(id)}
-              /* Le nom de la langue s'écrit dans cette langue-là : « English »
-                 reste lisible pour qui ne lit pas le français, et c'est
-                 justement cette personne qui cherche ce réglage. */
-              langue={id === 'systeme' ? undefined : id}
-            />
-          ))}
-        </div>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <Etiquette>{tr('reglages.jeu.titre')}</Etiquette>
-          <Panneau radius={16} pad="14px 16px" gap={3} onClick={onCartesManche}>
-            <span style={{ font: `700 17px/1 ${TITRE}`, color: t.ink }}>
-              {tr('reglages.jeu.cartesManche.titre')}
-            </span>
-            <Texte size={12} weight={400}>
-              {tr('reglages.jeu.cartesManche.detail')}
-            </Texte>
-          </Panneau>
-        </div>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <Etiquette>{tr('reglages.garde.titre')}</Etiquette>
-          <Panneau radius={16} pad="14px 16px" gap={8}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: DANS_SECTION }}>
+          <EnTeteSection>{tr('reglages.garde.titre')}</EnTeteSection>
+          <Panneau radius={RAYON} pad="14px 16px" gap={12}>
+            {/* La phrase qui répond à la question reste visible ; les deux
+                paragraphes qui la détaillent se lisent une fois et tenaient
+                autant de hauteur que toute la section Thème. */}
             <Texte size={14} color={t.ink}>
               {tr('reglages.garde.quoi')}
             </Texte>
-            <Texte size={13} weight={400}>
-              {tr('reglages.garde.rien')}
-            </Texte>
-            <Texte size={13} weight={400}>
-              {tr('reglages.garde.horsLigne')}
-            </Texte>
+
+            <details
+              className="rempart-repli"
+              style={{ '--choix-police': TEXTE, '--repli-encre': t.ink2 } as CSSProperties}
+            >
+              <summary>
+                <span>{tr('reglages.garde.plus')}</span>
+                <span className="rempart-repli-chevron">
+                  <Icone nom="chevron" size={14} color={t.ink2} />
+                </span>
+              </summary>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, paddingBottom: 2 }}>
+                <Texte size={13} weight={400}>
+                  {tr('reglages.garde.rien')}
+                </Texte>
+                <Texte size={13} weight={400}>
+                  {tr('reglages.garde.horsLigne')}
+                </Texte>
+              </div>
+            </details>
+
+            {/*
+             * Sortir doit coûter aussi peu qu'entrer.
+             *
+             * La section annonçait ce que l'app garde sans donner le moyen de
+             * l'effacer : la promesse « sans compte, sans tracking » n'était
+             * tenue qu'à moitié. Le bouton est en contour et non en aplat —
+             * c'est une issue, pas l'action principale de l'écran.
+             */}
+            <button
+              type="button"
+              onClick={() => setEffacementDemande(true)}
+              style={{
+                minHeight: 48,
+                borderRadius: RAYON,
+                background: 'transparent',
+                border: `2px solid ${t.clayText}`,
+                font: `700 15px/1 ${TITRE}`,
+                color: t.clayText,
+                cursor: 'pointer',
+                WebkitTapHighlightColor: 'transparent',
+              }}
+            >
+              {tr('reglages.effacer.bouton')}
+            </button>
+
+            {/* Court, et à sa place : dans la section qui vient de changer,
+                pas en travers de l'écran. */}
+            {efface && (
+              <div role="status" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <Icone nom="coche" size={15} color={t.greenText} />
+                <Texte size={13} weight={500} color={t.greenText}>
+                  {tr('reglages.effacer.fait')}
+                </Texte>
+              </div>
+            )}
           </Panneau>
         </div>
 
-        <Texte size={11} style={{ textAlign: 'center', marginTop: 'auto', lineHeight: 1.5 }}>
-          {tr('reglages.pied')}
-        </Texte>
+        {/*
+         * « Rempart · 2–4 joueurs · 10 manches · 4 minutes » répétait
+         * l'accroche de l'accueil, en bas de l'écran où l'on vient chercher
+         * les informations de l'app. C'est leur place naturelle.
+         */}
+        <APropos />
       </Corps>
+
+      {effacementDemande && (
+        <FeuilleEffacer
+          onAnnuler={() => setEffacementDemande(false)}
+          onEffacer={() => {
+            onEffacer()
+            setEffacementDemande(false)
+            setEfface(true)
+          }}
+        />
+      )}
     </Ecran>
   )
 }
 
-/** Une option de réglage : une pastille ocre, un nom, une ligne de détail. */
-function Option({
-  nom,
-  detail,
-  choisi,
-  onClick,
-  langue,
+/**
+ * La confirmation d'effacement.
+ *
+ * Elle **liste ce qui part avant que ça parte**, plutôt que de demander
+ * « êtes-vous sûr ? » — la question ne renseigne personne, et il n'y a aucune
+ * sauvegarde ailleurs pour rattraper un oui de trop.
+ *
+ * « Annuler » est le bouton fort, comme « Rester » sur la feuille de départ :
+ * cette feuille s'ouvre parfois par erreur, jamais l'inverse, donc c'est le
+ * choix sûr qui tombe sous le pouce. L'action irréversible reste en contour.
+ */
+function FeuilleEffacer({
+  onAnnuler,
+  onEffacer,
 }: {
-  nom: string
-  detail: string
-  choisi: boolean
-  onClick: () => void
-  /** La langue du NOM, quand elle diffère de celle de l'écran. */
-  langue?: string
+  onAnnuler: () => void
+  onEffacer: () => void
 }) {
   const t = useTheme()
+  const tr = useT()
+  const quoi: Cle[] = [
+    'reglages.effacer.palmares',
+    'reglages.effacer.theme',
+    'reglages.effacer.langue',
+    'reglages.effacer.nom',
+  ]
   return (
-    <Panneau
-      radius={16}
-      pad="14px 16px"
-      gap={6}
-      bg={choisi ? t.selBg : t.panel}
-      edge={choisi ? t.selEdge : t.edge}
-      onClick={onClick}
-      pressed={choisi}
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label={tr('reglages.effacer.titre')}
+      style={{
+        position: 'absolute',
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: t.panel,
+        borderRadius: '26px 26px 30px 30px',
+        boxShadow: `0 -3px 0 ${t.edge}`,
+        padding: '22px 20px 24px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 14,
+      }}
     >
-      <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-        <span
+      <div style={{ font: `700 24px/1.1 ${TITRE}`, color: t.ink, textWrap: 'pretty' }}>
+        {tr('reglages.effacer.titre')}
+      </div>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <Etiquette size={10}>{tr('reglages.effacer.avant')}</Etiquette>
+        {/* Une vraie liste : le lecteur d'écran annonce « 4 éléments », donc on
+            sait qu'on a tout entendu. */}
+        <ul style={{ margin: 0, paddingLeft: 18, display: 'flex', flexDirection: 'column', gap: 4 }}>
+          {quoi.map((cle) => (
+            <li key={cle} style={{ font: `500 13px/${LIGNE} ${TEXTE}`, color: t.ink }}>
+              {tr(cle)}
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <Texte size={13} weight={500} color={t.clayText}>
+        {tr('reglages.effacer.irreversible')}
+      </Texte>
+
+      <div style={{ display: 'flex', gap: 10 }}>
+        <button
+          type="button"
+          onClick={onAnnuler}
           style={{
-            width: 14,
-            height: 14,
-            borderRadius: '50%',
-            background: choisi ? t.ochre : t.edge,
-            flex: '0 0 14px',
+            flex: 1,
+            height: 56,
+            borderRadius: 16,
+            background: t.clayText,
+            boxShadow: `0 4px 0 ${t.clayTextEdge}`,
+            border: 'none',
+            font: `700 15px/1 ${TITRE}`,
+            color: t.panel,
+            cursor: 'pointer',
           }}
-        />
-        <span lang={langue} style={{ font: `700 16px/1 ${TITRE}`, color: choisi ? t.selFg : t.ink }}>
-          {nom}
-        </span>
-      </span>
-      <span
+        >
+          {tr('reglages.effacer.annuler')}
+        </button>
+        <button
+          type="button"
+          onClick={onEffacer}
+          style={{
+            flex: 1,
+            height: 56,
+            borderRadius: 16,
+            background: 'transparent',
+            border: `2px solid ${t.clayText}`,
+            font: `600 12px/1 ${TEXTE}`,
+            letterSpacing: '0.06em',
+            color: t.clayText,
+            textTransform: 'uppercase',
+            cursor: 'pointer',
+          }}
+        >
+          {tr('reglages.effacer.confirmer')}
+        </button>
+      </div>
+    </div>
+  )
+}
+
+/**
+ * Le nom par défaut.
+ *
+ * Il se sauvegarde à la perte de focus : pas de bouton « Enregistrer » à
+ * pousser pour trois lettres, et pas une écriture dans le stockage à chaque
+ * frappe. La frappe reste locale — sans cela, un `value` piloté depuis le
+ * parent replacerait le curseur à chaque lettre.
+ */
+function ChampNom({
+  valeur,
+  onValider,
+}: {
+  valeur: string
+  onValider: (n: string) => void
+}) {
+  const t = useTheme()
+  const tr = useT()
+  const [saisie, setSaisie] = useState(valeur)
+
+  /* Le nom change par en haut quand on efface ses données : le champ suit. */
+  useEffect(() => setSaisie(valeur), [valeur])
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+      <input
+        value={saisie}
+        onChange={(e) => setSaisie(e.target.value)}
+        onBlur={() => onValider(saisie.trim())}
+        maxLength={14}
+        placeholder={tr('creation.nom.exemple')}
+        aria-label={tr('reglages.jeu.nom.aria')}
         style={{
-          font: `400 13px/1.4 ${TEXTE}`,
-          color: choisi ? t.table : t.ink2,
-          textWrap: 'pretty',
+          height: 56,
+          borderRadius: RAYON,
+          background: t.panel,
+          boxShadow: `0 3px 0 ${t.edge}`,
+          border: '2px solid transparent',
+          padding: '0 14px',
+          font: `700 18px/1 ${TITRE}`,
+          color: t.ink,
+          width: '100%',
         }}
-      >
-        {detail}
+      />
+      <Texte size={12} weight={400} style={{ lineHeight: LIGNE }}>
+        {tr('reglages.jeu.nom.detail')}
+      </Texte>
+    </div>
+  )
+}
+
+/**
+ * Une ligne qui mène ailleurs : un libellé, une précision, et l'icône de sa
+ * destination.
+ *
+ * Visuellement distincte des cartes de choix — pas d'anneau à gauche, une
+ * icône à droite — parce qu'elle ne fait pas la même chose : elle ne retient
+ * rien, elle ouvre autre chose. Le chevron reste dans l'app, le cadre ouvert
+ * en sort : deux destinations différentes ne peuvent pas porter le même
+ * dessin.
+ */
+function Ligne({
+  libelle,
+  detail,
+  onClick,
+  href,
+}: {
+  libelle: string
+  detail?: string
+  onClick?: () => void
+  /** Une adresse hors de l'app : la ligne devient un vrai lien. */
+  href?: string
+}) {
+  const t = useTheme()
+  const style: CSSProperties = {
+    background: t.panel,
+    borderRadius: RAYON,
+    boxShadow: `0 3px 0 ${t.edge}`,
+    border: 'none',
+    minHeight: 56,
+    padding: '12px 14px',
+    display: 'flex',
+    alignItems: 'center',
+    gap: 12,
+    textAlign: 'left',
+    textDecoration: 'none',
+    color: 'inherit',
+    cursor: 'pointer',
+    WebkitTapHighlightColor: 'transparent',
+  }
+  const contenu = (
+    <>
+      <span style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 3 }}>
+        <span style={{ font: `700 16px/1.25 ${TITRE}`, color: t.ink }}>{libelle}</span>
+        {detail && (
+          <span
+            style={{ font: `400 12px/${LIGNE} ${TEXTE}`, color: t.ink2, textWrap: 'pretty' }}
+          >
+            {detail}
+          </span>
+        )}
       </span>
-    </Panneau>
+      <Icone nom={href ? 'lienExterne' : 'chevron'} size={href ? 16 : 18} color={t.ink2} />
+    </>
+  )
+  if (href) {
+    return (
+      <a href={href} target="_blank" rel="noreferrer" style={style}>
+        {contenu}
+      </a>
+    )
+  }
+  return (
+    <button type="button" onClick={onClick} style={style}>
+      {contenu}
+    </button>
+  )
+}
+
+/**
+ * À propos : la version, où lire ce qui a changé, où lire le code, et
+ * l'installation.
+ *
+ * « Installer l'app » n'apparaît qu'en navigateur et qu'une fois que celui-ci
+ * a offert une invite — voir `ui/installation.ts`. En app installée, il n'y a
+ * rien à proposer, et le proposer quand même ferait douter du reste de
+ * l'écran.
+ */
+function APropos() {
+  const tr = useT()
+  const { possible, installer } = useInstallation()
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: DANS_SECTION }}>
+      <EnTeteSection>{tr('reglages.propos.titre')}</EnTeteSection>
+      {/* En texte et non en ligne cliquable : il ne mène nulle part, donc il
+          n'a pas à ressembler à ce qui mène quelque part. */}
+      <Texte size={12} weight={500}>
+        {tr('reglages.propos.version', { v: VERSION })}
+      </Texte>
+      <Ligne libelle={tr('reglages.propos.changelog')} href={CHANGELOG} />
+      <Ligne libelle={tr('reglages.propos.depot')} href={DEPOT} />
+      {possible && (
+        <>
+          <Bouton ton="panel" height={52} size={16} onClick={installer}>
+            {tr('reglages.propos.installer')}
+          </Bouton>
+          <Texte size={12} weight={400} style={{ lineHeight: LIGNE }}>
+            {tr('reglages.propos.installerDetail')}
+          </Texte>
+        </>
+      )}
+    </div>
+  )
+}
+
+/**
+ * L'en-tête d'une section.
+ *
+ * En `ink2` à 11 px, il mesurait 5,27 contre 1 sur la table — au-dessus du
+ * seuil, mais assez discret pour que le regard saute par-dessus. Il passe à
+ * l'encre du texte courant : 10,7 contre 1 en établi, 14,8 en veillée.
+ *
+ * En `legend`, l'en-tête visible sert de nom au groupe de boutons radio ; une
+ * légende masquée en plus aurait redit le même mot à qui écoute.
+ */
+function EnTeteSection({ children, as }: { children: ReactNode; as?: 'div' | 'legend' }) {
+  const t = useTheme()
+  return (
+    <Etiquette
+      as={as}
+      className={as === 'legend' ? 'rempart-legende' : undefined}
+      size={12}
+      color={t.ink}
+    >
+      {children}
+    </Etiquette>
+  )
+}
+
+/**
+ * Un groupe de cartes descriptives — de VRAIS boutons radio.
+ *
+ * Pas une liste de `<button aria-pressed>` : les flèches du clavier parcourent
+ * un groupe de radios sans qu'on ait une ligne à écrire, et le lecteur d'écran
+ * annonce « 2 sur 3 », ce qu'aucun bouton ne sait dire. Le radio lui-même est
+ * sorti du flux (voir `.rempart-cartes` dans `global.css`) ; c'est la carte,
+ * son `<label>`, qui le porte à l'écran.
+ */
+function GroupeCartes<V extends string>({
+  nom,
+  titre,
+  options,
+  valeur,
+  onValeur,
+}: {
+  /** Le `name` commun : c'est lui qui fait le groupe, et donc la navigation. */
+  nom: string
+  titre: string
+  options: readonly { valeur: V; libelle: string; detail: string; langue?: string }[]
+  valeur: V
+  onValeur: (v: V) => void
+}) {
+  const t = useTheme()
+  const prefixe = useId()
+  return (
+    <fieldset className="rempart-groupe">
+      <EnTeteSection as="legend">{titre}</EnTeteSection>
+      <div
+        className="rempart-cartes"
+        style={
+          {
+            display: 'flex',
+            flexDirection: 'column',
+            gap: DANS_SECTION,
+            '--choix-focus': t.choix,
+          } as CSSProperties
+        }
+      >
+        {options.map((o) => {
+          const id = `${prefixe}-${nom}-${o.valeur}`
+          const choisi = o.valeur === valeur
+          return (
+            <div key={o.valeur} className="rempart-choix">
+              <input
+                type="radio"
+                id={id}
+                name={nom}
+                value={o.valeur}
+                checked={choisi}
+                onChange={() => onValeur(o.valeur)}
+              />
+              {/*
+               * La carte retenue garde son fond.
+               *
+               * Elle prenait un aplat de pleine encre, ou de terre cuite en
+               * veillée. Or la terre cuite dit « tu as perdu une brique » en
+               * jeu et « Lancer » sur les boutons d'action : trois sens pour
+               * une couleur, et deux blocs pleins sur un écran qui n'a aucune
+               * action primaire. Ce qui porte l'état, désormais : un contour
+               * de 2 px, l'anneau rempli, et une coche dessinée — trois
+               * signaux dont aucun n'est une couleur seule.
+               */}
+              <label
+                htmlFor={id}
+                style={{
+                  background: t.panel,
+                  borderRadius: RAYON,
+                  /* Transparent quand la carte n'est pas prise : la géométrie
+                     ne bouge pas d'un pixel au clic. */
+                  border: `2px solid ${choisi ? t.choix : 'transparent'}`,
+                  boxShadow: `0 3px 0 ${t.edge}`,
+                  padding: '12px 14px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 5,
+                  cursor: 'pointer',
+                }}
+              >
+                <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <Anneau coche={choisi} />
+                  <span
+                    lang={o.langue}
+                    style={{ font: `700 16px/1.25 ${TITRE}`, color: t.ink }}
+                  >
+                    {o.libelle}
+                  </span>
+                  {choisi && (
+                    <span style={{ marginLeft: 'auto', display: 'flex' }}>
+                      <Icone nom="coche" size={15} color={t.choix} />
+                    </span>
+                  )}
+                </span>
+                <span
+                  style={{
+                    font: `400 13px/${LIGNE} ${TEXTE}`,
+                    color: t.ink2,
+                    textWrap: 'pretty',
+                  }}
+                >
+                  {o.detail}
+                </span>
+              </label>
+            </div>
+          )
+        })}
+      </div>
+    </fieldset>
+  )
+}
+
+/**
+ * L'anneau d'un bouton radio, visible dans les DEUX états.
+ *
+ * La pastille ne se dessinait que sur l'option déjà cochée : ailleurs, elle
+ * était en `edge`, c'est-à-dire du brun sur du brun — 1,41 contre 1 en
+ * veillée. Le seul élément qui porte l'état n'existait donc visuellement que
+ * là où l'état était déjà acquis, et rien ne disait que ces cartes étaient des
+ * choix tant qu'on n'en avait pas touché une.
+ *
+ * Vide, l'anneau tient le 3:1 des éléments d'interface (3,86 en établi, 4,43
+ * en veillée) ; rempli, il passe à l'encre du choix.
+ */
+function Anneau({ coche }: { coche: boolean }) {
+  const t = useTheme()
+  return (
+    <span
+      aria-hidden="true"
+      style={{
+        width: 18,
+        height: 18,
+        flex: '0 0 18px',
+        borderRadius: '50%',
+        border: `2px solid ${coche ? t.choix : t.anneau}`,
+        display: 'grid',
+        placeItems: 'center',
+      }}
+    >
+      {coche && (
+        <span style={{ width: 8, height: 8, borderRadius: '50%', background: t.choix }} />
+      )}
+    </span>
   )
 }

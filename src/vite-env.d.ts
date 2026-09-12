@@ -1,6 +1,12 @@
 /// <reference types="vite/client" />
 /// <reference types="vite-plugin-pwa/client" />
 
+/**
+ * La version publiée, injectée à la compilation depuis `package.json`.
+ * Voir `vite.config.ts` et `src/version.ts`.
+ */
+declare const __APP_VERSION__: string
+
 interface ImportMetaEnv {
   /**
    * Serveur TURN, optionnel mais recommandé pour jouer à distance en 4G/5G.

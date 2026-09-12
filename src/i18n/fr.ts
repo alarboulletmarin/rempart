@@ -84,23 +84,49 @@ export const fr = {
   'reglages.theme.veillee.nom': 'Veillée',
   'reglages.theme.veillee.detail': 'Le même établi à la lampe : bois brûlé et craie.',
   'reglages.langue.titre': 'Langue',
-  'reglages.langue.systeme.nom': 'Comme le téléphone',
-  'reglages.langue.systeme.detail': 'Suit la langue du système, si le jeu la parle.',
+  // « Comme le téléphone » ne tient pas dans un segment d'un tiers de ligne.
+  'reglages.langue.systeme.nom': 'Système',
   'reglages.langue.fr.nom': 'Français',
-  'reglages.langue.fr.detail': 'Le jeu, les règles et le récit des manches en français.',
   'reglages.langue.en.nom': 'English',
-  'reglages.langue.en.detail': 'Le jeu, les règles et le récit des manches en anglais.',
+  // La seule ligne qui apporte ce que les trois libellés ne disent pas : la
+  // langue réellement parlée, « Système » compris.
+  'reglages.langue.actuellement': 'Actuellement : {langue}',
+  'reglages.langue.nom.fr': 'français',
+  'reglages.langue.nom.en': 'anglais',
   'reglages.jeu.titre': 'Le jeu',
-  'reglages.jeu.cartesManche.titre': 'Cartes de manche',
+  'reglages.jeu.nom.titre': 'Nom par défaut',
+  'reglages.jeu.nom.aria': 'Ton nom par défaut',
+  'reglages.jeu.nom.detail': 'Pré-rempli quand tu crées ou rejoins une partie.',
+  'reglages.jeu.cartesManche.titre': 'Voir les neuf cartes',
   'reglages.jeu.cartesManche.detail':
-    'Les neuf cartes des manches 3, 6 et 9. Elles s’activent à la création de la partie.',
-  'reglages.garde.titre': 'Ce que l’app garde',
+    'Celles des manches 3, 6 et 9. Elles s’activent à la création de la partie.',
+  'reglages.garde.titre': 'Confidentialité',
   'reglages.garde.quoi': 'Ton palmarès, ton thème et ta langue, sur cet appareil uniquement.',
   'reglages.garde.rien':
     'Aucun compte, aucune publicité, aucune mesure d’audience. Les parties passent directement d’un téléphone à l’autre : il n’y a pas de serveur de jeu, et un service de mise en relation sert seulement à établir la connexion — il ne voit jamais la partie.',
   'reglages.garde.horsLigne':
     'Une fois l’app installée, elle fonctionne hors ligne. Le multijoueur, lui, demande une connexion.',
-  'reglages.pied': 'Rempart · 2–4 joueurs · 10 manches · 4 minutes',
+  'reglages.garde.plus': 'En savoir plus',
+  'reglages.effacer.bouton': 'Effacer mes données',
+  'reglages.effacer.titre': 'Effacer mes données ?',
+  // Ce qui part est listé AVANT de partir : « êtes-vous sûr ? » ne renseigne
+  // personne, et il n'y a aucune sauvegarde ailleurs.
+  'reglages.effacer.avant': 'Ce qui part :',
+  'reglages.effacer.palmares': 'Ton palmarès : parties, victoires, briques, cartes jouées',
+  'reglages.effacer.theme': 'Ton thème',
+  'reglages.effacer.langue': 'Ta langue',
+  'reglages.effacer.nom': 'Ton nom par défaut',
+  'reglages.effacer.irreversible': 'C’est immédiat, et rien n’en est gardé ailleurs.',
+  'reglages.effacer.annuler': 'Annuler',
+  'reglages.effacer.confirmer': 'Effacer',
+  'reglages.effacer.fait': 'C’est effacé. L’app est comme au premier jour.',
+  'reglages.propos.titre': 'À propos',
+  'reglages.propos.version': 'Version {v}',
+  'reglages.propos.changelog': 'Journal des versions',
+  'reglages.propos.depot': 'Code source',
+  'reglages.propos.installer': 'Installer l’app',
+  'reglages.propos.installerDetail':
+    'Elle démarre plus vite, tient hors ligne et n’a plus de barre d’adresse.',
 
   /* ------------------------------------------------ le récit de la manche
    *

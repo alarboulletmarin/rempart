@@ -4,6 +4,7 @@ import type { Choice, Format } from './game/types'
 import type { ChapitreId } from './game/content'
 import { Session, type Avis, type VueSession } from './net/session'
 import { compterCarte, enregistrerPartie } from './store/palmares'
+import { ecrireNom, effacerTout, lireNom } from './store/preferences'
 import { Accueil } from './screens/Accueil'
 import { Creation } from './screens/Creation'
 import { Fin } from './screens/Fin'
@@ -94,7 +95,18 @@ export function App() {
   const [places, setPlaces] = useState(4)
   const [format, setFormat] = useState<Format>('chacun')
   const [cartesManche, setCartesManche] = useState(true)
-  const [monNom, setMonNom] = useState('')
+  /*
+   * Le nom, mémorisé d'une partie à l'autre.
+   *
+   * Il se retapait à chaque partie, sur un écran où c'est la première chose
+   * qu'on rencontre. Il se règle donc aussi dans Réglages, et ce qui y est
+   * écrit pré-remplit « Nouvelle partie » et « Rejoindre ».
+   *
+   * Ce qu'on tape à la création n'est PAS enregistré au passage : jouer une
+   * fois sous un autre nom est exactement le cas où on ne veut pas que l'app
+   * s'en souvienne. Seul le champ des réglages écrit sur le disque.
+   */
+  const [monNom, setMonNom] = useState(lireNom)
   /**
    * Le dernier code essayé.
    *
@@ -141,6 +153,22 @@ export function App() {
     setSortieDemandee(false)
     setVue({ v: 'accueil' })
   }, [])
+
+  /**
+   * Tout effacer, et revenir à l'état du premier lancement.
+   *
+   * Sans rechargement, et c'est le point : la page se rechargerait en rompant
+   * une partie en cours (le lien est direct entre les téléphones), alors qu'il
+   * suffit de remettre l'état en mémoire là où il était au démarrage. Le
+   * thème et la langue repassent donc par leurs propres `set`, qui réécrivent
+   * aussitôt la préférence — d'où l'ordre : le disque est nettoyé en dernier.
+   */
+  const effacerDonnees = useCallback(() => {
+    setPref('systeme')
+    setLanguePref('systeme')
+    setMonNom('')
+    effacerTout()
+  }, [setPref, setLanguePref])
 
   useEffect(() => () => sessionRef.current?.quitter(), [])
 
@@ -386,6 +414,12 @@ export function App() {
             onPref={setPref}
             languePref={languePref}
             onLanguePref={setLanguePref}
+            nomDefaut={monNom}
+            onNomDefaut={(n) => {
+              setMonNom(n)
+              ecrireNom(n)
+            }}
+            onEffacer={effacerDonnees}
             onCartesManche={() => setVue({ v: 'cartes-manche' })}
             onRetour={() => setVue({ v: 'accueil' })}
           />
