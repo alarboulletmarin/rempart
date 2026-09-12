@@ -145,7 +145,7 @@ export const en: Catalogue = {
   'revelation.cascade': 'turning the cards over one by one',
   'revelation.dosCache': 'Card still face down.',
   'revelation.suivant': 'Next round',
-  'revelation.classement': 'See the standings',
+  'revelation.classement': 'Final standings',
   'revelation.toi': 'you',
   'revelation.absent': 'away',
 

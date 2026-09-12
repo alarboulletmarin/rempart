@@ -172,7 +172,7 @@ export const fr = {
   'revelation.cascade': 'on retourne les cartes une par une',
   'revelation.dosCache': 'Carte encore face cachée.',
   'revelation.suivant': 'Manche suivante',
-  'revelation.classement': 'Voir le classement',
+  'revelation.classement': 'Classement final',
   'revelation.toi': 'toi',
   'revelation.absent': 'absent',
 

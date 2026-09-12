@@ -440,7 +440,7 @@ export function BandeauManche({
       <Etiquette size={10} color={t.ochreInk}>
         {surtitre ?? tr('jeu.manche.bandeau')}
       </Etiquette>
-      <div style={{ font: `700 19px/1.1 ${TITRE}`, color: '#2E2418' }}>{nom}</div>
+      <div style={{ font: `700 19px/1.1 ${TITRE}`, color: t.ochreFort }}>{nom}</div>
       <div style={{ font: `500 12px/1.35 ${TEXTE}`, color: t.ochreInk }}>{detail}</div>
     </div>
   )

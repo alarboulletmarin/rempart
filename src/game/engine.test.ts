@@ -542,3 +542,56 @@ describe('la mémoire de la partie', () => {
     expect(r2.history).toHaveLength(1)
   })
 })
+
+describe('la couleur d’une étiquette de manche', () => {
+  function manche(moves: Record<PlayerId, Choice | Choice[]>) {
+    return resolveRound(play(game(), moves))
+  }
+  const ton = (s: GameState, id: PlayerId) =>
+    s.lastOutcome!.outcomes.find((o) => o.playerId === id)!.ton
+
+  it('met la terre cuite sur les lignes où une brique est tombée', () => {
+    // « b » ne répare pas : une réparation compenserait la frappe, le solde
+    // serait nul, et la ligne n'aurait effectivement rien perdu.
+    const s = manche({
+      a: { card: 'frapper', target: 'b' },
+      b: { card: 'frapper', target: 'd' },
+      c: { card: 'bloquer' },
+      d: { card: 'reparer' },
+    })
+    expect(ton(s, 'b')).toBe('degat')
+  })
+
+  it('ne met pas la terre cuite sur un piège qui a fonctionné', () => {
+    // Son mur n'a pas bougé : la couleur des briques qui tombent n'a rien à
+    // faire sur sa ligne. C'est l'attaquant qui paie, et c'est lui qui la porte.
+    const s = manche({
+      a: { card: 'frapper', target: 'c' },
+      b: { card: 'bloquer' },
+      c: { card: 'pieger' },
+      d: { card: 'reparer' },
+    })
+    expect(ton(s, 'c')).toBe('defense')
+    expect(ton(s, 'a')).toBe('degat')
+  })
+
+  it('ne met pas la terre cuite sur un blocage qui a tenu', () => {
+    const s = manche({
+      a: { card: 'frapper', target: 'b' },
+      b: { card: 'bloquer' },
+      c: { card: 'frapper', target: 'b' },
+      d: { card: 'reparer' },
+    })
+    expect(ton(s, 'b')).toBe('defense')
+  })
+
+  it('ne colore pas ce qui ne s’est pas passé', () => {
+    const s = manche({
+      a: { card: 'bloquer' },
+      b: { card: 'bloquer' },
+      c: { card: 'bloquer' },
+      d: { card: 'bloquer' },
+    })
+    for (const id of ['a', 'b', 'c', 'd']) expect(ton(s, id)).toBe('neutre')
+  })
+})

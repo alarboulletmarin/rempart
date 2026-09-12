@@ -53,7 +53,7 @@ export function FeuilleDeconnexion({
           bottom: 0,
           background: t.panel,
           borderRadius: '26px 26px 30px 30px',
-          padding: '22px 20px calc(24px + env(safe-area-inset-bottom))',
+          padding: '22px 20px 24px',
           display: 'flex',
           flexDirection: 'column',
           gap: 14,

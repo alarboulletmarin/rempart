@@ -113,7 +113,7 @@ export function ReglesRapides({
             gap: 5,
           }}
         >
-          <span style={{ font: `700 15px/1.2 ${TITRE}`, color: '#2E2418' }}>
+          <span style={{ font: `700 15px/1.2 ${TITRE}`, color: t.ochreFort }}>
             {tr('rapides.manches.titre')}
           </span>
           <span style={{ font: `400 13px/1.4 ${TEXTE}`, color: t.ochreInk }}>

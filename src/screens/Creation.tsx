@@ -161,7 +161,7 @@ export function Creation({
               WebkitTapHighlightColor: 'transparent',
             }}
           >
-            <span style={{ font: `500 13px/1.4 ${TEXTE}`, color: '#2E2418', flex: 1 }}>
+            <span style={{ font: `500 13px/1.4 ${TEXTE}`, color: t.ochreFort, flex: 1 }}>
               {tr('creation.cartesManche.detail')}
             </span>
             <span
@@ -169,7 +169,7 @@ export function Creation({
                 width: 48,
                 height: 28,
                 borderRadius: 999,
-                background: cartesManche ? '#2E2418' : t.ochreEdge,
+                background: cartesManche ? t.ochreFort : t.ochreEdge,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: cartesManche ? 'flex-end' : 'flex-start',

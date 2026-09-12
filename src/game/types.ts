@@ -136,6 +136,20 @@ export interface EtiquetteManche {
   n: number
 }
 
+/**
+ * La matière d'une étiquette de manche.
+ *
+ * Elle suivait un seul booléen, « marquante ou non », et la terre cuite se
+ * retrouvait aussi bien sur « −1 brique » que sur « piège déclenché » ou
+ * « 1 frappe annulée » — c'est-à-dire sur un dégât et sur deux défenses qui
+ * avaient parfaitement tenu. La couleur ne disait donc plus rien.
+ *
+ *  - `degat`   : une brique est tombée sur cette ligne.
+ *  - `defense` : ce qui visait cette ligne n'est pas passé, ou le mur est monté.
+ *  - `neutre`  : il ne s'est rien passé qui vaille une couleur.
+ */
+export type TonEtiquette = 'degat' | 'defense' | 'neutre'
+
 /** Ce qui est arrivé à un joueur pendant la résolution, pour l'écran de révélation. */
 export interface PlayerOutcome {
   playerId: PlayerId
@@ -153,8 +167,8 @@ export interface PlayerOutcome {
   wallBefore: Slot[]
   /** Le motif qui résume son sort : « annulé », « retourné −1 », « +1 brique »… */
   tag: EtiquetteManche
-  /** L'étiquette est-elle marquante (terre cuite pleine) ou discrète ? */
-  hot: boolean
+  /** La matière de cette étiquette — dégât, défense, ou rien. */
+  ton: TonEtiquette
   /** Variation de briques sur la manche, pour l'animation et le récit. */
   delta: number
 }

@@ -59,7 +59,7 @@ export function Fin({
         style={{
           flex: 1,
           minHeight: 0,
-          padding: `calc(${SAFE_TOP} + 20px) 20px calc(20px + env(safe-area-inset-bottom, 0px)) 20px`,
+          padding: `calc(${SAFE_TOP} + 20px) 20px 20px 20px`,
           display: 'flex',
           flexDirection: 'column',
           overflowY: 'auto',

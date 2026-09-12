@@ -419,7 +419,7 @@ export function FeuilleDiscussion({ onFermer }: { onFermer: () => void }) {
         background: t.panel,
         borderRadius: '26px 26px 30px 30px',
         boxShadow: `0 -3px 0 ${t.edge}`,
-        padding: '16px 16px calc(16px + env(safe-area-inset-bottom))',
+        padding: '16px 16px 16px',
         display: 'flex',
         flexDirection: 'column',
         gap: 12,

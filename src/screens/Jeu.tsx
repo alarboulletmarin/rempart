@@ -669,10 +669,10 @@ export function FicheCarteManche({
           <Etiquette size={11} color={t.ochreInk} style={{ letterSpacing: '0.12em' }}>
             {tr('jeu.manche.surtitre')}
           </Etiquette>
-          <div style={{ font: `700 38px/1.05 ${TITRE}`, color: '#2E2418' }}>
+          <div style={{ font: `700 38px/1.05 ${TITRE}`, color: t.ochreFort }}>
             {tr(`manche.${carte.id}.nom`)}
           </div>
-          <div style={{ font: `600 17px/1.35 ${TEXTE}`, color: '#2E2418', textWrap: 'pretty' }}>
+          <div style={{ font: `600 17px/1.35 ${TEXTE}`, color: t.ochreFort, textWrap: 'pretty' }}>
             {tr(`manche.${carte.id}.detail`)}
           </div>
         </div>

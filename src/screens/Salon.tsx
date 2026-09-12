@@ -271,7 +271,7 @@ export function Salon({
                       j.pret,
                       j.connecte,
                       t.ink2,
-                      t.green,
+                      t.greenText,
                       t.clayText,
                     )}
                     style={{ letterSpacing: '0.1em', marginLeft: 'auto' }}
@@ -514,7 +514,7 @@ export function Salon({
       <div
         style={{
           flex: '0 0 auto',
-          padding: '12px 20px calc(14px + env(safe-area-inset-bottom, 0px)) 20px',
+          padding: '12px 20px 14px 20px',
           background: t.table,
           // Le même chant que la feuille de conversation : il dit que ce qui
           // est au-dessus continue, plutôt que de laisser une carte coupée net.
@@ -703,7 +703,7 @@ function Fermeture({ onFermer, onAnnuler }: { onFermer: () => void; onAnnuler: (
         background: t.panel,
         borderRadius: '26px 26px 30px 30px',
         boxShadow: `0 -3px 0 ${t.edge}`,
-        padding: '22px 20px calc(20px + env(safe-area-inset-bottom, 0px))',
+        padding: '22px 20px 20px',
         display: 'flex',
         flexDirection: 'column',
         gap: 14,

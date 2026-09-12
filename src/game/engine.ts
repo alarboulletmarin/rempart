@@ -30,6 +30,7 @@ import {
   type Slot,
   type EtiquetteManche,
   type MotifEtiquette,
+  type TonEtiquette,
 } from './types'
 import { ROUND_CARDS } from './roundCards'
 
@@ -417,13 +418,13 @@ export function resolveRound(state: GameState): GameState {
 
   const outcomes: PlayerOutcome[] = players.map((p) => {
     const delta = bricks(p) - (before.get(p.id) ?? 0)
-    const { tag, hot } = tagFor(p.id, events, delta, p.connected)
+    const { tag, ton } = tagFor(p.id, events, delta, p.connected)
     return {
       playerId: p.id,
       played: state.choices[p.id] ?? [],
       wallBefore: murAvant.get(p.id) ?? [...p.wall],
       tag,
-      hot,
+      ton,
       delta,
     }
   })
@@ -465,25 +466,32 @@ function tagFor(
   events: RoundEvent[],
   delta: number,
   connected: boolean,
-): { tag: EtiquetteManche; hot: boolean } {
-  const etiquette = (motif: MotifEtiquette, n = 0, hot = false) => ({ tag: { motif, n }, hot })
+): { tag: EtiquetteManche; ton: TonEtiquette } {
+  const etiquette = (motif: MotifEtiquette, n = 0, ton: TonEtiquette = 'neutre') => ({
+    tag: { motif, n },
+    ton,
+  })
 
   if (!connected) return etiquette('absent')
 
+  // Celui qui s'est fait retourner sa frappe perd la brique : c'est un dégât.
   const reflectedOnMe = events.find((e) => e.t === 'retournee' && e.from === id)
   if (reflectedOnMe && reflectedOnMe.t === 'retournee') {
-    return etiquette('retourne', reflectedOnMe.amount, true)
+    return etiquette('retourne', reflectedOnMe.amount, 'degat')
   }
+  // Celui dont le piège a fonctionné n'a RIEN perdu : sa ligne était en terre
+  // cuite, la couleur des briques qui tombent, sur une manche où son mur n'a
+  // pas bougé.
   if (events.some((e) => e.t === 'retournee' && e.to === id)) {
-    return etiquette('piegeDeclenche', 0, true)
+    return etiquette('piegeDeclenche', 0, 'defense')
   }
 
   const cancelled = events.filter((e) => e.t === 'annulee' && e.to === id).length
-  if (cancelled > 0) return etiquette('frappesAnnulees', cancelled, true)
+  if (cancelled > 0) return etiquette('frappesAnnulees', cancelled, 'defense')
   if (events.some((e) => e.t === 'annulee' && e.from === id)) return etiquette('annule')
 
-  if (delta < 0) return etiquette('briquesPerdues', -delta, true)
-  if (delta > 0) return etiquette('briquesGagnees', delta)
+  if (delta < 0) return etiquette('briquesPerdues', -delta, 'degat')
+  if (delta > 0) return etiquette('briquesGagnees', delta, 'defense')
 
   if (events.some((e) => e.t === 'reparation' && e.who === id)) return etiquette('murPlein')
   if (events.some((e) => e.t === 'frappe' && e.from === id)) return etiquette('touche')

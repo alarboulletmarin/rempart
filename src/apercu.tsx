@@ -662,6 +662,69 @@ function Galerie() {
         <Cadre titre="11 · Fin de partie · veillée" theme="veillee">
           <Fin state={finDePartie()} moi={MOI} peutRejouer onRejouer={noop} onPalmares={noop} onQuitter={noop} />
         </Cadre>
+        <Cadre titre="02 · Création · veillée" theme="veillee">
+          <Creation
+            places={4}
+            format="chacun"
+            cartesManche
+            nom="Léa"
+            onNom={noop}
+            onPlaces={noop}
+            onFormat={noop}
+            onCartesManche={noop}
+            onOuvrir={noop}
+            onRetour={noop}
+          />
+        </Cadre>
+        <Cadre titre="Rejoindre · veillée" theme="veillee">
+          <Rejoindre nom="Malo" onNom={noop} onRejoindre={noop} onRetour={noop} />
+        </Cadre>
+        <Cadre titre="04 · Règles · veillée" theme="veillee">
+          <ReglesRapides onCompris={noop} onChapitres={noop} onRetour={noop} />
+        </Cadre>
+        <Cadre titre="R0 · Sommaire · veillée" theme="veillee">
+          <ReglesSommaire onChapitre={noop} onRetour={noop} />
+        </Cadre>
+        <Cadre titre="C1 · Cartes de manche · veillée" theme="veillee">
+          <CartesDeManche onRetour={noop} />
+        </Cadre>
+        <Cadre titre="11 bis · Palmarès · veillée" theme="veillee">
+          <Palmares onRetour={noop} />
+        </Cadre>
+        <Cadre titre="Réglages · veillée" theme="veillee">
+          <Reglages
+            pref="systeme"
+            onPref={noop}
+            languePref="systeme"
+            onLanguePref={noop}
+            onCartesManche={noop}
+            onRetour={noop}
+          />
+        </Cadre>
+        <Cadre titre="12 · Déconnexion · veillée" theme="veillee">
+          <Jeu
+            state={base({
+              players: base().players.map((p, i) => (i === 2 ? { ...p, connected: false } : p)),
+            })}
+            moi={MOI}
+            joues={[]}
+            absentsDepuis={new Map([['c', Date.now()]])}
+            onJouer={noop}
+            onSuite={noop}
+            onQuitter={noop}
+          />
+        </Cadre>
+        <Cadre titre="09 · Carte de manche · veillée" theme="veillee">
+          <Jeu
+            state={base({ round: 6, activeRoundCard: roundCardById('double-frappe')! })}
+            moi={MOI}
+            joues={[]}
+            absentsDepuis={SANS_ABSENT}
+            onJouer={noop}
+            onSuite={noop}
+            onQuitter={noop}
+          />
+        </Cadre>
         <Cadre titre="03 · Salon · veillée" theme="veillee">
           <Salon
             etat={vueSalon()}

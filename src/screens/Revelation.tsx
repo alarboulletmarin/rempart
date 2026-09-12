@@ -100,10 +100,7 @@ export function Revelation({
           </>
         }
       />
-      <Corps
-        pad="14px 14px calc(8px + env(safe-area-inset-bottom, 0px)) 14px"
-        gap={11}
-      >
+      <Corps pad="14px 14px 8px 14px" gap={11}>
         <div
           style={{
             flex: 1,
@@ -195,8 +192,17 @@ export function Revelation({
                         </span>
                         {o && o.tag.motif !== 'rien' && (
                           <Pastille
-                            bg={o.hot ? t.clayText : t.panel2}
-                            fg={o.hot ? t.panel : t.ink2}
+                            /* Terre cuite = une brique est tombée. Vert = ce qui
+                               visait cette ligne n'est pas passé. Rien d'autre
+                               ne prend de couleur. */
+                            bg={
+                              o.ton === 'degat'
+                                ? t.clayText
+                                : o.ton === 'defense'
+                                  ? t.greenText
+                                  : t.panel2
+                            }
+                            fg={o.ton === 'neutre' ? t.ink2 : t.panel}
                             style={{ marginLeft: 'auto' }}
                           >
                             {direEtiquette(tr, o.tag)}
@@ -268,7 +274,8 @@ export function Revelation({
  */
 function Recit({ recit }: { recit: Narration }) {
   const t = useTheme()
-  const fond = recit.tone === 'clay' ? t.clayText : recit.tone === 'green' ? t.green : t.selBg
+  const fond =
+    recit.tone === 'clay' ? t.clayText : recit.tone === 'green' ? t.greenText : t.selBg
   const chant =
     recit.tone === 'clay' ? t.clayTextEdge : recit.tone === 'green' ? t.greenEdge : t.selEdge
   const encre = recit.tone === 'ink' ? t.selFg : t.panel
@@ -378,7 +385,7 @@ function Recompte({
     }
   }, [bouge, de, a, delai])
 
-  const couleur = a < de ? t.clayText : a > de ? t.green : t.ink2
+  const couleur = a < de ? t.clayText : a > de ? t.greenText : t.ink2
   return (
     <Pastille style={{ marginLeft: 'auto' }} bg={bg} fg={couleur}>
       <span

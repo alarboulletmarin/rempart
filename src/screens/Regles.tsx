@@ -283,7 +283,7 @@ function ChapitreManche() {
           boxShadow: `0 4px 0 ${t.ochreEdge}`,
           padding: '14px 16px',
           font: `500 14px/1.45 ${TEXTE}`,
-          color: '#2E2418',
+          color: t.ochreFort,
         }}
       >
         {tr('regles.tour.duree')}
@@ -491,8 +491,11 @@ export function CartesDeManche({
           padding: `${SAFE_TOP} 18px 0 18px`,
         }}
       >
-        <Retour onClick={onRetour} bg={t.panel} fg={t.ochreInk} />
-        <div style={{ font: `700 21px/1 ${TITRE}`, color: '#2E2418', whiteSpace: 'nowrap' }}>
+        {/* Sur l'ocre, la pastille ne suit pas le thème : la bande est claire
+            dans les deux, donc ce qui s'y pose est sombre dans les deux. En
+            `panel`, elle devenait du brun sur du brun en veillée. */}
+        <Retour onClick={onRetour} bg={t.ochreFort} fg={t.ochreFortInk} />
+        <div style={{ font: `700 21px/1 ${TITRE}`, color: t.ochreFort, whiteSpace: 'nowrap' }}>
           {tr('regles.chapitre.manches')}
         </div>
         {onSommaire && (
@@ -501,13 +504,13 @@ export function CartesDeManche({
             onClick={onSommaire}
             style={{
               marginLeft: 'auto',
-              background: '#2E2418',
+              background: t.ochreFort,
               borderRadius: 12,
               padding: '9px 13px',
               border: 'none',
               font: `600 12px/1 ${TEXTE}`,
               letterSpacing: '0.06em',
-              color: t.panel,
+              color: t.ochreFortInk,
               textTransform: 'uppercase',
               whiteSpace: 'nowrap',
               cursor: 'pointer',

@@ -203,6 +203,21 @@ jouer une partie entière en test, par le chemin exact que prend une vraie parti
 
 ## La direction artistique, en pratique
 
+### Les libellés
+
+Un verbe à l'infinitif pour une action — « Créer une partie », « Lancer la
+partie », « Ajouter un bot », « Effacer le palmarès ». Un nom pour une
+destination — « Retour », « Chapitres », « Palmarès », « Manche suivante ». Une
+phrase à la première personne pour un accusé de réception seulement, et il n'y
+en a que deux : « J'ai compris » et « Compris, je joue ».
+
+### Ce que dit chaque accent
+
+Une couleur qui sert à deux choses ne dit plus rien. La règle tient en quatre
+lignes, et elle vit dans `theme.ts` : terre cuite pour une brique qui tombe,
+vert atelier pour une défense qui tient ou un mur qui remonte, ocre pour ce qui
+concerne toute la table à la fois, encre pleine pour ce que **tu** as choisi.
+
 Trois règles qui expliquent la plupart des choix de code :
 
 1. **De l'épaisseur, jamais de contour.** Un chant sombre en bas

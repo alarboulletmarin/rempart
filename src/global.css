@@ -54,6 +54,16 @@ body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  /*
+   * La zone sûre du bas, une fois pour toutes.
+   *
+   * Elle se posait écran par écran, donc elle manquait sur huit d'entre eux :
+   * « Ouvrir le salon », « J'ai compris » et la main de cartes passaient sous
+   * l'indicateur d'accueil d'iOS. Ici, elle vaut pour tout ce que le cadre
+   * contient — les feuilles comprises, qui se posent sur le bord intérieur du
+   * cadre et non sur celui de l'écran.
+   */
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 /* Le texte des écrans de lecture reste sélectionnable. */
