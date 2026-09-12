@@ -6,6 +6,38 @@ publication.
 
 ## Non publié
 
+### Ajouté : la partie se raconte à la fin
+
+Quarante à cinquante pour cent de l'écran de fin restait vide — un classement
+au milieu, et rien d'autre — alors que la partie qu'on venait de jouer était
+encore en mémoire sur l'appareil.
+
+- **Un récapitulatif des dix manches** : une ligne par joueur, une colonne par
+  manche, le dessin de la carte jouée. C'est ce qui donne envie de relancer :
+  « tu as bloqué trois fois de suite ».
+- **Un mur tombé se dit** : « mur tombé · manche 7 » sous le nom. Le jeu
+  n'élimine personne — un mur à zéro peut remonter et gagner — mais la manche
+  où il a cédé fait partie de l'histoire.
+- **Le récit de la manche se pose sous les cartes qu'il explique**, sur l'écran
+  de révélation : « Le piège de Nour a retourné ta frappe » s'affichait en bas
+  de page, à quatre lignes des deux cartes concernées.
+- Les deux écrans **centrent leur contenu** quand il est plus court que
+  l'écran, au lieu de coller le titre en haut et les boutons en bas.
+
+### Changé : plus un seul emoji dans l'interface
+
+Un visage emoji dans la barre du haut, sans libellé : on ne savait pas si ce
+bouton ouvrait un menu, un profil ou une réaction, et il ne se rendait pas
+pareil d'un téléphone à l'autre.
+
+Le bouton devient une bulle dessinée. Les six réactions sont dessinées elles
+aussi — rire, aïe, bravo, bien joué, grr, pitié — au même atelier que les
+pictogrammes de carte, et elles portent leur mot dans la feuille du salon. La
+croix qui referme cette feuille est dessinée elle aussi.
+
+Ce que les téléphones s'envoient entre eux n'a pas changé : les parties entre
+une version à jour et une version plus ancienne se comprennent toujours.
+
 ### Corrigé : on voit enfin ce que les autres ne peuvent pas jouer
 
 Le cœur du jeu est « la carte jouée est interdite la manche suivante », et
