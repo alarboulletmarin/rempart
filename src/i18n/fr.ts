@@ -84,12 +84,15 @@ export const fr = {
   'reglages.theme.veillee.nom': 'Veillée',
   'reglages.theme.veillee.detail': 'Le même établi à la lampe : bois brûlé et craie.',
   'reglages.langue.titre': 'Langue',
-  'reglages.langue.systeme.nom': 'Comme le téléphone',
-  'reglages.langue.systeme.detail': 'Suit la langue du système, si le jeu la parle.',
+  // « Comme le téléphone » ne tient pas dans un segment d'un tiers de ligne.
+  'reglages.langue.systeme.nom': 'Système',
   'reglages.langue.fr.nom': 'Français',
-  'reglages.langue.fr.detail': 'Le jeu, les règles et le récit des manches en français.',
   'reglages.langue.en.nom': 'English',
-  'reglages.langue.en.detail': 'Le jeu, les règles et le récit des manches en anglais.',
+  // La seule ligne qui apporte ce que les trois libellés ne disent pas : la
+  // langue réellement parlée, « Système » compris.
+  'reglages.langue.actuellement': 'Actuellement : {langue}',
+  'reglages.langue.nom.fr': 'français',
+  'reglages.langue.nom.en': 'anglais',
   'reglages.jeu.titre': 'Le jeu',
   'reglages.jeu.cartesManche.titre': 'Cartes de manche',
   'reglages.jeu.cartesManche.detail':

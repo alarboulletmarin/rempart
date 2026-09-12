@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from 'react'
+import { Fragment, useId, type CSSProperties, type ReactNode } from 'react'
 import { R, TEXTE, TITRE } from '../theme'
 import type { CardKey, Slot } from '../game/types'
 import { useT, type Cle } from '../i18n'
@@ -408,6 +408,108 @@ export function Texte({
     >
       {children}
     </div>
+  )
+}
+
+/* ------------------------------------------------------- choix segmenté */
+
+/**
+ * Un contrôle segmenté : un choix qui s'explique tout seul, sur une ligne.
+ *
+ * Pour un réglage dont les libellés suffisent — `Français` n'a pas besoin
+ * qu'on précise que le jeu sera en français. Trois cartes plein format avec
+ * description mangeaient un tiers de l'écran pour un choix fait une fois.
+ *
+ * Ce n'est **pas** un `<select>` natif : sur iOS il ouvre une roue plein
+ * écran, avec un tap de plus et une validation, et il ne se style pas. Ce
+ * n'est pas non plus une rangée de `<button>` : de vrais radios donnent la
+ * navigation aux flèches et l'annonce « 2 sur 3 » sans une ligne à écrire.
+ *
+ * Le dessin vit dans `.rempart-segmente` (`global.css`) — les sélecteurs
+ * `:checked` et `:focus-visible` ne s'écrivent pas en style en ligne.
+ */
+export function Segmente<V extends string>({
+  nom,
+  legende,
+  options,
+  valeur,
+  onValeur,
+  note,
+}: {
+  /** Le `name` commun : c'est lui qui fait le groupe, et donc la navigation. */
+  nom: string
+  /**
+   * L'en-tête visible, rendu en `<legend>` par l'appelant.
+   *
+   * Il sert de nom au groupe : une légende masquée en plus aurait redit le
+   * même mot à qui écoute.
+   */
+  legende: ReactNode
+  /**
+   * QUATRE segments au maximum.
+   *
+   * Au-delà, les libellés passent sur deux lignes et le contrôle cesse de se
+   * lire d'un coup d'œil : il faudra alors une ligne qui ouvre une feuille de
+   * sélection, et non un cinquième segment. Rien à changer ici pour passer de
+   * trois à quatre — les colonnes se déduisent du nombre d'options.
+   */
+  options: readonly { valeur: V; libelle: string; langue?: string }[]
+  valeur: V
+  onValeur: (v: V) => void
+  /** La ligne sous le contrôle : l'effet réel du choix, et rien de plus. */
+  note?: ReactNode
+}) {
+  const t = useTheme()
+  const prefixe = useId()
+  return (
+    <fieldset className="rempart-groupe">
+      {legende}
+      <div
+        className="rempart-segmente"
+        style={
+          {
+            '--seg-piste': t.panel2,
+            '--seg-creux': t.edge,
+            '--seg-encre': t.ink2,
+            '--seg-choix': t.choix,
+            '--seg-choix-encre': t.choixInk,
+            '--choix-police': TEXTE,
+            '--choix-focus': t.choix,
+          } as CSSProperties
+        }
+      >
+        {options.map((o) => {
+          const id = `${prefixe}-${nom}-${o.valeur}`
+          return (
+            <Fragment key={o.valeur}>
+              <input
+                type="radio"
+                id={id}
+                name={nom}
+                value={o.valeur}
+                checked={o.valeur === valeur}
+                onChange={() => onValeur(o.valeur)}
+              />
+              <label htmlFor={id} lang={o.langue}>
+                {o.libelle}
+              </label>
+            </Fragment>
+          )
+        })}
+      </div>
+      {note && (
+        <div
+          style={{
+            font: `500 12px/1.4 ${TEXTE}`,
+            color: t.ink2,
+            marginTop: 8,
+            textWrap: 'pretty',
+          }}
+        >
+          {note}
+        </div>
+      )}
+    </fieldset>
   )
 }
 

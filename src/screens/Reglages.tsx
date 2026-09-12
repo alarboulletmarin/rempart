@@ -2,7 +2,7 @@ import { Fragment, useId, type CSSProperties, type ReactNode } from 'react'
 import { TEXTE, TITRE } from '../theme'
 import { useT, type Cle, type LanguePref } from '../i18n'
 import { Icone } from '../ui/Icone'
-import { Etiquette, Panneau, Texte } from '../ui/atoms'
+import { Etiquette, Panneau, Segmente, Texte } from '../ui/atoms'
 import { Corps, Ecran, EnTete } from '../ui/shell'
 import { useTheme, type ThemePref } from '../ui/theme'
 
@@ -81,20 +81,32 @@ export function Reglages({
           }))}
         />
 
-        <GroupeCartes
+        {/*
+         * La langue tient sur une ligne, et sans description.
+         *
+         * « Le jeu, les règles et le récit des manches en français » sous
+         * « Français » ne disait rien que le libellé ne disait déjà. La seule
+         * ligne qui apporte quelque chose est celle de l'effet réel, et elle
+         * est unique : elle suit la sélection, « Système » compris — c'est là
+         * que se trouve la vraie information, puisque le libellé ne dit pas
+         * quelle langue le système parle.
+         */}
+        <Segmente
           nom="langue"
-          titre={tr('reglages.langue.titre')}
+          legende={<EnTeteSection as="legend">{tr('reglages.langue.titre')}</EnTeteSection>}
           valeur={languePref}
           onValeur={onLanguePref}
           options={langues.map((id) => ({
             valeur: id,
             libelle: tr(`reglages.langue.${id}.nom` as Cle),
-            detail: tr(`reglages.langue.${id}.detail` as Cle),
             /* Le nom de la langue s'écrit dans cette langue-là : « English »
                reste lisible pour qui ne lit pas le français, et c'est
                justement cette personne qui cherche ce réglage. */
             langue: id === 'systeme' ? undefined : id,
           }))}
+          note={tr('reglages.langue.actuellement', {
+            langue: tr(`reglages.langue.nom.${tr.langue}` as Cle),
+          })}
         />
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: DANS_SECTION }}>
