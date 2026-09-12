@@ -12,6 +12,7 @@ import {
   legalCards,
   MORT_SUBITE_MAX,
   possibleTargets,
+  ricochetTarget,
   readyCount,
   replay,
   resolveRound,
@@ -198,6 +199,57 @@ describe('les cartes de manche', () => {
     expect(wallOf(s, 'b')).toBe(4)
     expect(wallOf(s, 'c')).toBe(4)
     expect(wallOf(s, 'd')).toBe(5)
+  })
+
+  /*
+   * Ce que l'écran de ciblage annonce avant le coup.
+   *
+   * La même fonction sert à résoudre la manche et à l'annoncer : deux copies
+   * de cette arithmétique-là auraient fini par diverger, et c'est l'écran qui
+   * aurait menti — il ne disait déjà rien du second mur touché.
+   */
+  describe('Ricochet : le mur qui encaisse en plus', () => {
+    it('c’est la place suivante', () => {
+      const s = withCard('ricochet')
+      expect(ricochetTarget(s, 'b')).toBe('c')
+    })
+
+    it('le tour se referme : après la dernière place vient la première', () => {
+      const s = withCard('ricochet')
+      expect(ricochetTarget(s, 'd')).toBe('a')
+    })
+
+    it('une place vide est sautée, alors que sa ligne reste à l’écran', () => {
+      const s = withCard('ricochet')
+      const sansC = {
+        ...s,
+        players: s.players.map((p) => (p.id === 'c' ? { ...p, connected: false } : p)),
+      }
+      expect(ricochetTarget(sansC, 'b')).toBe('d')
+    })
+
+    it('à deux joueurs le rebond revient sur l’attaquant', () => {
+      const g = createGame(SEATS.slice(0, 2), { format: 'chacun', roundCards: true }, 1)
+      const duo: GameState = {
+        ...g,
+        phase: 'choix',
+        round: 3,
+        activeRoundCard: roundCardById('ricochet')!,
+      }
+      expect(ricochetTarget(duo, 'b')).toBe('a')
+    })
+
+    it('sans la carte, rien ne rebondit', () => {
+      expect(ricochetTarget(game(), 'b')).toBe(null)
+    })
+
+    it('ce qu’il annonce est ce que la manche applique', () => {
+      const s = withCard('ricochet')
+      const rebond = ricochetTarget(s, 'b')!
+      const apres = resolveRound(play(s, { a: { card: 'frapper', target: 'b' } }))
+      expect(wallOf(apres, 'b')).toBe(4)
+      expect(wallOf(apres, rebond)).toBe(4)
+    })
   })
 
   it('Réquisition : la brique cassée passe sur le mur de l’attaquant', () => {

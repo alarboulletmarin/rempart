@@ -8,6 +8,7 @@ import {
   hasPlayed,
   legalCards,
   playersToAct,
+  ricochetTarget,
   possibleTargets,
   readyCount,
 } from '../game/engine'
@@ -22,7 +23,14 @@ import {
 import { useT, type Cle, type T } from '../i18n'
 import { Etiquette, Panneau, Texte } from '../ui/atoms'
 import { Bulles, Eventail } from '../ui/discussion'
-import { BandeauCible, BandeauManche, LigneJoueur, Main, type EtatCarte } from '../ui/jeu'
+import {
+  BandeauCible,
+  BandeauManche,
+  LigneJoueur,
+  Main,
+  NoteRicochet,
+  type EtatCarte,
+} from '../ui/jeu'
 import { DUREE, anime, useMouvement } from '../ui/mouvement'
 import { Pictogramme } from '../ui/Pictogramme'
 import { CompteurManche, Corps, Ecran, EnTete } from '../ui/shell'
@@ -50,6 +58,24 @@ const GEOMETRIE = {
   equipes: { pad: '14px', gap: 12, mur: 34, carte: 118, pied: 54 },
   /** 12 · déconnexion en pleine manche */
   pause: { pad: '14px', gap: 11, mur: 36, carte: 126, pied: 56 },
+  /**
+   * 06 ter · ciblage sous « Ricochet », quand chaque mur visable porte sa note.
+   *
+   * Trois notes de plus, c'est quatre-vingt-dix pixels que le cadre du ciblage
+   * n'a pas : le mur du bas — celui qu'on est justement en train de viser —
+   * passait sous la ligne de flottaison. Murs, cartes et barre du bas rendent
+   * ce qu'il faut, et le bandeau ocre se resserre à son nom.
+   */
+  rebond: { pad: '14px 14px 8px 14px', gap: 7, mur: 26, carte: 102, pied: 50 },
+  /**
+   * 10 bis · le même ciblage, mais en équipes.
+   *
+   * Deux notes seulement — on ne vise que le camp d'en face — mais elles se
+   * posent dans des lignes déjà emboîtées dans le panneau de leur équipe, et
+   * ce cadre-là partait de plus bas. Il lui faut sa propre mesure : lui
+   * laisser celle des équipes faisait passer treize pixels sous la ligne.
+   */
+  equipesRebond: { pad: '14px', gap: 10, mur: 26, carte: 106, pied: 52 },
 } as const
 
 /**
@@ -252,6 +278,36 @@ export function Jeu({
   }
 
   /*
+   * Ce que viser cette ligne-ci coûterait à une autre.
+   *
+   * Sous « Ricochet », la frappe part sur deux murs et l'écran de ciblage n'en
+   * montrait qu'un : la seconde brique tombait sur quelqu'un que personne
+   * n'avait visé, et on ne pouvait pas le prévoir — « le joueur assis juste
+   * après » n'est pas « la ligne d'en dessous » dès qu'une place est vide, et
+   * le tour se referme sur lui-même.
+   *
+   * La note ne se pose que sur les murs qu'on peut effectivement toucher, et
+   * seulement pendant qu'on vise : hors de ce geste elle n'aurait aucune
+   * question à laquelle répondre.
+   */
+  const noteRicochetDe = (p: Player) => {
+    if (carteEnCours !== 'frapper' || !cibles.includes(p.id)) return undefined
+    const rebond = ricochetTarget(state, p.id)
+    if (!rebond) return undefined
+    const nom = state.players.find((x) => x.id === rebond)?.name
+    return (
+      <NoteRicochet
+        fond={p.id === moi ? t.panel : t.panel2}
+        texte={
+          rebond === moi
+            ? tr('jeu.ricochet.aussi.moi')
+            : tr('jeu.ricochet.aussi', { nom: nom ?? '' })
+        }
+      />
+    )
+  }
+
+  /*
    * La géométrie de chaque cadre, relevée sur la planche.
    *
    * Un seul composant sert les écrans 05, 06, 07, 09, 10 et 12, mais la planche
@@ -260,17 +316,28 @@ export function Jeu({
    * sa place sur les murs, les cartes et la barre du bas. Les approximer, c'est
    * faire déborder un cadre sur deux.
    */
+  /*
+   * Vise-t-on sous « Ricochet » ? Alors chaque cible possible porte une note,
+   * et le cadre doit leur faire de la place.
+   */
+  const notesRebond =
+    carteEnCours === 'frapper' && cibles.some((id) => ricochetTarget(state, id) !== null)
+
   const cadre = deconnecte
     ? GEOMETRIE.pause
-    : equipes
-      ? GEOMETRIE.equipes
-      : state.activeRoundCard
-        ? GEOMETRIE.manche
-        : carteEnCours
-          ? GEOMETRIE.cible
-          : envoye
-            ? GEOMETRIE.attente
-            : GEOMETRIE.neutre
+    : notesRebond
+      ? equipes
+        ? GEOMETRIE.equipesRebond
+        : GEOMETRIE.rebond
+      : equipes
+        ? GEOMETRIE.equipes
+        : state.activeRoundCard
+          ? GEOMETRIE.manche
+          : carteEnCours
+            ? GEOMETRIE.cible
+            : envoye
+              ? GEOMETRIE.attente
+              : GEOMETRIE.neutre
 
   const ligne = (p: Player, nu = false) => {
     const { tag, couleur, discret } = tagDe(p)
@@ -298,6 +365,7 @@ export function Jeu({
         tagDiscret={discret}
         hauteurMur={nu ? GEOMETRIE.equipes.mur : cadre.mur}
         bandeau={bandeauDe(p)}
+        dessous={noteRicochetDe(p)}
         onClick={ciblable ? () => choisirCible(p.id) : undefined}
         ariaLabel={
           ciblable
@@ -425,6 +493,7 @@ export function Jeu({
           <BandeauManche
             nom={tr(`manche.${state.activeRoundCard.id}.nom`)}
             detail={tr(`manche.${state.activeRoundCard.id}.detail`)}
+            resserre={notesRebond}
             /*
              * « Dernier mur » ne change la manche que d'une seule personne, et
              * son détail la désignait par une périphrase — « le joueur qui a le

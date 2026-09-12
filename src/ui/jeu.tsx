@@ -426,15 +426,71 @@ export function BandeauCible({ card, texte }: { card: CardKey; texte: string }) 
   )
 }
 
+/**
+ * La note de ricochet, posée sur un mur qu'on peut viser.
+ *
+ * Discrète, et non en terre cuite : rien n'est encore parti. Le bandeau terre
+ * cuite dit « ta frappe part sur ce mur » — un fait —, alors que celle-ci dit
+ * ce qui arriverait si l'on touchait CETTE ligne-ci. Lui donner la même
+ * matière ferait croire à quatre frappes simultanées.
+ *
+ * Elle se répète sur chaque cible possible parce que la réponse change avec la
+ * cible : c'est une information par ligne, pas une règle générale. La règle
+ * générale, elle, est déjà écrite sur le bandeau ocre.
+ */
+export function NoteRicochet({ texte, fond }: { texte: string; fond?: string }) {
+  const t = useTheme()
+  /*
+   * Une seule ligne, et sans pictogramme.
+   *
+   * Elle se répète sur chaque cible possible : ce qui coûte trente-huit pixels
+   * sur une ligne en coûte cent quatorze sur trois, et le plateau du tour de
+   * jeu ne défile jamais — le mur du bas passait sous la ligne de flottaison,
+   * c'est-à-dire le mur qu'on est en train de viser. Le pictogramme doublait
+   * d'ailleurs le mot « Frapper » déjà peint en grand dans la barre du haut.
+   */
+  return (
+    <div
+      style={{
+        background: fond ?? t.panel2,
+        borderRadius: 10,
+        padding: '5px 9px',
+        font: `500 11px/1.3 ${TEXTE}`,
+        color: t.ink2,
+        minWidth: 0,
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap',
+      }}
+    >
+      {texte}
+    </div>
+  )
+}
+
 /** Le bandeau ocre d'une carte de manche : la seule chose ocre du jeu. */
 export function BandeauManche({
   nom,
   detail,
   surtitre,
+  resserre,
 }: {
   nom: string
   detail: string
   surtitre?: string
+  /**
+   * Le bandeau réduit à son nom, quand l'écran dit sa règle mieux que lui.
+   *
+   * C'est le cas pendant qu'on vise sous « Ricochet » : chaque mur visable
+   * porte déjà le nom de celui qui encaissera la seconde brique, ce qui est la
+   * même règle rendue à la ligne près. Garder les deux coûtait deux lignes de
+   * texte — et le plateau du tour de jeu ne défile jamais, donc ces deux
+   * lignes-là se prenaient sur un mur.
+   *
+   * Le nom reste : c'est lui qui rattache les notes à la carte, sans quoi
+   * elles arriveraient sans cause.
+   */
+  resserre?: boolean
 }) {
   const t = useTheme()
   const tr = useT()
@@ -454,7 +510,9 @@ export function BandeauManche({
         {surtitre ?? tr('jeu.manche.bandeau')}
       </Etiquette>
       <div style={{ font: `700 19px/1.1 ${TITRE}`, color: t.ochreFort }}>{nom}</div>
-      <div style={{ font: `500 12px/1.35 ${TEXTE}`, color: t.ochreInk }}>{detail}</div>
+      {!resserre && (
+        <div style={{ font: `500 12px/1.35 ${TEXTE}`, color: t.ochreInk }}>{detail}</div>
+      )}
     </div>
   )
 }

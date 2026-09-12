@@ -583,6 +583,24 @@ function Galerie() {
             `base()` verrouille une carte par joueur : c'est ce verrou-là que
             les deux premières doivent rendre ou recouvrir.
         */}
+        {/* Le ciblage sous « Ricochet » : chaque mur qu'on peut viser annonce
+            celui qui encaissera la seconde brique. Le cadre 06 le montre sans
+            carte de manche, donc sans note — les deux se lisent l'un à côté
+            de l'autre. */}
+        <Cadre titre="06 bis · Ciblage sous Ricochet · qui encaisse en plus">
+          <AvecSalle>
+            <Jeu
+              state={base({ round: 6, activeRoundCard: roundCardById('ricochet')! })}
+              moi={MOI}
+              joues={[]}
+              absentsDepuis={SANS_ABSENT}
+              carteInitiale="frapper"
+              onJouer={noop}
+              onSuite={noop} onDemanderQuitter={noop}
+              onQuitter={noop}
+            />
+          </AvecSalle>
+        </Cadre>
         <Cadre titre="09 bis · Mémoire courte · le verrou est levé">
           <AvecSalle>
             <Jeu
@@ -664,6 +682,34 @@ function Galerie() {
               moi={MOI}
               joues={[]}
               absentsDepuis={SANS_ABSENT}
+              onJouer={noop}
+              onSuite={noop} onDemanderQuitter={noop}
+              onQuitter={noop}
+            />
+          </AvecSalle>
+        </Cadre>
+        {/* Les équipes gardent leur propre géométrie — deux murs par panneau —
+            et le ciblage y porte deux notes au lieu de trois. C'est le cadre
+            qui le vérifie : une note de plus non budgétée pousse un mur sous
+            la ligne de flottaison, et le plateau ne défile jamais. */}
+        <Cadre titre="10 bis · Équipes · ciblage sous Ricochet">
+          <AvecSalle>
+            <Jeu
+              state={{
+                ...equipes,
+                round: 6,
+                phase: 'choix',
+                activeRoundCard: roundCardById('ricochet')!,
+                players: equipes.players.map((p, i) => ({
+                  ...p,
+                  wall: mur(['IIIBI', 'IIIBB', 'IIBBI', 'IIIIB'][i]),
+                  locked: [['bloquer'], ['frapper'], ['reparer'], ['pieger']][i] as never,
+                })),
+              }}
+              moi={MOI}
+              joues={[]}
+              absentsDepuis={SANS_ABSENT}
+              carteInitiale="frapper"
               onJouer={noop}
               onSuite={noop} onDemanderQuitter={noop}
               onQuitter={noop}

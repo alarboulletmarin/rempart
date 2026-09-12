@@ -191,6 +191,8 @@ export const en: Catalogue = {
   'jeu.tag.coequipier': 'teammate',
 
   'jeu.bandeau.frappe': 'Your strike lands on this wall',
+  'jeu.ricochet.aussi': 'Ricochet — also hits {nom}',
+  'jeu.ricochet.aussi.moi': 'Ricochet — also hits your wall',
   'jeu.viser.aria': 'Aim at {nom}’s wall — {briques} standing',
 
   'jeu.pied.cibler': 'Touch a wall to aim',

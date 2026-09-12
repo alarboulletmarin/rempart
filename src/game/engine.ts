@@ -261,6 +261,28 @@ export function forbiddenCards(state: GameState, id: PlayerId): CardKey[] {
 }
 
 /**
+ * Le mur qui encaisse EN PLUS de la cible, sous « Ricochet » — sinon `null`.
+ *
+ * « Le joueur assis juste après » n'est pas « la ligne d'en dessous » : le tour
+ * se referme sur lui-même (frapper le dernier touche le premier), et un joueur
+ * déconnecté ne compte pas, alors que sa ligne reste à l'écran. L'écran de
+ * ciblage ne peut donc pas le déduire de ce qu'il affiche, et c'est justement
+ * pour ça qu'il ne disait rien : la seconde brique tombait sur un mur que
+ * personne n'avait visé, sans qu'on ait pu le prévoir.
+ *
+ * Résolution et ciblage lisent désormais cette fonction-ci, et pas deux copies
+ * de la même arithmétique de places.
+ */
+export function ricochetTarget(state: GameState, cible: PlayerId): PlayerId | null {
+  if (!has(state, 'ricochet')) return null
+  const places = [...playersToAct(state)].sort((a, b) => a.seat - b.seat)
+  const at = places.findIndex((p) => p.id === cible)
+  if (at < 0) return null
+  const suivant = places[(at + 1) % places.length]
+  return suivant && suivant.id !== cible ? suivant.id : null
+}
+
+/**
  * Les murs que ce joueur peut viser avec cette carte.
  * Frapper ne vise jamais son camp ; en équipes, Bloquer et Réparer peuvent
  * viser le coéquipier.
@@ -383,16 +405,11 @@ export function resolveRound(state: GameState): GameState {
     for (const c of cardsOf(p.id, 'frapper')) {
       if (!c.target) continue
       strikes.push({ from: p.id, to: c.target })
-      // « Ricochet » : la frappe touche aussi le joueur assis juste après la cible.
-      if (has(state, 'ricochet')) {
-        const target = byId.get(c.target)
-        if (target) {
-          const seats = [...active].sort((a, b) => a.seat - b.seat)
-          const at = seats.findIndex((s) => s.id === target.id)
-          const next = seats[(at + 1) % seats.length]
-          if (next && next.id !== target.id) strikes.push({ from: p.id, to: next.id })
-        }
-      }
+      // « Ricochet » : la frappe touche aussi le joueur assis juste après la
+      // cible. C'est `ricochetTarget` qui le dit, et l'écran de ciblage le
+      // demande à la même fonction pour l'annoncer avant le coup.
+      const rebond = ricochetTarget(state, c.target)
+      if (rebond) strikes.push({ from: p.id, to: rebond })
     }
   }
 
