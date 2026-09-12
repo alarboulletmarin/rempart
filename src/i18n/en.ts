@@ -339,6 +339,9 @@ export const en: Catalogue = {
   'creation.cartesManche.titre': 'Round cards',
   'creation.cartesManche.detail': 'Every three rounds, one rule drawn at random for everyone.',
   'creation.ouvrir': 'Open the room',
+  'creation.format.equipes.raison': 'Four walls are needed: pick 4 players to switch it on.',
+  'jeu.pied.attendUn.temps': 'Waiting for {nom} — {s}s',
+  'jeu.pied.attendPlusieurs.temps': 'Waiting for {n} players — {s}s',
 
   /* ----------------------------------------------------------- rejoindre */
 
@@ -401,6 +404,16 @@ export const en: Catalogue = {
   'avis.hotePris':
     'Someone else is refereeing the table: you are a guest again, and your wall is untouched.',
   'avis.gestRefuse': 'That move is not playable.',
+
+  'lien.recherche.titre': 'Reconnecting…',
+  'lien.recherche.detail': 'The game is kept, nothing is lost.',
+  'lien.perdu.partie.titre': 'The link with the host is down.',
+  'lien.perdu.partie.detail':
+    'Your wall stays put. If the host does not come back, someone else will referee and the game will go on.',
+  'lien.perdu.salon.titre': 'The host is gone.',
+  'lien.perdu.salon.detail': 'This room no longer exists. Try another code, or create your own game.',
+  'lien.repris.titre': 'Connection restored.',
+  'lien.autreCode': 'Try another code',
   'avis.botLeve': '{humain} joins the game — {nom} gives up their seat.',
 
   /* ------------------------------------------------- les quatre cartes, au long */

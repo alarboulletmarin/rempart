@@ -373,6 +373,9 @@ export const fr = {
   'creation.cartesManche.detail':
     'Toutes les trois manches, une règle tirée au sort pour tout le monde.',
   'creation.ouvrir': 'Ouvrir le salon',
+  'creation.format.equipes.raison': 'Il faut quatre murs : choisis 4 joueurs pour l’activer.',
+  'jeu.pied.attendUn.temps': 'On attend {nom} — {s} s',
+  'jeu.pied.attendPlusieurs.temps': 'On attend {n} joueurs — {s} s',
 
   /* ----------------------------------------------------------- rejoindre */
 
@@ -436,6 +439,18 @@ export const fr = {
   'avis.hotePris':
     'Quelqu’un d’autre arbitre la table : tu redeviens invité, ton mur reste intact.',
   'avis.gestRefuse': 'Ce coup n’est pas jouable.',
+
+  /* ---------------------------------------------- le lien, quand il lâche */
+
+  'lien.recherche.titre': 'On rétablit la connexion…',
+  'lien.recherche.detail': 'La partie est gardée, rien n’est perdu.',
+  'lien.perdu.partie.titre': 'Le lien avec l’hôte est coupé.',
+  'lien.perdu.partie.detail':
+    'Ton mur reste en place. Si l’hôte ne revient pas, quelqu’un d’autre arbitrera et la partie reprendra.',
+  'lien.perdu.salon.titre': 'L’hôte n’est plus là.',
+  'lien.perdu.salon.detail': 'Ce salon n’existe plus. Essaie un autre code, ou crée ta partie.',
+  'lien.repris.titre': 'Connexion rétablie.',
+  'lien.autreCode': 'Essayer un autre code',
   'avis.botLeve': '{humain} rejoint la partie — {nom} laisse sa place.',
 
   /* ------------------------------------------------- les quatre cartes, au long */

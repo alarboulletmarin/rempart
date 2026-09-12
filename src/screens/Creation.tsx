@@ -1,5 +1,6 @@
 import { TEXTE, TITRE } from '../theme'
 import type { Format } from '../game/types'
+import { MAX_SIEGES } from '../net/room'
 import { useT } from '../i18n'
 import { Icone } from '../ui/Icone'
 import { Bouton, Etiquette, Texte } from '../ui/atoms'
@@ -126,14 +127,16 @@ export function Creation({
             choisi={format === 'chacun'}
             onClick={() => onFormat('chacun')}
           />
+          {/* Le deux contre deux demande quatre murs. Il changeait le nombre
+              de joueurs dans le dos de qui le choisissait ; il dit maintenant
+              pourquoi il n'est pas disponible, et ne fait rien tant que ce
+              n'est pas réglé. */}
           <OptionFormat
             titre={tr('creation.format.equipes.titre')}
             detail={tr('creation.format.equipes.detail')}
             choisi={format === 'equipes'}
-            onClick={() => {
-              onFormat('equipes')
-              onPlaces(4)
-            }}
+            empeche={places !== MAX_SIEGES ? tr('creation.format.equipes.raison') : undefined}
+            onClick={() => onFormat('equipes')}
           />
           </div>
         </div>
@@ -193,11 +196,14 @@ function OptionFormat({
   titre,
   detail,
   choisi,
+  empeche,
   onClick,
 }: {
   titre: string
   detail: string
   choisi: boolean
+  /** La raison pour laquelle cette option ne peut pas être prise, s'il y en a une. */
+  empeche?: string
   onClick: () => void
 }) {
   const t = useTheme()
@@ -206,7 +212,8 @@ function OptionFormat({
       type="button"
       role="radio"
       aria-checked={choisi}
-      onClick={onClick}
+      aria-disabled={!!empeche}
+      onClick={() => !empeche && onClick()}
       style={{
         borderRadius: 16,
         background: choisi ? t.selBg : t.panel,
@@ -217,7 +224,8 @@ function OptionFormat({
         flexDirection: 'column',
         gap: 6,
         textAlign: 'left',
-        cursor: 'pointer',
+        cursor: empeche ? 'default' : 'pointer',
+        opacity: empeche ? 0.6 : 1,
         WebkitTapHighlightColor: 'transparent',
       }}
     >
@@ -242,6 +250,11 @@ function OptionFormat({
       <Texte size={13} weight={400} color={choisi ? t.table : t.ink2} style={{ lineHeight: 1.4 }}>
         {detail}
       </Texte>
+      {empeche && (
+        <Texte size={12} weight={500} color={t.clayText} style={{ lineHeight: 1.35 }}>
+          {empeche}
+        </Texte>
+      )}
     </button>
   )
 }

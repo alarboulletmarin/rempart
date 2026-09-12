@@ -313,6 +313,7 @@ function Galerie() {
             onNiveauBots={noop}
             onLancer={noop}
             onQuitter={noop}
+            onAutreCode={noop}
           />
         </Cadre>
         <Cadre titre="03 quater · Salon · trois bots, trois niveaux">
@@ -347,6 +348,7 @@ function Galerie() {
             onNiveauBots={noop}
             onLancer={noop}
             onQuitter={noop}
+            onAutreCode={noop}
           />
         </Cadre>
         <Cadre titre="03 quinquies · Salon · la conversation">
@@ -363,6 +365,7 @@ function Galerie() {
               onNiveauBots={noop}
               onLancer={noop}
               onQuitter={noop}
+              onAutreCode={noop}
             />
             <FeuilleDiscussion onFermer={noop} />
           </AvecSalle>
@@ -382,6 +385,7 @@ function Galerie() {
             onNiveauBots={noop}
             onLancer={noop}
             onQuitter={noop}
+            onAutreCode={noop}
           />
         </Cadre>
         <Cadre titre="03 ter · Salon · invité, en attente de l’hôte">
@@ -405,6 +409,7 @@ function Galerie() {
             onNiveauBots={noop}
             onLancer={noop}
             onQuitter={noop}
+            onAutreCode={noop}
           />
         </Cadre>
         <Cadre titre="Rejoindre avec un code">
@@ -670,6 +675,7 @@ function Galerie() {
             onNiveauBots={noop}
             onLancer={noop}
             onQuitter={noop}
+            onAutreCode={noop}
           />
         </Cadre>
       </Section>

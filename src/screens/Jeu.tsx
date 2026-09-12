@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { TEXTE, TITRE } from '../theme'
 import {
   bricks,
@@ -111,6 +111,16 @@ export function Jeu({
 
   /** Les choix qui font foi : ceux déjà partis, sinon le brouillon en cours. */
   const choix = envoye ? (state.choices[moi] ?? []) : brouillon
+
+  /*
+   * Depuis combien de temps on attend les autres.
+   *
+   * « On attend Iris… » ne disait rien de la durée : au bout d'une minute on
+   * ne savait toujours pas si la manche avançait ou si l'écran était figé. Le
+   * compte ne démarre qu'après un seuil — l'afficher dès la première seconde
+   * mettrait la pression à qui réfléchit, et réfléchir est le jeu.
+   */
+  const attente = useAttente(envoye && played < total, state.round)
 
   const cibles = useMemo(
     () => (carteEnCours ? possibleTargets(state, moi, carteEnCours) : []),
@@ -290,8 +300,14 @@ export function Jeu({
       {attendus.length === 0
         ? tr('jeu.pied.tousJoue')
         : attendus.length === 1
-          ? tr('jeu.pied.attendUn', { nom: attendus[0].name })
-          : tr('jeu.pied.attendPlusieurs', { n: attendus.length })}
+          ? tr(attente > 0 ? 'jeu.pied.attendUn.temps' : 'jeu.pied.attendUn', {
+              nom: attendus[0].name,
+              s: attente,
+            })
+          : tr(attente > 0 ? 'jeu.pied.attendPlusieurs.temps' : 'jeu.pied.attendPlusieurs', {
+              n: attendus.length,
+              s: attente,
+            })}
     </BarrePied>
   ) : // « Ta main — choisis une carte » est écrit juste au-dessus des cartes :
   // « Touche une carte pour continuer » le répétait dans un grand bloc, et
@@ -438,6 +454,39 @@ export function Jeu({
       )}
     </Ecran>
   )
+}
+
+/**
+ * Le temps passé à attendre, en secondes — zéro tant qu'on est sous le seuil.
+ *
+ * Vingt secondes : c'est la durée d'une manche quand tout va bien (voir les
+ * règles). Au-delà, ce n'est plus quelqu'un qui réfléchit, c'est quelque chose
+ * qu'on aimerait comprendre.
+ */
+const SEUIL_ATTENTE_MS = 20_000
+
+function useAttente(actif: boolean, manche: number): number {
+  const depuis = useRef(0)
+  const [secondes, setSecondes] = useState(0)
+
+  useEffect(() => {
+    if (!actif) {
+      depuis.current = 0
+      setSecondes(0)
+      return
+    }
+    depuis.current = Date.now()
+    setSecondes(0)
+    const id = setInterval(() => {
+      const passe = Date.now() - depuis.current
+      setSecondes(passe < SEUIL_ATTENTE_MS ? 0 : Math.round(passe / 1000))
+    }, 1000)
+    return () => clearInterval(id)
+    // La manche remet le compteur à zéro : chaque manche s'attend pour
+    // elle-même.
+  }, [actif, manche])
+
+  return secondes
 }
 
 /**

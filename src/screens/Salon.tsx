@@ -38,6 +38,7 @@ export function Salon({
   onNiveauBots,
   onLancer,
   onQuitter,
+  onAutreCode,
 }: {
   etat: VueSession
   avis?: string
@@ -52,6 +53,8 @@ export function Salon({
   onNiveauBots: (niveau: NiveauBot) => void
   onLancer: () => void
   onQuitter: () => void
+  /** Repartir de l'écran « Rejoindre », le code encore en main. */
+  onAutreCode: () => void
 }) {
   const t = useTheme()
   const tr = useT()
@@ -563,6 +566,16 @@ export function Salon({
             {attente(tr, statutDemande, lien)}
           </div>
         )}
+        {/* Une porte close, une table pleine ou un code inconnu ne laissaient
+            qu'un écran d'attente sans issue, et revenir en arrière effaçait
+            les huit caractères qu'on venait de taper. */}
+        {!hote &&
+          !jeSuis &&
+          (statutDemande === 'refuse' || statutDemande === 'spectateur' || lien === 'perdu') && (
+            <BoutonPorte ton="creux" onClick={onAutreCode}>
+              {tr('lien.autreCode')}
+            </BoutonPorte>
+          )}
         <Sortie hote={hote} onSortir={() => (hote ? setConfirmeFermeture(true) : onQuitter())} />
       </div>
 

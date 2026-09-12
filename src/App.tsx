@@ -15,6 +15,7 @@ import { ReglesRapides } from './screens/ReglesRapides'
 import { Rejoindre } from './screens/Rejoindre'
 import { Revelation } from './screens/Revelation'
 import { Salon } from './screens/Salon'
+import { BandeauLien } from './ui/Bandeau'
 import { DiscussionProvider, type Salle } from './ui/discussion'
 import { LangueProvider, traducteur, useLanguePref, type Cle, type T } from './i18n'
 import { ThemeProvider, useThemePref } from './ui/theme'
@@ -92,6 +93,14 @@ export function App() {
   const [format, setFormat] = useState<Format>('chacun')
   const [cartesManche, setCartesManche] = useState(true)
   const [monNom, setMonNom] = useState('')
+  /**
+   * Le dernier code essayé.
+   *
+   * Une partie pleine, un refus ou un code inconnu renvoyaient vers un écran
+   * d'attente sans issue, et revenir en arrière effaçait les huit caractères
+   * qu'on venait de taper. Ils se gardent ici.
+   */
+  const [codeEssaye, setCodeEssaye] = useState(CODE_INVITE)
 
   const sessionRef = useRef<Session | null>(null)
   const [etat, setEtat] = useState<VueSession | null>(null)
@@ -236,13 +245,14 @@ export function App() {
         return (
           <Rejoindre
             nom={monNom}
-            codeInitial={CODE_INVITE}
+            codeInitial={codeEssaye}
             onNom={setMonNom}
             erreur={avis}
             onRetour={() => setVue({ v: 'accueil' })}
             onRejoindre={(code, nom) => {
               setMotifAvis(undefined)
               setMonNom(nom)
+              setCodeEssaye(code)
               const session = Session.rejoindre(code, nom, ecouteurs())
               sessionRef.current = session
               setEtat(session.vue())
@@ -267,6 +277,12 @@ export function App() {
             onNiveauBots={(niveau) => sessionRef.current?.reglerNiveauBots(niveau)}
             onLancer={() => sessionRef.current?.lancer()}
             onQuitter={quitterSalon}
+            onAutreCode={() => {
+              sessionRef.current?.quitter()
+              sessionRef.current = null
+              setEtat(null)
+              setVue({ v: 'rejoindre' })
+            }}
           />
         )
       }
@@ -359,7 +375,15 @@ export function App() {
     <LangueProvider langue={langue}>
       <ThemeProvider name={themeName}>
         <DiscussionProvider valeur={salle}>
-          <div className="rempart-cadre">{contenu()}</div>
+          <div className="rempart-cadre">
+            {/* Au-dessus de l'écran et dans le flux : il ne recouvre jamais ni
+                un mur ni un bouton, et il ne s'efface pas tant que le lien
+                n'est pas revenu. */}
+            {etat && (
+              <BandeauLien lien={etat.lien} lancee={etat.salon.lancee} hote={etat.hote} />
+            )}
+            {contenu()}
+          </div>
         </DiscussionProvider>
       </ThemeProvider>
     </LangueProvider>
