@@ -15,6 +15,7 @@ import { TITRE } from './theme'
 import { createGame, resolveRound } from './game/engine'
 import { roundCardById } from './game/roundCards'
 import type { Choice, GameState, PlayerId, Slot } from './game/types'
+import { LangueScope, type Langue } from './i18n'
 import { ThemeScope } from './ui/theme'
 import type { VueSession } from './net/session'
 import type { ThemeName } from './theme'
@@ -120,7 +121,25 @@ function AvecSalle({ children }: { children: ReactNode }) {
   )
 }
 
-function Cadre({ titre, theme = 'etabli', children }: { titre: string; theme?: ThemeName; children: ReactNode }) {
+/**
+ * Un cadre de la galerie : un écran, dans un thème et dans une langue.
+ *
+ * La langue y est un axe comme le thème parce qu'elle change la GÉOMÉTRIE :
+ * un libellé anglais plus long décale un bandeau, un nom de joueur pousse une
+ * pastille hors de sa ligne. Se relire dans les deux langues est le seul moyen
+ * de le voir sans installer l'app deux fois.
+ */
+function Cadre({
+  titre,
+  theme = 'etabli',
+  langue = 'fr',
+  children,
+}: {
+  titre: string
+  theme?: ThemeName
+  langue?: Langue
+  children: ReactNode
+}) {
   return (
     <div style={{ flex: '0 0 390px' }}>
       <div
@@ -147,7 +166,9 @@ function Cadre({ titre, theme = 'etabli', children }: { titre: string; theme?: T
           position: 'relative',
         }}
       >
-        <ThemeScope name={theme}>{children}</ThemeScope>
+        <ThemeScope name={theme}>
+          <LangueScope langue={langue}>{children}</LangueScope>
+        </ThemeScope>
       </div>
     </div>
   )
@@ -457,7 +478,14 @@ function Galerie() {
           />
         </Cadre>
         <Cadre titre="Réglages">
-          <Reglages pref="systeme" onPref={noop} onCartesManche={noop} onRetour={noop} />
+          <Reglages
+            pref="systeme"
+            onPref={noop}
+            languePref="systeme"
+            onLanguePref={noop}
+            onCartesManche={noop}
+            onRetour={noop}
+          />
         </Cadre>
       </Section>
 

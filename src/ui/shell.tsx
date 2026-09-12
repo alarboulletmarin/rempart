@@ -1,5 +1,6 @@
 import type { CSSProperties, ReactNode } from 'react'
 import { BANDEAU_PLANCHE, R, SAFE_TOP, TEXTE, TITRE } from '../theme'
+import { useT } from '../i18n'
 import { useTheme } from './theme'
 
 /**
@@ -73,6 +74,7 @@ export function Corps({
 /** La pastille « Retour » : de la matière et un mot, jamais un chevron. */
 export function Retour({ onClick, bg, fg }: { onClick?: () => void; bg?: string; fg?: string }) {
   const t = useTheme()
+  const tr = useT()
   return (
     <button
       type="button"
@@ -91,7 +93,7 @@ export function Retour({ onClick, bg, fg }: { onClick?: () => void; bg?: string;
         WebkitTapHighlightColor: 'transparent',
       }}
     >
-      Retour
+      {tr('commun.retour')}
     </button>
   )
 }
@@ -165,9 +167,10 @@ export function EnTete({
 /** « Manche 4/10 » — le /10 volontairement en retrait. */
 export function CompteurManche({ round, total = 10 }: { round: number; total?: number }) {
   const t = useTheme()
+  const tr = useT()
   return (
     <div style={{ font: `700 22px/1 ${TITRE}`, color: t.ink, whiteSpace: 'nowrap', flex: '0 0 auto' }}>
-      Manche {round}
+      {tr('commun.manche', { n: round })}
       <span style={{ color: t.name === 'etabli' ? '#8A7B63' : t.ink3 }}>/{total}</span>
     </div>
   )

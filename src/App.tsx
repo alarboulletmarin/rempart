@@ -16,6 +16,7 @@ import { Rejoindre } from './screens/Rejoindre'
 import { Revelation } from './screens/Revelation'
 import { Salon } from './screens/Salon'
 import { DiscussionProvider, type Salle } from './ui/discussion'
+import { LangueProvider, useLanguePref } from './i18n'
 import { ThemeProvider, useThemePref } from './ui/theme'
 
 type Vue =
@@ -51,6 +52,7 @@ const PHRASES: Record<Avis['code'], string> = {
 
 export function App() {
   const [pref, setPref, themeName] = useThemePref()
+  const [languePref, setLanguePref, langue] = useLanguePref()
   const [vue, setVue] = useState<Vue>({ v: 'accueil' })
 
   /* Réglages de la partie à créer, avant que le salon existe. */
@@ -308,6 +310,8 @@ export function App() {
           <Reglages
             pref={pref}
             onPref={setPref}
+            languePref={languePref}
+            onLanguePref={setLanguePref}
             onCartesManche={() => setVue({ v: 'cartes-manche' })}
             onRetour={() => setVue({ v: 'accueil' })}
           />
@@ -316,10 +320,12 @@ export function App() {
   }
 
   return (
-    <ThemeProvider name={themeName}>
-      <DiscussionProvider valeur={salle}>
-        <div className="rempart-cadre">{contenu()}</div>
-      </DiscussionProvider>
-    </ThemeProvider>
+    <LangueProvider langue={langue}>
+      <ThemeProvider name={themeName}>
+        <DiscussionProvider valeur={salle}>
+          <div className="rempart-cadre">{contenu()}</div>
+        </DiscussionProvider>
+      </ThemeProvider>
+    </LangueProvider>
   )
 }
