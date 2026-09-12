@@ -328,6 +328,8 @@ export function Etiquette({
   size = 11,
   style,
   id,
+  as: Balise = 'div',
+  className,
 }: {
   children: ReactNode
   color?: string
@@ -335,11 +337,20 @@ export function Etiquette({
   style?: CSSProperties
   /** Pour qu'un groupe de boutons radio puisse nommer son titre de section. */
   id?: string
+  /**
+   * `legend` quand l'étiquette EST le nom d'un `fieldset`.
+   *
+   * L'en-tête visible sert alors de nom au groupe, plutôt qu'une légende
+   * masquée qui redirait le même mot à qui écoute.
+   */
+  as?: 'div' | 'legend'
+  className?: string
 }) {
   const t = useTheme()
   return (
-    <div
+    <Balise
       id={id}
+      className={className}
       style={{
         font: `600 ${size}px/1 ${TEXTE}`,
         letterSpacing: '0.12em',
@@ -349,7 +360,7 @@ export function Etiquette({
       }}
     >
       {children}
-    </div>
+    </Balise>
   )
 }
 

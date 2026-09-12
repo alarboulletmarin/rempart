@@ -1,8 +1,21 @@
+import type { ReactNode } from 'react'
 import { TEXTE, TITRE } from '../theme'
 import { useT, type Cle, type LanguePref } from '../i18n'
 import { Etiquette, Panneau, Texte } from '../ui/atoms'
 import { Corps, Ecran, EnTete } from '../ui/shell'
 import { useTheme, type ThemePref } from '../ui/theme'
+
+/**
+ * L'espace qui fait les groupes.
+ *
+ * Les cartes d'une même section se touchent presque — huit pixels —, et
+ * vingt-six séparent une section de la suivante. Trois fois plus, et c'est la
+ * seule chose qui dise « ceci est un groupe » : l'espace au-dessus d'un en-tête
+ * valait le même que celui entre deux cartes, donc le regard ne voyait qu'une
+ * pile, et les deux « Comme le téléphone » de deux sections différentes se
+ * confondaient. Proximité avant bordures : aucun trait de séparation ajouté.
+ */
+const DANS_SECTION = 8
 
 /**
  * Réglages.
@@ -38,9 +51,9 @@ export function Reglages({
   return (
     <Ecran>
       <EnTete titre={tr('reglages.titre')} onRetour={onRetour} hauteur={102} />
-      <Corps pad={20} gap={20} scroll>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <Etiquette>{tr('reglages.theme.titre')}</Etiquette>
+      <Corps pad={20} gap={26} scroll>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: DANS_SECTION }}>
+          <EnTeteSection>{tr('reglages.theme.titre')}</EnTeteSection>
           {themes.map((id) => (
             <Option
               key={id}
@@ -52,8 +65,8 @@ export function Reglages({
           ))}
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <Etiquette>{tr('reglages.langue.titre')}</Etiquette>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: DANS_SECTION }}>
+          <EnTeteSection>{tr('reglages.langue.titre')}</EnTeteSection>
           {langues.map((id) => (
             <Option
               key={id}
@@ -69,8 +82,8 @@ export function Reglages({
           ))}
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <Etiquette>{tr('reglages.jeu.titre')}</Etiquette>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: DANS_SECTION }}>
+          <EnTeteSection>{tr('reglages.jeu.titre')}</EnTeteSection>
           <Panneau radius={16} pad="14px 16px" gap={3} onClick={onCartesManche}>
             <span style={{ font: `700 17px/1 ${TITRE}`, color: t.ink }}>
               {tr('reglages.jeu.cartesManche.titre')}
@@ -81,8 +94,8 @@ export function Reglages({
           </Panneau>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <Etiquette>{tr('reglages.garde.titre')}</Etiquette>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: DANS_SECTION }}>
+          <EnTeteSection>{tr('reglages.garde.titre')}</EnTeteSection>
           <Panneau radius={16} pad="14px 16px" gap={8}>
             <Texte size={14} color={t.ink}>
               {tr('reglages.garde.quoi')}
@@ -101,6 +114,22 @@ export function Reglages({
         </Texte>
       </Corps>
     </Ecran>
+  )
+}
+
+/**
+ * L'en-tête d'une section.
+ *
+ * En `ink2` à 11 px, il mesurait 5,27 contre 1 sur la table — au-dessus du
+ * seuil, mais assez discret pour que le regard saute par-dessus. Il passe à
+ * l'encre du texte courant : 10,7 contre 1 en établi, 14,8 en veillée.
+ */
+function EnTeteSection({ children }: { children: ReactNode }) {
+  const t = useTheme()
+  return (
+    <Etiquette size={12} color={t.ink}>
+      {children}
+    </Etiquette>
   )
 }
 
