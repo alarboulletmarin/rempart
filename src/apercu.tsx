@@ -14,7 +14,12 @@ import './global.css'
 import { TITRE } from './theme'
 import { createGame, resolveRound } from './game/engine'
 import { roundCardById } from './game/roundCards'
-import type { Choice, GameState, PlayerId, Slot } from './game/types'
+import type { CardKey, Choice, GameState, PlayerId, Slot } from './game/types'
+import { LangueScope, type Langue } from './i18n'
+import { Icone } from './ui/Icone'
+import { VueMiseAJour } from './ui/MiseAJour'
+import { FeuilleQuitter } from './screens/Quitter'
+import { salonNeuf } from './net/table'
 import { ThemeScope } from './ui/theme'
 import type { VueSession } from './net/session'
 import type { ThemeName } from './theme'
@@ -40,13 +45,29 @@ const SEATS = [
 
 const MOI: PlayerId = 'a'
 
+/**
+ * Les noms les plus longs que le jeu accepte (quatorze caractères, la limite
+ * des deux champs de saisie).
+ *
+ * Ils ne sont pas là pour faire joli : c'est le cas qui fait déborder les
+ * lignes de joueur et le titre de l'écran de fin, et le seul moyen de vérifier
+ * qu'une décoration n'empiète pas sur un texte est de lui donner sa largeur
+ * maximale — dans les deux langues, puisqu'elles n'ont pas la même.
+ */
+const SEATS_LONGS = [
+  { id: 'a', name: 'Bartholomée', ci: 0 as const },
+  { id: 'b', name: 'Anne-Charlott', ci: 1 as const },
+  { id: 'c', name: 'Maximilienne', ci: 2 as const },
+  { id: 'd', name: 'Jean-Baptiste', ci: 3 as const },
+]
+
 /** Reprend les codes de mur de la planche : I intact, B cassée, R réparée. */
 function mur(code: string): Slot[] {
   return code.split('').map((c) => (c === 'B' ? 'broken' : c === 'R' ? 'repaired' : 'intact'))
 }
 
-function base(over: Partial<GameState> = {}): GameState {
-  const g = createGame(SEATS, { format: 'chacun', roundCards: true }, 7)
+function base(over: Partial<GameState> = {}, seats = SEATS): GameState {
+  const g = createGame(seats, { format: 'chacun', roundCards: true }, 7)
   return {
     ...g,
     round: 4,
@@ -66,11 +87,11 @@ const SANS_ABSENT: ReadonlyMap<string, number> = new Map()
 /** Un salon figé, pour rendre l'écran 03 hors de toute session. */
 function vueSalon(over: Partial<VueSession> = {}): VueSession {
   return {
-    code: 'K7P2M9XR',
+    code: 'K7P3M9XR',
     moi: 'a',
     hote: true,
     salon: {
-      code: 'K7P2M9XR',
+      code: 'K7P3M9XR',
       hoteClientId: 'a',
       epoch: 0,
       round: 0,
@@ -103,6 +124,7 @@ const CONVERSATION = [
   { id: 'b:1', de: 'b', texte: 'je prends le carré', at: Date.now() + 1e6 },
   { id: 'a:1', de: 'a', texte: 'on lance dès que Nour est là', at: Date.now() + 1e6 },
   { id: 'c:1', de: 'c', texte: '🙏', at: Date.now() + 1e6 },
+  { id: 'a:2', de: 'a', texte: '👏', at: Date.now() + 1e6 },
 ]
 
 function AvecSalle({ children }: { children: ReactNode }) {
@@ -120,7 +142,57 @@ function AvecSalle({ children }: { children: ReactNode }) {
   )
 }
 
-function Cadre({ titre, theme = 'etabli', children }: { titre: string; theme?: ThemeName; children: ReactNode }) {
+/**
+ * Un cadre de la galerie : un écran, dans un thème et dans une langue.
+ *
+ * La langue y est un axe comme le thème parce qu'elle change la GÉOMÉTRIE :
+ * un libellé anglais plus long décale un bandeau, un nom de joueur pousse une
+ * pastille hors de sa ligne. Se relire dans les deux langues est le seul moyen
+ * de le voir sans installer l'app deux fois.
+ */
+/** Un salon à plusieurs, et un salon d'un seul : les deux discours du départ. */
+function salonADeux() {
+  const s = salonNeuf('K7P2M9XR', MOI, 'Léa')
+  s.joueurs.push({
+    clientId: 'b',
+    nom: 'Malo',
+    ci: 1,
+    peerId: null,
+    hote: false,
+    pret: true,
+    connecte: true,
+  })
+  s.lancee = true
+  return s
+}
+
+function salonSolo() {
+  const s = salonNeuf('K7P2M9XR', MOI, 'Léa')
+  s.joueurs.push({
+    clientId: 'bot-1',
+    nom: 'Nour',
+    ci: 2,
+    peerId: null,
+    hote: false,
+    pret: true,
+    connecte: true,
+    bot: true,
+  })
+  s.lancee = true
+  return s
+}
+
+function Cadre({
+  titre,
+  theme = 'etabli',
+  langue = 'fr',
+  children,
+}: {
+  titre: string
+  theme?: ThemeName
+  langue?: Langue
+  children: ReactNode
+}) {
   return (
     <div style={{ flex: '0 0 390px' }}>
       <div
@@ -147,7 +219,9 @@ function Cadre({ titre, theme = 'etabli', children }: { titre: string; theme?: T
           position: 'relative',
         }}
       >
-        <ThemeScope name={theme}>{children}</ThemeScope>
+        <ThemeScope name={theme}>
+          <LangueScope langue={langue}>{children}</LangueScope>
+        </ThemeScope>
       </div>
     </div>
   )
@@ -192,15 +266,26 @@ function revelationBlocage(): GameState {
   return resolveRound(s)
 }
 
-function finDePartie(): GameState {
-  const s = base({ round: 10, phase: 'fin' })
+function finDePartie(seats = SEATS): GameState {
+  const s = base({ round: 10, phase: 'fin' }, seats)
+  const murs = ['IIIBB', 'IIIII', 'BBBBB', 'IIBBB']
+  /* Dix manches jouées, pour que le récapitulatif ait quelque chose à montrer. */
+  const cartes: CardKey[] = ['frapper', 'bloquer', 'reparer', 'pieger']
+  const history = Array.from({ length: 10 }, (_, m) => ({
+    round: m + 1,
+    joue: Object.fromEntries(
+      s.players.map((p, i) => [p.id, m === 6 && i === 1 ? [] : [cartes[(m + i) % 4]]]),
+    ),
+    // Le troisième mur tombe à la septième manche : l'état que l'écran de fin
+    // doit savoir dire.
+    briques: Object.fromEntries(
+      s.players.map((p, i) => [p.id, i === 2 ? Math.max(0, 5 - m) : Math.max(1, 5 - (m % 4))]),
+    ),
+  }))
   return {
     ...s,
-    players: s.players.map((p, i) => ({
-      ...p,
-      wall: mur(['IIIBB', 'IIIII', 'IBBBB', 'IIBBB'][i]),
-      locked: [],
-    })),
+    history,
+    players: s.players.map((p, i) => ({ ...p, wall: mur(murs[i]), locked: [] })),
   }
 }
 
@@ -260,8 +345,10 @@ function Galerie() {
             onAjouterBot={noop}
             onRetirerBot={noop}
             onNiveauBot={noop}
+            onNiveauBots={noop}
             onLancer={noop}
             onQuitter={noop}
+            onAutreCode={noop}
           />
         </Cadre>
         <Cadre titre="03 quater · Salon · trois bots, trois niveaux">
@@ -293,8 +380,10 @@ function Galerie() {
             onAjouterBot={noop}
             onRetirerBot={noop}
             onNiveauBot={noop}
+            onNiveauBots={noop}
             onLancer={noop}
             onQuitter={noop}
+            onAutreCode={noop}
           />
         </Cadre>
         <Cadre titre="03 quinquies · Salon · la conversation">
@@ -308,8 +397,10 @@ function Galerie() {
               onAjouterBot={noop}
               onRetirerBot={noop}
               onNiveauBot={noop}
+              onNiveauBots={noop}
               onLancer={noop}
               onQuitter={noop}
+              onAutreCode={noop}
             />
             <FeuilleDiscussion onFermer={noop} />
           </AvecSalle>
@@ -326,8 +417,10 @@ function Galerie() {
             onAjouterBot={noop}
             onRetirerBot={noop}
             onNiveauBot={noop}
+            onNiveauBots={noop}
             onLancer={noop}
             onQuitter={noop}
+            onAutreCode={noop}
           />
         </Cadre>
         <Cadre titre="03 ter · Salon · invité, en attente de l’hôte">
@@ -348,8 +441,10 @@ function Galerie() {
             onAjouterBot={noop}
             onRetirerBot={noop}
             onNiveauBot={noop}
+            onNiveauBots={noop}
             onLancer={noop}
             onQuitter={noop}
+            onAutreCode={noop}
           />
         </Cadre>
         <Cadre titre="Rejoindre avec un code">
@@ -359,7 +454,43 @@ function Galerie() {
           <ReglesRapides onCompris={noop} onChapitres={noop} onRetour={noop} />
         </Cadre>
         <Cadre titre="05 · Jeu · état neutre">
-          <Jeu state={base()} moi={MOI} joues={[]} absentsDepuis={SANS_ABSENT} onJouer={noop} onSuite={noop} onQuitter={noop} />
+          <Jeu state={base()} moi={MOI} joues={[]} absentsDepuis={SANS_ABSENT} onJouer={noop} onSuite={noop} onDemanderQuitter={noop} onQuitter={noop} />
+        </Cadre>
+        {/* Manche 1 : personne n'a encore joué, donc personne n'a de
+            contrainte. C'est l'état que la ligne doit dire en toutes lettres
+            plutôt que de laisser un vide. */}
+        <Cadre titre="05 bis · Jeu · manche 1, aucune contrainte">
+          <Jeu
+            state={base({ round: 1, players: base().players.map((p) => ({ ...p, locked: [] })) })}
+            moi={MOI}
+            joues={[]}
+            absentsDepuis={SANS_ABSENT}
+            onJouer={noop}
+            onSuite={noop} onDemanderQuitter={noop}
+            onQuitter={noop}
+          />
+        </Cadre>
+        <Cadre titre="05 ter · Jeu · noms les plus longs">
+          <Jeu
+            state={base({ choices: { a: [{ card: 'frapper', target: 'b' }] } }, SEATS_LONGS)}
+            moi={MOI}
+            joues={['a', 'b']}
+            absentsDepuis={SANS_ABSENT}
+            onJouer={noop}
+            onSuite={noop} onDemanderQuitter={noop}
+            onQuitter={noop}
+          />
+        </Cadre>
+        <Cadre titre="05 quater · Jeu · noms les plus longs · anglais" langue="en">
+          <Jeu
+            state={base({ choices: { a: [{ card: 'frapper', target: 'b' }] } }, SEATS_LONGS)}
+            moi={MOI}
+            joues={['a', 'b']}
+            absentsDepuis={SANS_ABSENT}
+            onJouer={noop}
+            onSuite={noop} onDemanderQuitter={noop}
+            onQuitter={noop}
+          />
         </Cadre>
         <Cadre titre="06 · Jeu · carte choisie, choix de la cible">
           <Jeu
@@ -369,7 +500,7 @@ function Galerie() {
             absentsDepuis={SANS_ABSENT}
             carteInitiale="frapper"
             onJouer={noop}
-            onSuite={noop}
+            onSuite={noop} onDemanderQuitter={noop}
             onQuitter={noop}
           />
         </Cadre>
@@ -380,7 +511,7 @@ function Galerie() {
             joues={['a', 'b', 'c']}
             absentsDepuis={SANS_ABSENT}
             onJouer={noop}
-            onSuite={noop}
+            onSuite={noop} onDemanderQuitter={noop}
             onQuitter={noop}
           />
         </Cadre>
@@ -391,7 +522,7 @@ function Galerie() {
             joues={[]}
             absentsDepuis={SANS_ABSENT}
             onJouer={noop}
-            onSuite={noop}
+            onSuite={noop} onDemanderQuitter={noop}
             onQuitter={noop}
           />
         </Cadre>
@@ -406,7 +537,7 @@ function Galerie() {
             joues={[]}
             absentsDepuis={SANS_ABSENT}
             onJouer={noop}
-            onSuite={noop}
+            onSuite={noop} onDemanderQuitter={noop}
             onQuitter={noop}
           />
         </Cadre>
@@ -426,18 +557,56 @@ function Galerie() {
             joues={[]}
             absentsDepuis={SANS_ABSENT}
             onJouer={noop}
-            onSuite={noop}
+            onSuite={noop} onDemanderQuitter={noop}
             onQuitter={noop}
           />
         </Cadre>
         <Cadre titre="08 · Révélation (piège retourné)">
-          <Revelation state={revelationPiege()} moi={MOI} onSuivant={noop} />
+          <Revelation state={revelationPiege()} moi={MOI} onSuivant={noop} onDemanderQuitter={noop} />
+        </Cadre>
+        {/* Une réaction en vol : c'est le seul moment où une forme claire
+            passe au-dessus d'une ligne de joueur, donc le seul où l'on peut
+            vérifier qu'elle ne couvre ni un nom ni une contrainte. */}
+        <Cadre titre="05 quinquies · Jeu · une réaction en vol">
+          <AvecSalle>
+            <Jeu
+              state={base()}
+              moi={MOI}
+              joues={[]}
+              absentsDepuis={SANS_ABSENT}
+              onJouer={noop}
+              onSuite={noop} onDemanderQuitter={noop}
+              onQuitter={noop}
+            />
+          </AvecSalle>
         </Cadre>
         <Cadre titre="08 bis · Révélation (un blocage annule deux frappes)">
-          <Revelation state={revelationBlocage()} moi={MOI} onSuivant={noop} />
+          <Revelation state={revelationBlocage()} moi={MOI} onSuivant={noop} onDemanderQuitter={noop} />
         </Cadre>
         <Cadre titre="11 · Fin de partie">
           <Fin state={finDePartie()} moi={MOI} peutRejouer onRejouer={noop} onPalmares={noop} onQuitter={noop} />
+        </Cadre>
+        {/* Le cas qui faisait déborder le titre : le nom le plus long que le
+            jeu accepte, dans les deux langues, avec la décoration à côté. */}
+        <Cadre titre="11 bis · Fin · nom le plus long">
+          <Fin
+            state={finDePartie(SEATS_LONGS)}
+            moi={MOI}
+            peutRejouer
+            onRejouer={noop}
+            onPalmares={noop}
+            onQuitter={noop}
+          />
+        </Cadre>
+        <Cadre titre="11 ter · Fin · nom le plus long · anglais" langue="en">
+          <Fin
+            state={finDePartie(SEATS_LONGS)}
+            moi={MOI}
+            peutRejouer
+            onRejouer={noop}
+            onPalmares={noop}
+            onQuitter={noop}
+          />
         </Cadre>
         <Cadre titre="11 bis · Palmarès">
           <Palmares onRetour={noop} />
@@ -452,13 +621,53 @@ function Galerie() {
             joues={[]}
             absentsDepuis={SANS_ABSENT}
             onJouer={noop}
-            onSuite={noop}
+            onSuite={noop} onDemanderQuitter={noop}
             onQuitter={noop}
           />
         </Cadre>
         <Cadre titre="Réglages">
-          <Reglages pref="systeme" onPref={noop} onCartesManche={noop} onRetour={noop} />
+          <Reglages
+            pref="systeme"
+            onPref={noop}
+            languePref="systeme"
+            onLanguePref={noop}
+            onCartesManche={noop}
+            onRetour={noop}
+          />
         </Cadre>
+      </Section>
+
+      {/* La planche des icônes : elles se jugent à leur taille d'emploi, pas
+          agrandies. */}
+      <Section titre="Les icônes dessinées">
+        <div
+          style={{
+            display: 'flex',
+            gap: 26,
+            flexWrap: 'wrap',
+            background: '#FCF7EC',
+            borderRadius: 20,
+            padding: 24,
+          }}
+        >
+          {(['reaction', 'rire', 'aie', 'bravo', 'bienJoue', 'grr', 'pitie', 'cadenas'] as const).map(
+            (nom) => (
+              <div
+                key={nom}
+                style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}
+              >
+                <ThemeScope name="etabli">
+                  <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12 }}>
+                    <Icone nom={nom} size={44} />
+                    <Icone nom={nom} size={22} />
+                    <Icone nom={nom} size={13} />
+                  </div>
+                </ThemeScope>
+                <span style={{ font: '600 11px/1 Outfit, sans-serif', color: '#5F5342' }}>{nom}</span>
+              </div>
+            ),
+          )}
+        </div>
       </Section>
 
       <Section titre="Les règles dans l’app">
@@ -473,6 +682,34 @@ function Galerie() {
         <Cadre titre="C1 · Cartes de manche · les neuf">
           <CartesDeManche onRetour={noop} />
         </Cadre>
+        <Cadre titre="13 · Quitter · à plusieurs, arbitre">
+          <Jeu state={base()} moi={MOI} joues={[]} absentsDepuis={SANS_ABSENT} onJouer={noop} onSuite={noop} onDemanderQuitter={noop} onQuitter={noop} />
+          <FeuilleQuitter salon={salonADeux()} hote onRester={noop} onQuitter={noop} />
+        </Cadre>
+        <Cadre titre="13 bis · Quitter · à plusieurs, invité">
+          <Jeu state={base()} moi={MOI} joues={[]} absentsDepuis={SANS_ABSENT} onJouer={noop} onSuite={noop} onDemanderQuitter={noop} onQuitter={noop} />
+          <FeuilleQuitter salon={salonADeux()} hote={false} onRester={noop} onQuitter={noop} />
+        </Cadre>
+        <Cadre titre="13 ter · Quitter · seul contre des bots">
+          <Jeu state={base()} moi={MOI} joues={[]} absentsDepuis={SANS_ABSENT} onJouer={noop} onSuite={noop} onDemanderQuitter={noop} onQuitter={noop} />
+          <FeuilleQuitter salon={salonSolo()} hote onRester={noop} onQuitter={noop} />
+        </Cadre>
+        <Cadre titre="13 quater · Quitter · anglais" langue="en">
+          <Jeu state={base()} moi={MOI} joues={[]} absentsDepuis={SANS_ABSENT} onJouer={noop} onSuite={noop} onDemanderQuitter={noop} onQuitter={noop} />
+          <FeuilleQuitter salon={salonADeux()} hote onRester={noop} onQuitter={noop} />
+        </Cadre>
+        <Cadre titre="M1 · Mise à jour · hors partie">
+          <Accueil onCreer={noop} onRejoindre={noop} onRegles={noop} onPalmares={noop} onReglages={noop} />
+          <VueMiseAJour enPartie={false} onRecharger={noop} onPlusTard={noop} />
+        </Cadre>
+        <Cadre titre="M2 · Mise à jour · en partie">
+          <Jeu state={base()} moi={MOI} joues={[]} absentsDepuis={SANS_ABSENT} onJouer={noop} onSuite={noop} onDemanderQuitter={noop} onQuitter={noop} />
+          <VueMiseAJour enPartie onRecharger={noop} onPlusTard={noop} />
+        </Cadre>
+        <Cadre titre="M3 · Mise à jour · en partie · anglais" langue="en">
+          <Jeu state={base()} moi={MOI} joues={[]} absentsDepuis={SANS_ABSENT} onJouer={noop} onSuite={noop} onDemanderQuitter={noop} onQuitter={noop} />
+          <VueMiseAJour enPartie onRecharger={noop} onPlusTard={noop} />
+        </Cadre>
       </Section>
 
       <Section titre="Veillée · les écrans sombres">
@@ -480,13 +717,84 @@ function Galerie() {
           <Accueil onCreer={noop} onRejoindre={noop} onRegles={noop} onPalmares={noop} onReglages={noop} />
         </Cadre>
         <Cadre titre="05 · Jeu · état neutre · veillée" theme="veillee">
-          <Jeu state={base()} moi={MOI} joues={[]} absentsDepuis={SANS_ABSENT} onJouer={noop} onSuite={noop} onQuitter={noop} />
+          <Jeu state={base()} moi={MOI} joues={[]} absentsDepuis={SANS_ABSENT} onJouer={noop} onSuite={noop} onDemanderQuitter={noop} onQuitter={noop} />
         </Cadre>
         <Cadre titre="08 · Révélation · veillée" theme="veillee">
-          <Revelation state={revelationPiege()} moi={MOI} onSuivant={noop} />
+          <Revelation state={revelationPiege()} moi={MOI} onSuivant={noop} onDemanderQuitter={noop} />
         </Cadre>
         <Cadre titre="11 · Fin de partie · veillée" theme="veillee">
           <Fin state={finDePartie()} moi={MOI} peutRejouer onRejouer={noop} onPalmares={noop} onQuitter={noop} />
+        </Cadre>
+        <Cadre titre="02 · Création · veillée" theme="veillee">
+          <Creation
+            places={4}
+            format="chacun"
+            cartesManche
+            nom="Léa"
+            onNom={noop}
+            onPlaces={noop}
+            onFormat={noop}
+            onCartesManche={noop}
+            onOuvrir={noop}
+            onRetour={noop}
+          />
+        </Cadre>
+        <Cadre titre="Rejoindre · veillée" theme="veillee">
+          <Rejoindre nom="Malo" onNom={noop} onRejoindre={noop} onRetour={noop} />
+        </Cadre>
+        <Cadre titre="04 · Règles · veillée" theme="veillee">
+          <ReglesRapides onCompris={noop} onChapitres={noop} onRetour={noop} />
+        </Cadre>
+        <Cadre titre="R0 · Sommaire · veillée" theme="veillee">
+          <ReglesSommaire onChapitre={noop} onRetour={noop} />
+        </Cadre>
+        <Cadre titre="C1 · Cartes de manche · veillée" theme="veillee">
+          <CartesDeManche onRetour={noop} />
+        </Cadre>
+        <Cadre titre="13 · Quitter · veillée" theme="veillee">
+          <Jeu state={base()} moi={MOI} joues={[]} absentsDepuis={SANS_ABSENT} onJouer={noop} onSuite={noop} onDemanderQuitter={noop} onQuitter={noop} />
+          <FeuilleQuitter salon={salonADeux()} hote onRester={noop} onQuitter={noop} />
+        </Cadre>
+        <Cadre titre="M2 · Mise à jour · en partie · veillée" theme="veillee">
+          <Jeu state={base()} moi={MOI} joues={[]} absentsDepuis={SANS_ABSENT} onJouer={noop} onSuite={noop} onDemanderQuitter={noop} onQuitter={noop} />
+          <VueMiseAJour enPartie onRecharger={noop} onPlusTard={noop} />
+        </Cadre>
+        <Cadre titre="11 bis · Palmarès · veillée" theme="veillee">
+          <Palmares onRetour={noop} />
+        </Cadre>
+        <Cadre titre="Réglages · veillée" theme="veillee">
+          <Reglages
+            pref="systeme"
+            onPref={noop}
+            languePref="systeme"
+            onLanguePref={noop}
+            onCartesManche={noop}
+            onRetour={noop}
+          />
+        </Cadre>
+        <Cadre titre="12 · Déconnexion · veillée" theme="veillee">
+          <Jeu
+            state={base({
+              players: base().players.map((p, i) => (i === 2 ? { ...p, connected: false } : p)),
+            })}
+            moi={MOI}
+            joues={[]}
+            absentsDepuis={new Map([['c', Date.now()]])}
+            onJouer={noop}
+            onSuite={noop} onDemanderQuitter={noop}
+            onQuitter={noop}
+          />
+        </Cadre>
+        <Cadre titre="09 · Carte de manche · veillée" theme="veillee">
+          <Jeu
+            state={base({ round: 6, activeRoundCard: roundCardById('double-frappe')! })}
+            moi={MOI}
+            joues={[]}
+            absentsDepuis={SANS_ABSENT}
+            onJouer={noop}
+            onSuite={noop} onDemanderQuitter={noop}
+            onQuitter={noop}
+          />
         </Cadre>
         <Cadre titre="03 · Salon · veillée" theme="veillee">
           <Salon
@@ -498,8 +806,10 @@ function Galerie() {
             onAjouterBot={noop}
             onRetirerBot={noop}
             onNiveauBot={noop}
+            onNiveauBots={noop}
             onLancer={noop}
             onQuitter={noop}
+            onAutreCode={noop}
           />
         </Cadre>
       </Section>

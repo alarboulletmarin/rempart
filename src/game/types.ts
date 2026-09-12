@@ -3,13 +3,6 @@ export type CardKey = 'frapper' | 'bloquer' | 'reparer' | 'pieger'
 
 export const CARD_KEYS: readonly CardKey[] = ['frapper', 'bloquer', 'reparer', 'pieger']
 
-export const CARD_LABEL: Record<CardKey, string> = {
-  frapper: 'Frapper',
-  bloquer: 'Bloquer',
-  reparer: 'Réparer',
-  pieger: 'Piéger',
-}
-
 export type PlayerId = string
 
 /** Nombre de briques au départ, et plafond d'une réparation. */
@@ -73,16 +66,27 @@ export type Phase =
   | 'mort-subite'
   | 'fin'
 
+/** Les neuf cartes de manche. Le texte de chacune vit au catalogue. */
+export type RoundCardId =
+  | 'double-frappe'
+  | 'mur-nu'
+  | 'treve'
+  | 'ricochet'
+  | 'requisition'
+  | 'memoire-courte'
+  | 'contre-attaque'
+  | 'cartes-sur-table'
+  | 'dernier-mur'
+
+/**
+ * La carte de manche en vigueur — son identifiant, et rien d'autre.
+ *
+ * Elle voyage dans l'état de la partie : l'arbitre la tire et l'envoie aux
+ * autres téléphones, qui ne lisent pas forcément sa langue. Son nom et sa
+ * description se lisent donc au catalogue, chez celui qui regarde l'écran.
+ */
 export interface RoundCard {
-  id: string
-  /** Le nom affiché sur le bandeau ocre. */
-  n: string
-  /** L'axe de jeu qu'elle déplace. */
-  axis: string
-  /** Ce qu'elle change, tel qu'annoncé au joueur. */
-  d: string
-  /** Pourquoi elle existe — texte de la planche de règles. */
-  why: string
+  id: RoundCardId
 }
 
 /**
@@ -104,6 +108,48 @@ export type RoundEvent =
   /** Un joueur déconnecté n'a pas joué cette manche. */
   | { t: 'absent'; who: PlayerId }
 
+/**
+ * Le sort d'un joueur sur sa ligne de révélation, dit en MOTIF et non en
+ * phrase.
+ *
+ * Le moteur tourne chez l'arbitre, et son résultat part sur le réseau vers des
+ * téléphones qui ne sont pas forcément dans sa langue : une étiquette écrite
+ * ici arriverait en français sur un écran anglais. Le motif voyage, la phrase
+ * se fabrique chez qui lit — c'est la même règle que pour les avis de
+ * connexion.
+ */
+export type MotifEtiquette =
+  | 'absent'
+  | 'retourne'
+  | 'piegeDeclenche'
+  | 'frappesAnnulees'
+  | 'annule'
+  | 'briquesPerdues'
+  | 'briquesGagnees'
+  | 'murPlein'
+  | 'touche'
+  | 'rien'
+
+export interface EtiquetteManche {
+  motif: MotifEtiquette
+  /** Le nombre que porte le motif : des briques, des frappes. */
+  n: number
+}
+
+/**
+ * La matière d'une étiquette de manche.
+ *
+ * Elle suivait un seul booléen, « marquante ou non », et la terre cuite se
+ * retrouvait aussi bien sur « −1 brique » que sur « piège déclenché » ou
+ * « 1 frappe annulée » — c'est-à-dire sur un dégât et sur deux défenses qui
+ * avaient parfaitement tenu. La couleur ne disait donc plus rien.
+ *
+ *  - `degat`   : une brique est tombée sur cette ligne.
+ *  - `defense` : ce qui visait cette ligne n'est pas passé, ou le mur est monté.
+ *  - `neutre`  : il ne s'est rien passé qui vaille une couleur.
+ */
+export type TonEtiquette = 'degat' | 'defense' | 'neutre'
+
 /** Ce qui est arrivé à un joueur pendant la résolution, pour l'écran de révélation. */
 export interface PlayerOutcome {
   playerId: PlayerId
@@ -119,10 +165,10 @@ export interface PlayerOutcome {
    * `ui/mouvement.ts`).
    */
   wallBefore: Slot[]
-  /** L'étiquette qui résume son sort : « annulé », « retourné −1 », « +1 brique »… */
-  tag: string
-  /** L'étiquette est-elle marquante (terre cuite pleine) ou discrète ? */
-  hot: boolean
+  /** Le motif qui résume son sort : « annulé », « retourné −1 », « +1 brique »… */
+  tag: EtiquetteManche
+  /** La matière de cette étiquette — dégât, défense, ou rien. */
+  ton: TonEtiquette
   /** Variation de briques sur la manche, pour l'animation et le récit. */
   delta: number
 }
@@ -136,6 +182,28 @@ export interface RoundOutcome {
    * avec « Cartes sur table », du mur le plus bas au plus haut.
    */
   revealOrder: PlayerId[]
+}
+
+/**
+ * Ce qu'on garde d'une manche une fois qu'elle est passée.
+ *
+ * Le moteur ne gardait que la DERNIÈRE résolution, parce que c'est tout ce
+ * dont la révélation a besoin. L'écran de fin, lui, n'avait alors rien à
+ * raconter d'une partie qui venait pourtant de durer dix manches : il montrait
+ * un classement, et la moitié de sa hauteur restait vide. Ces deux nombres par
+ * joueur et par manche suffisent à redonner la partie entière — quarante
+ * entrées pour une table de quatre, soit quelques centaines d'octets dans
+ * l'état qui voyage.
+ *
+ * Aucune règle ne le lit : c'est une mémoire d'affichage, et le moteur décide
+ * exactement comme avant.
+ */
+export interface ManchePassee {
+  round: number
+  /** La ou les cartes jouées, par joueur. Vide pour un joueur absent. */
+  joue: Record<PlayerId, CardKey[]>
+  /** Les briques encore debout à la fin de la manche, par joueur. */
+  briques: Record<PlayerId, number>
 }
 
 export interface GameState {
@@ -152,6 +220,13 @@ export interface GameState {
   choices: Record<PlayerId, Choice[]>
   /** Le résultat de la dernière résolution, affiché à la révélation. */
   lastOutcome: RoundOutcome | null
+  /**
+   * Les manches déjà jouées, dans l'ordre — la mémoire de la partie.
+   *
+   * Optionnelle à la lecture : un état publié par une version plus ancienne
+   * n'en porte pas, et l'écran de fin retombe alors sur le classement seul.
+   */
+  history?: ManchePassee[]
   /** Graine du tirage aléatoire — l'hôte la partage pour que tout le monde tire pareil. */
   seed: number
   /**

@@ -1,6 +1,6 @@
 import { TEXTE, TITRE } from '../theme'
-import { DECK } from '../game/content'
-import { CARD_LABEL } from '../game/types'
+import { CARD_KEYS } from '../game/types'
+import { useT } from '../i18n'
 import { Panneau, usePanneauEncre } from '../ui/atoms'
 import { Pictogramme } from '../ui/Pictogramme'
 import { Corps, Ecran, EnTete } from '../ui/shell'
@@ -25,12 +25,13 @@ export function ReglesRapides({
   onRetour: () => void
 }) {
   const t = useTheme()
+  const tr = useT()
   const encre = usePanneauEncre()
 
   return (
     <Ecran>
       <EnTete
-        titre="Règles"
+        titre={tr('regles.titre')}
         onRetour={onRetour}
         hauteur={90}
         droite={
@@ -53,28 +54,31 @@ export function ReglesRapides({
               cursor: 'pointer',
             }}
           >
-            Chapitres
+            {tr('regles.chapitres')}
           </button>
         }
       />
       <Corps pad="16px 16px 8px 16px" gap={8} scroll>
         <h1 style={{ font: `700 25px/1.15 ${TITRE}`, color: t.ink, margin: 0, textWrap: 'pretty' }}>
-          Garde le plus de briques debout au bout de dix manches.
+          {tr('rapides.titre')}
         </h1>
 
         <Panneau radius={16} pad="12px 14px">
           <span style={{ font: `500 13px/1.45 ${TEXTE}`, color: t.ink }}>
-            Tout le monde choisit une carte <strong>en même temps</strong>, plus une cible. On
-            révèle, on résout. C’est tout.
+            {tr('rapides.resume')}
           </span>
         </Panneau>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
-          {DECK.map((c) => (
-            <Panneau key={c.k} radius={16} pad={12} gap={6}>
-              <Pictogramme card={c.k} size={46} />
-              <span style={{ font: `700 14px/1 ${TITRE}`, color: t.ink }}>{CARD_LABEL[c.k]}</span>
-              <span style={{ font: `400 12px/1.35 ${TEXTE}`, color: t.ink2 }}>{c.long}</span>
+          {CARD_KEYS.map((k) => (
+            <Panneau key={k} radius={16} pad={12} gap={6}>
+              <Pictogramme card={k} size={46} />
+              <span style={{ font: `700 14px/1 ${TITRE}`, color: t.ink }}>
+                {tr(`carte.${k}` as const)}
+              </span>
+              <span style={{ font: `400 12px/1.35 ${TEXTE}`, color: t.ink2 }}>
+                {tr(`carte.${k}.long` as const)}
+              </span>
             </Panneau>
           ))}
         </div>
@@ -90,10 +94,11 @@ export function ReglesRapides({
             gap: 6,
           }}
         >
-          <span style={{ font: `700 16px/1.2 ${TITRE}`, color: encre.fg }}>Le verrou</span>
+          <span style={{ font: `700 16px/1.2 ${TITRE}`, color: encre.fg }}>
+            {tr('rapides.verrou.titre')}
+          </span>
           <span style={{ font: `400 13px/1.45 ${TEXTE}`, color: encre.detail }}>
-            La carte que tu viens de jouer est mise de côté : interdite la manche suivante. Tes
-            adversaires le voient — et toi aussi, sur leur ligne.
+            {tr('rapides.verrou.detail')}
           </span>
         </div>
 
@@ -108,10 +113,11 @@ export function ReglesRapides({
             gap: 5,
           }}
         >
-          <span style={{ font: `700 15px/1.2 ${TITRE}`, color: '#2E2418' }}>Cartes de manche</span>
+          <span style={{ font: `700 15px/1.2 ${TITRE}`, color: t.ochreFort }}>
+            {tr('rapides.manches.titre')}
+          </span>
           <span style={{ font: `400 13px/1.4 ${TEXTE}`, color: t.ochreInk }}>
-            Manches 3, 6 et 9 : une règle commune s’affiche en bandeau. Elle vaut pour tout le
-            monde, une seule manche.
+            {tr('rapides.manches.detail')}
           </span>
         </div>
 
@@ -131,7 +137,7 @@ export function ReglesRapides({
             cursor: 'pointer',
           }}
         >
-          J’ai compris
+          {tr('rapides.compris')}
         </button>
       </Corps>
     </Ecran>

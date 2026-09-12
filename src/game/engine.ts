@@ -25,8 +25,12 @@ import {
   type PlayerOutcome,
   type RoundCard,
   type RoundEvent,
+  type ManchePassee,
   type RoundOutcome,
   type Slot,
+  type EtiquetteManche,
+  type MotifEtiquette,
+  type TonEtiquette,
 } from './types'
 import { ROUND_CARDS } from './roundCards'
 
@@ -125,6 +129,7 @@ export function createGame(seats: SeatSpec[], config: GameConfig, seed: number):
     usedRoundCards: [],
     choices: {},
     lastOutcome: null,
+    history: [],
     seed,
     seq: 0,
     mortSubite: 0,
@@ -143,6 +148,9 @@ export function replay(state: GameState, seed: number): GameState {
     usedRoundCards: [],
     choices: {},
     lastOutcome: null,
+    // Une revanche est une autre partie : elle ne garde pas la mémoire de la
+    // précédente, sans quoi l'écran de fin en raconterait vingt.
+    history: [],
     seed,
     seq: 0,
     mortSubite: 0,
@@ -410,13 +418,13 @@ export function resolveRound(state: GameState): GameState {
 
   const outcomes: PlayerOutcome[] = players.map((p) => {
     const delta = bricks(p) - (before.get(p.id) ?? 0)
-    const { tag, hot } = tagFor(p.id, events, delta, p.connected)
+    const { tag, ton } = tagFor(p.id, events, delta, p.connected)
     return {
       playerId: p.id,
       played: state.choices[p.id] ?? [],
       wallBefore: murAvant.get(p.id) ?? [...p.wall],
       tag,
-      hot,
+      ton,
       delta,
     }
   })
@@ -427,38 +435,67 @@ export function resolveRound(state: GameState): GameState {
     : [...players].sort((a, b) => a.seat - b.seat).map((p) => p.id)
 
   const outcome: RoundOutcome = { round: state.round, outcomes, events, revealOrder }
-  return { ...state, players, phase: 'revelation', lastOutcome: outcome }
+
+  // La manche rejoint la mémoire de la partie : c'est elle que l'écran de fin
+  // relit pour raconter les dix manches plutôt que d'afficher un classement
+  // dans le vide.
+  const passee: ManchePassee = {
+    round: state.round,
+    joue: Object.fromEntries(players.map((p) => [p.id, (played.get(p.id) ?? []).map((c) => c.card)])),
+    briques: Object.fromEntries(players.map((p) => [p.id, bricks(p)])),
+  }
+
+  return {
+    ...state,
+    players,
+    phase: 'revelation',
+    lastOutcome: outcome,
+    history: [...(state.history ?? []), passee],
+  }
 }
 
-/** L'étiquette qui résume le sort d'un joueur, sur sa ligne de révélation. */
+/**
+ * Le motif qui résume le sort d'un joueur, sur sa ligne de révélation.
+ *
+ * Un motif et un nombre, jamais une phrase : ce résultat part de l'arbitre
+ * vers les autres téléphones, qui ne lisent pas forcément la même langue que
+ * lui. C'est l'écran qui met des mots dessus, dans la sienne.
+ */
 function tagFor(
   id: PlayerId,
   events: RoundEvent[],
   delta: number,
   connected: boolean,
-): { tag: string; hot: boolean } {
-  if (!connected) return { tag: 'absent', hot: false }
+): { tag: EtiquetteManche; ton: TonEtiquette } {
+  const etiquette = (motif: MotifEtiquette, n = 0, ton: TonEtiquette = 'neutre') => ({
+    tag: { motif, n },
+    ton,
+  })
 
+  if (!connected) return etiquette('absent')
+
+  // Celui qui s'est fait retourner sa frappe perd la brique : c'est un dégât.
   const reflectedOnMe = events.find((e) => e.t === 'retournee' && e.from === id)
   if (reflectedOnMe && reflectedOnMe.t === 'retournee') {
-    return { tag: `retourné −${reflectedOnMe.amount}`, hot: true }
+    return etiquette('retourne', reflectedOnMe.amount, 'degat')
   }
+  // Celui dont le piège a fonctionné n'a RIEN perdu : sa ligne était en terre
+  // cuite, la couleur des briques qui tombent, sur une manche où son mur n'a
+  // pas bougé.
   if (events.some((e) => e.t === 'retournee' && e.to === id)) {
-    return { tag: 'piège déclenché', hot: true }
+    return etiquette('piegeDeclenche', 0, 'defense')
   }
 
   const cancelled = events.filter((e) => e.t === 'annulee' && e.to === id).length
-  if (cancelled > 0) {
-    return { tag: cancelled === 1 ? '1 frappe annulée' : `${cancelled} frappes annulées`, hot: true }
-  }
-  if (events.some((e) => e.t === 'annulee' && e.from === id)) return { tag: 'annulé', hot: false }
+  if (cancelled > 0) return etiquette('frappesAnnulees', cancelled, 'defense')
+  if (events.some((e) => e.t === 'annulee' && e.from === id)) return etiquette('annule')
 
-  if (delta < 0) return { tag: `−${-delta} brique${-delta > 1 ? 's' : ''}`, hot: true }
-  if (delta > 0) return { tag: `+${delta} brique${delta > 1 ? 's' : ''}`, hot: false }
+  if (delta < 0) return etiquette('briquesPerdues', -delta, 'degat')
+  if (delta > 0) return etiquette('briquesGagnees', delta, 'defense')
 
-  if (events.some((e) => e.t === 'reparation' && e.who === id)) return { tag: 'mur plein', hot: false }
-  if (events.some((e) => e.t === 'frappe' && e.from === id)) return { tag: 'touché', hot: false }
-  return { tag: '', hot: false }
+  if (events.some((e) => e.t === 'reparation' && e.who === id)) return etiquette('murPlein')
+  if (events.some((e) => e.t === 'frappe' && e.from === id)) return etiquette('touche')
+  return etiquette('rien')
 }
 
 /* --------------------------------------------------------------- fin */

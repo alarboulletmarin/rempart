@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { bricks, standings } from './game/engine'
 import type { Choice, Format } from './game/types'
 import type { ChapitreId } from './game/content'
@@ -14,8 +14,12 @@ import { CartesDeManche, ReglesChapitre, ReglesSommaire } from './screens/Regles
 import { ReglesRapides } from './screens/ReglesRapides'
 import { Rejoindre } from './screens/Rejoindre'
 import { Revelation } from './screens/Revelation'
+import { FeuilleQuitter, consequenceDuDepart } from './screens/Quitter'
 import { Salon } from './screens/Salon'
+import { BandeauLien } from './ui/Bandeau'
+import { MiseAJour } from './ui/MiseAJour'
 import { DiscussionProvider, type Salle } from './ui/discussion'
+import { LangueProvider, traducteur, useLanguePref, type Cle, type T } from './i18n'
 import { ThemeProvider, useThemePref } from './ui/theme'
 
 type Vue =
@@ -32,50 +36,109 @@ type Vue =
   | { v: 'reglages' }
 
 /**
- * Les phrases des avis.
+ * Les avis, gardés sous leur MOTIF et non sous leur phrase.
  *
  * La couche réseau transmet un motif, jamais une phrase : elle n'a pas à
  * connaître la langue du joueur, et une même cause doit se dire pareil partout.
+ * Le motif reste donc tel quel dans l'état de l'écran, et la phrase se
+ * fabrique au rendu — un changement de langue en cours de partie retourne
+ * ainsi l'avis affiché avec le reste.
  */
-const PHRASES: Record<Avis['code'], string> = {
-  lienEchoue: 'La mise en relation n’a pas abouti. Vérifie ta connexion.',
-  lienBloque:
-    'Ton réseau bloque la connexion directe. Un partage de connexion, ou un autre Wi-Fi, passe souvent mieux.',
-  lienPerdu: 'Le lien avec l’hôte est coupé.',
-  refuse: 'L’hôte n’a pas ouvert la porte.',
-  salonPlein: 'Le salon est complet.',
-  partieEnCours: 'La partie a déjà commencé.',
-  hotePris: 'Quelqu’un d’autre arbitre la table : tu redeviens invité, ton mur reste intact.',
-  gestRefuse: 'Ce coup n’est pas jouable.',
+const CLE_AVIS: Record<Exclude<Avis['code'], 'botLeve'>, Cle> = {
+  lienEchoue: 'avis.lienEchoue',
+  lienBloque: 'avis.lienBloque',
+  lienPerdu: 'avis.lienPerdu',
+  refuse: 'avis.refuse',
+  salonPlein: 'avis.salonPlein',
+  partieEnCours: 'avis.partieEnCours',
+  hotePris: 'avis.hotePris',
+  gestRefuse: 'avis.gestRefuse',
+}
+
+/** L'avis, mis en mots. Seul « un bot s'est levé » nomme quelqu'un. */
+function direAvis(tr: T, avis: Avis): string {
+  return avis.code === 'botLeve'
+    ? tr('avis.botLeve', { nom: avis.nom, humain: avis.humain })
+    : tr(CLE_AVIS[avis.code])
+}
+
+/**
+ * Le code lu dans l'adresse, quand on arrive par un QR scanné.
+ *
+ * Lu **une fois, au chargement du module**, et non dans un état de composant :
+ * l'adresse s'efface aussitôt — sans quoi un rechargement renverrait
+ * indéfiniment vers un salon peut-être refermé depuis, et le code resterait
+ * affiché à qui regarde par-dessus l'épaule. Or `StrictMode` rejoue les
+ * initialiseurs d'état, et la seconde lecture tombait sur une adresse déjà
+ * nettoyée : l'app repartait sur l'accueil, le code perdu. Ici, la lecture
+ * précède tout rendu et ne peut pas se rejouer.
+ */
+const CODE_INVITE = lireCodeInvite()
+
+function lireCodeInvite(): string {
+  if (typeof window === 'undefined') return ''
+  const code = new URLSearchParams(window.location.search).get('partie') ?? ''
+  if (code) window.history.replaceState(null, '', window.location.pathname)
+  return code
 }
 
 export function App() {
   const [pref, setPref, themeName] = useThemePref()
-  const [vue, setVue] = useState<Vue>({ v: 'accueil' })
+  const [languePref, setLanguePref, langue] = useLanguePref()
+  /* Le traducteur se fabrique ici plutôt que par `useT()` : `App` monte le
+     fournisseur de langue, donc elle est au-dessus de son propre contexte. */
+  const tr = useMemo(() => traducteur(langue), [langue])
+  const [vue, setVue] = useState<Vue>(CODE_INVITE ? { v: 'rejoindre' } : { v: 'accueil' })
 
   /* Réglages de la partie à créer, avant que le salon existe. */
   const [places, setPlaces] = useState(4)
   const [format, setFormat] = useState<Format>('chacun')
   const [cartesManche, setCartesManche] = useState(true)
   const [monNom, setMonNom] = useState('')
+  /**
+   * Le dernier code essayé.
+   *
+   * Une partie pleine, un refus ou un code inconnu renvoyaient vers un écran
+   * d'attente sans issue, et revenir en arrière effaçait les huit caractères
+   * qu'on venait de taper. Ils se gardent ici.
+   */
+  const [codeEssaye, setCodeEssaye] = useState(CODE_INVITE)
 
   const sessionRef = useRef<Session | null>(null)
   const [etat, setEtat] = useState<VueSession | null>(null)
-  const [avis, setAvis] = useState<string | undefined>()
+  const [motifAvis, setMotifAvis] = useState<Avis | undefined>()
 
   const ecouteurs = useCallback(
     () => ({
       onChange: () => setEtat(sessionRef.current?.vue() ?? null),
-      onAvis: (a: Avis) => setAvis(PHRASES[a.code]),
+      onAvis: (a: Avis) => setMotifAvis(a),
     }),
     [],
   )
 
+  /** La feuille « Quitter la partie ? » est ouverte. */
+  const [sortieDemandee, setSortieDemandee] = useState(false)
+
   const quitterSalon = useCallback(() => {
+    /*
+     * Le code part avec nous.
+     *
+     * La feuille promet qu'on retrouve sa place « avec le code » : le siège
+     * reste tenu côté arbitre (`net/table.ts`, `sortir`) et le `clientId` le
+     * rouvre sans rien demander. Encore faut-il avoir le code sous la main —
+     * celui qui a scanné un QR ne l'a jamais lu. Il pré-remplit « Rejoindre ».
+     *
+     * Sous la même condition que la promesse, et pas une de plus : seul contre
+     * des bots, la partie meurt en partant, et pré-remplir « Rejoindre » avec
+     * un code mort serait une invitation à frapper à une porte murée.
+     */
+    const v = sessionRef.current?.vue()
+    if (v?.jeu && consequenceDuDepart(v.salon, v.hote).garde) setCodeEssaye(v.code)
     sessionRef.current?.quitter()
     sessionRef.current = null
     setEtat(null)
-    setAvis(undefined)
+    setMotifAvis(undefined)
+    setSortieDemandee(false)
     setVue({ v: 'accueil' })
   }, [])
 
@@ -128,6 +191,8 @@ export function App() {
     if (!etat.salon.lancee && vue.v === 'partie') setVue({ v: 'salon' })
   }, [etat, vue.v])
 
+  const avis = motifAvis ? direAvis(tr, motifAvis) : undefined
+
   const jouer = (choix: Choice[]) => {
     for (const c of choix) compterCarte(c.card)
     sessionRef.current?.jouer(choix)
@@ -162,7 +227,7 @@ export function App() {
           <Accueil
             onCreer={() => setVue({ v: 'creation' })}
             onRejoindre={() => {
-              setAvis(undefined)
+              setMotifAvis(undefined)
               setVue({ v: 'rejoindre' })
             }}
             onRegles={() => setVue({ v: 'regles' })}
@@ -184,7 +249,7 @@ export function App() {
             onCartesManche={setCartesManche}
             onRetour={() => setVue({ v: 'accueil' })}
             onOuvrir={() => {
-              setAvis(undefined)
+              setMotifAvis(undefined)
               const session = Session.creer(monNom, ecouteurs())
               sessionRef.current = session
               session.reglerPlaces(places)
@@ -200,12 +265,14 @@ export function App() {
         return (
           <Rejoindre
             nom={monNom}
+            codeInitial={codeEssaye}
             onNom={setMonNom}
             erreur={avis}
             onRetour={() => setVue({ v: 'accueil' })}
             onRejoindre={(code, nom) => {
-              setAvis(undefined)
+              setMotifAvis(undefined)
               setMonNom(nom)
+              setCodeEssaye(code)
               const session = Session.rejoindre(code, nom, ecouteurs())
               sessionRef.current = session
               setEtat(session.vue())
@@ -227,8 +294,15 @@ export function App() {
             onAjouterBot={() => sessionRef.current?.ajouterBot()}
             onRetirerBot={(id) => sessionRef.current?.retirerBot(id)}
             onNiveauBot={(id, niveau) => sessionRef.current?.reglerNiveauBot(id, niveau)}
+            onNiveauBots={(niveau) => sessionRef.current?.reglerNiveauBots(niveau)}
             onLancer={() => sessionRef.current?.lancer()}
             onQuitter={quitterSalon}
+            onAutreCode={() => {
+              sessionRef.current?.quitter()
+              sessionRef.current = null
+              setEtat(null)
+              setVue({ v: 'rejoindre' })
+            }}
           />
         )
       }
@@ -242,6 +316,7 @@ export function App() {
               state={jeu}
               moi={etat.moi}
               onSuivant={() => sessionRef.current?.passerALaSuite()}
+              onDemanderQuitter={() => setSortieDemandee(true)}
             />
           )
         }
@@ -266,6 +341,7 @@ export function App() {
             onJouer={jouer}
             onSuite={() => sessionRef.current?.passerALaSuite()}
             onQuitter={quitterSalon}
+            onDemanderQuitter={() => setSortieDemandee(true)}
           />
         )
       }
@@ -308,6 +384,8 @@ export function App() {
           <Reglages
             pref={pref}
             onPref={setPref}
+            languePref={languePref}
+            onLanguePref={setLanguePref}
             onCartesManche={() => setVue({ v: 'cartes-manche' })}
             onRetour={() => setVue({ v: 'accueil' })}
           />
@@ -316,10 +394,41 @@ export function App() {
   }
 
   return (
-    <ThemeProvider name={themeName}>
-      <DiscussionProvider valeur={salle}>
-        <div className="rempart-cadre">{contenu()}</div>
-      </DiscussionProvider>
-    </ThemeProvider>
+    <LangueProvider langue={langue}>
+      <ThemeProvider name={themeName}>
+        <DiscussionProvider valeur={salle}>
+          <div className="rempart-cadre">
+            {/* Au-dessus de l'écran et dans le flux : il ne recouvre jamais ni
+                un mur ni un bouton, et il ne s'efface pas tant que le lien
+                n'est pas revenu. */}
+            {etat && (
+              <BandeauLien lien={etat.lien} lancee={etat.salon.lancee} hote={etat.hote} />
+            )}
+            {contenu()}
+            {/*
+              La confirmation de départ, tenue ici plutôt que dans chaque écran.
+              Elle couvre le tour de jeu ET la révélation, qui n'ont rien en
+              commun sinon d'être la partie, et elle est la seule à savoir ce
+              que quitter coûte : il faut pour cela le salon et le rôle
+              d'arbitre, que ni l'un ni l'autre écran ne reçoit.
+            */}
+            {/* La partie finie, la question ne se pose plus : l'écran de fin a
+                sa propre sortie, et une feuille par-dessus serait un mur de
+                plus devant un score qu'on veut lire. */}
+            {sortieDemandee && etat && etat.jeu && etat.jeu.phase !== 'fin' && (
+              <FeuilleQuitter
+                salon={etat.salon}
+                hote={etat.hote}
+                onRester={() => setSortieDemandee(false)}
+                onQuitter={quitterSalon}
+              />
+            )}
+            {/* En bas, dans le flux : il ne recouvre ni un mur ni un bouton, et
+                il ne se referme que si on le referme. */}
+            <MiseAJour enPartie={!!etat?.jeu && etat.salon.lancee} />
+          </div>
+        </DiscussionProvider>
+      </ThemeProvider>
+    </LangueProvider>
   )
 }

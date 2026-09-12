@@ -1,8 +1,10 @@
 import type { ReactNode } from 'react'
 import { R, TEXTE, TITRE } from '../theme'
-import { CARD_LABEL, type CardKey, type Player, type Slot } from '../game/types'
+import type { CardKey, Player, Slot } from '../game/types'
+import { useT } from '../i18n'
+import { Icone } from './Icone'
 import { Pictogramme } from './Pictogramme'
-import { Etiquette, Forme, Mur, MurAccessible, Pastille } from './atoms'
+import { Etiquette, Forme, LigneAccessible, Mur, Pastille } from './atoms'
 import { DUREE, anime, useMouvement } from './mouvement'
 import { useTheme } from './theme'
 
@@ -16,8 +18,14 @@ export type EtatCarte = 'choisie' | 'jouable' | 'interdite'
  * Une carte de la main.
  *
  * Une carte interdite n'est ni rayée ni estompée : elle est posée sur un
- * carton plus pâle, à pleine encre, avec la mention « interdite ». Un état se
- * lit à la matière, jamais à l'opacité.
+ * carton plus pâle, à pleine encre, avec un cadenas et la mention « interdit
+ * ce tour ». Un état se lit à la matière, jamais à l'opacité — et jamais à la
+ * seule pâleur du carton, qui ne dit pas POURQUOI la carte ne répond pas.
+ *
+ * Elle porte `aria-disabled` et non `disabled` : une carte que le verrou
+ * ferme reste une information à lire, et un bouton `disabled` sort de l'ordre
+ * de tabulation — le lecteur d'écran passerait devant la seule carte dont il
+ * fallait parler.
  */
 export function CarteMain({
   card,
@@ -41,6 +49,7 @@ export function CarteMain({
   fremis?: boolean
 }) {
   const t = useTheme()
+  const tr = useT()
   const bouge = useMouvement()
   const choisie = etat === 'choisie'
   const interdite = etat === 'interdite'
@@ -53,9 +62,12 @@ export function CarteMain({
     <button
       type="button"
       onClick={interdite ? undefined : onClick}
-      disabled={interdite}
+      aria-disabled={interdite}
       aria-pressed={choisie}
-      aria-label={`${CARD_LABEL[card]} — ${etat}`}
+      aria-label={tr('jeu.carte.aria', {
+        carte: tr(`carte.${card}` as const),
+        etat: tr(`jeu.etat.${etat}` as const),
+      })}
       style={{
         flex: 1,
         minWidth: 0,
@@ -77,15 +89,32 @@ export function CarteMain({
       }}
     >
       <Pictogramme card={card} size={40} color={pictoColor} />
-      <span style={{ font: `700 13px/1 ${TITRE}`, color: fg }}>{CARD_LABEL[card]}</span>
+      <span style={{ font: `700 13px/1 ${TITRE}`, color: fg }}>
+        {tr(`carte.${card}` as const)}
+      </span>
+      {/*
+       * Le cadenas se pose AU-DESSUS du libellé, dans le flux.
+       *
+       * En ligne devant « interdit ce tour », il poussait le libellé sur deux
+       * lignes ; posé en absolu au coin de la carte, il venait mordre le
+       * pictogramme sur un écran de 320 px. Empilé, il ne peut rien
+       * rencontrer : la carte a de la hauteur à revendre, c'est sa largeur qui
+       * manque. Il double la matière plus pâle du carton — l'état ne tient
+       * donc pas au seul ton du papier.
+       */}
       <span
         style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: 3,
           font: `500 9px/1.2 ${TEXTE}`,
           color: choisie ? t.selFg : t.ink2,
           textAlign: 'center',
         }}
       >
-        {etat}
+        {interdite && <Icone nom="cadenas" size={13} color={t.ink3} />}
+        {tr(interdite ? 'jeu.carte.interdite' : (`jeu.etat.${etat}` as const))}
       </span>
     </button>
   )
@@ -123,14 +152,28 @@ export function Main({
 }
 
 /**
- * La pastille « dernier joué » d'un joueur : ce qu'il vient de jouer, donc ce
- * qu'il ne peut pas rejouer. C'est l'information qui porte tout le jeu, et
- * elle doit être visible en permanence, pour soi comme pour les adversaires.
+ * La contrainte d'un joueur pour la manche en cours : ce qu'il ne peut pas
+ * jouer, donc ce qu'il lui reste.
+ *
+ * **C'est l'information qui porte tout le jeu**, et la seule qui soit
+ * publique : « la carte jouée est interdite la manche suivante » ne se décide
+ * que si on la lit sur les trois adversaires. La tenir de tête, c'est trois
+ * adversaires fois dix manches — au-delà de ce que la mémoire de travail
+ * garde, donc le choix redevient un tirage au sort. Elle est affichée en
+ * permanence, sur chaque ligne, la tienne comprise.
+ *
+ * **L'absence de contrainte se dit aussi.** Une ligne sans pastille se lit
+ * comme une ligne dont on ne sait rien ; « Tout est jouable » est une
+ * information, et c'en est une lourde en manche 1 ou après une carte
+ * « Mémoire courte ».
+ *
+ * Le pictogramme de la carte double le mot : en niveaux de gris, sur un écran
+ * au soleil ou pour qui distingue mal les couleurs, la forme reste.
  *
  * Elle prend le carton opposé à son panneau pour rester visible sur toutes les
  * lignes, y compris la tienne (dont le fond est plus foncé).
  */
-export function Verrou({
+export function Contrainte({
   locked,
   chipBg,
   petit,
@@ -141,25 +184,33 @@ export function Verrou({
   petit?: boolean
 }) {
   const t = useTheme()
+  const tr = useT()
   const pad = petit ? '3px 8px' : '4px 9px'
-  if (locked.length === 0) {
-    return (
-      <Pastille bg={chipBg} style={{ padding: pad }}>
-        <span style={{ font: `500 10px/1 ${TEXTE}`, color: t.ink2 }}>rien joué</span>
-      </Pastille>
-    )
-  }
+  const taille = petit ? 15 : 17
+
   return (
-    <>
+    <Pastille
+      bg={chipBg}
+      aria-hidden="true"
+      style={{ padding: pad, flex: '0 0 auto', gap: locked.length > 0 ? 5 : 0 }}
+    >
       {locked.map((k) => (
-        <Pastille key={k} bg={chipBg} style={{ padding: pad }}>
-          <Pictogramme card={k} size={18} color={t.ink2} />
-          <span style={{ font: `500 10px/1 ${TEXTE}`, color: t.ink2 }}>
-            {CARD_LABEL[k]} · interdite
-          </span>
-        </Pastille>
+        <Pictogramme key={k} card={k} size={taille} color={t.ink2} />
       ))}
-    </>
+      <span
+        style={{
+          font: `600 10px/1 ${TEXTE}`,
+          color: t.ink2,
+          marginLeft: locked.length > 0 ? 1 : 0,
+        }}
+      >
+        {locked.length === 0
+          ? tr('jeu.contrainte.libre')
+          : tr('jeu.contrainte.interdit', {
+              cartes: tr.liste(locked.map((k) => tr(`carte.${k}` as const))),
+            })}
+      </span>
+    </Pastille>
   )
 }
 
@@ -175,6 +226,7 @@ export function LigneJoueur({
   moi,
   tag,
   tagColor,
+  tagDiscret,
   hauteurMur = 42,
   chant = 5,
   pad = 13,
@@ -195,6 +247,15 @@ export function LigneJoueur({
   moi?: boolean
   tag?: string
   tagColor?: string
+  /**
+   * L'étiquette se dit à voix basse : minuscules, sans interlettrage.
+   *
+   * C'est le traitement de « en train de choisir » et « a joué », qui
+   * accompagnent la ligne sans rien lui apprendre d'irremplaçable. Les
+   * capitales espacées restent aux états qui, eux, changent ce qu'on peut
+   * faire : « toi », « cibler », « absent ».
+   */
+  tagDiscret?: boolean
   hauteurMur?: number
   chant?: number
   pad?: number | string
@@ -253,26 +314,68 @@ export function LigneJoueur({
         WebkitTapHighlightColor: 'transparent',
       }}
     >
-      <MurAccessible nom={player.name} wall={w} />
+      <LigneAccessible nom={player.name} wall={w} locked={verrou ? player.locked : undefined} />
       {bulles}
       <div style={{ display: 'flex', alignItems: 'center', gap: 9, flexWrap: 'nowrap' }}>
         <Forme ci={player.ci} size={nu ? 17 : 20} />
+        {/*
+         * Le nom cède avant la contrainte.
+         *
+         * Sur 390 px, un nom de quatorze caractères et une contrainte ne
+         * tiennent pas ensemble sur la ligne. C'est le nom qui s'abrège : la
+         * forme et la couleur l'identifient déjà, alors que la contrainte
+         * n'est écrite nulle part ailleurs.
+         */}
         <span
           style={{
             font: nu ? `600 14px/1 ${TEXTE}` : `700 17px/1 ${TITRE}`,
             color: t.ink,
-            flex: '0 0 auto',
+            flex: '0 1 auto',
+            minWidth: 0,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
           }}
         >
           {player.name}
         </span>
-        {verrou && <Verrou locked={player.locked} chipBg={chipBg} petit={nu} />}
+        {verrou && <Contrainte locked={player.locked} chipBg={chipBg} petit={nu} />}
         {compte}
-        {tag && (
-          <Etiquette size={10} color={tagColor ?? t.ink2} style={{ marginLeft: 'auto', letterSpacing: '0.08em' }}>
-            {tag}
-          </Etiquette>
-        )}
+        {tag &&
+          (tagDiscret ? (
+            <span
+              style={{
+                marginLeft: 'auto',
+                font: `500 10px/1 ${TEXTE}`,
+                color: t.ink3,
+                flex: '0 100 auto',
+                minWidth: 0,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                textAlign: 'right',
+              }}
+            >
+              {tag}
+            </span>
+          ) : (
+            <Etiquette
+              size={10}
+              color={tagColor ?? t.ink2}
+              style={{
+                marginLeft: 'auto',
+                letterSpacing: '0.08em',
+                flex: '0 100 auto',
+                minWidth: 0,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                textAlign: 'right',
+              }}
+            >
+              {tag}
+            </Etiquette>
+          ))}
       </div>
       {bandeau}
       {dessous}
@@ -314,13 +417,14 @@ export function BandeauCible({ card, texte }: { card: CardKey; texte: string }) 
 export function BandeauManche({
   nom,
   detail,
-  surtitre = 'Carte de manche · pour tout le monde',
+  surtitre,
 }: {
   nom: string
   detail: string
   surtitre?: string
 }) {
   const t = useTheme()
+  const tr = useT()
   return (
     <div
       style={{
@@ -334,9 +438,9 @@ export function BandeauManche({
       }}
     >
       <Etiquette size={10} color={t.ochreInk}>
-        {surtitre}
+        {surtitre ?? tr('jeu.manche.bandeau')}
       </Etiquette>
-      <div style={{ font: `700 19px/1.1 ${TITRE}`, color: '#2E2418' }}>{nom}</div>
+      <div style={{ font: `700 19px/1.1 ${TITRE}`, color: t.ochreFort }}>{nom}</div>
       <div style={{ font: `500 12px/1.35 ${TEXTE}`, color: t.ochreInk }}>{detail}</div>
     </div>
   )

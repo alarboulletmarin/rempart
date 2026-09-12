@@ -6,7 +6,8 @@
  * parce qu'il dépend de qui lit l'écran — « ta frappe » pour l'un est
  * « la frappe de Léa » pour l'autre.
  */
-import { CARD_LABEL, type GameState, type PlayerId, type RoundEvent, type RoundOutcome } from './types'
+import type { T } from '../i18n'
+import type { GameState, PlayerId, RoundEvent, RoundOutcome } from './types'
 
 export type Tone = 'clay' | 'green' | 'ink'
 
@@ -17,122 +18,156 @@ export interface Narration {
   detail: string
   /** La matière du panneau : terre cuite pour un dégât, vert atelier pour une défense. */
   tone: Tone
+  /**
+   * Les joueurs dont ce récit parle.
+   *
+   * L'écran s'en sert pour poser le bandeau **sous leurs cartes** plutôt qu'en
+   * bas de page : « Le piège de Nour a retourné ta frappe » se lisait à quatre
+   * lignes des deux cartes concernées, et il fallait remonter des yeux pour
+   * savoir de quoi il parlait. Vide quand la manche n'a rien produit : le
+   * bandeau reprend alors sa place à la suite de tout le monde.
+   */
+  concerne: PlayerId[]
 }
 
+/**
+ * Le récit se dit en phrases entières, une par point de vue.
+ *
+ * On l'écrivait par collage : un sujet (« Tu » ou le prénom), un verbe accordé
+ * à la main (« as » ou « a »), un possessif choisi au passage. Ça tenait en
+ * français, et uniquement en français — « Tu » + « as frappé » n'a pas de
+ * traduction, seule la phrase entière en a une. Chaque cas a donc autant de
+ * clés qu'il a de lecteurs possibles : celui qui a frappé, celui qui a pris le
+ * coup, et celui qui regarde les deux.
+ */
 export function narrate(
   state: GameState,
   outcome: RoundOutcome,
   viewerId: PlayerId | null,
+  t: T,
 ): Narration {
-  const name = (id: PlayerId) => state.players.find((p) => p.id === id)?.name ?? '?'
-  /** « tu » quand c'est le lecteur, le prénom sinon. */
-  const isMe = (id: PlayerId) => id === viewerId
-  const subject = (id: PlayerId) => (isMe(id) ? 'Tu' : name(id))
-  const ofWhom = (id: PlayerId) => (isMe(id) ? '' : ` de ${name(id)}`)
+  const nom = (id: PlayerId) => state.players.find((p) => p.id === id)?.name ?? '?'
+  const moi = (id: PlayerId) => id === viewerId
 
   const ev = outcome.events
-  const lockLine = (id: PlayerId) => {
-    const cards = outcome.outcomes.find((o) => o.playerId === id)?.played.map((c) => CARD_LABEL[c.card])
-    if (!cards || cards.length === 0) return ''
-    const list = cards.join(' et ')
-    return isMe(id)
-      ? ` — et ${list} t’est interdit${cards.length > 1 ? 'es' : ''} la manche prochaine.`
-      : ` — ${list} lui est interdit${cards.length > 1 ? 'es' : ''} la manche prochaine.`
+
+  /** « — et Frapper t'est interdit la manche prochaine. », ou rien. */
+  const verrou = (id: PlayerId) => {
+    const cartes = outcome.outcomes
+      .find((o) => o.playerId === id)
+      ?.played.map((c) => t(`carte.${c.card}` as const))
+    if (!cartes || cartes.length === 0) return ''
+    const params = { cartes: t.liste(cartes), nom: nom(id) }
+    return ' ' + t.n(moi(id) ? 'recit.verrou.moi' : 'recit.verrou.autre', cartes.length, params)
   }
 
   // 1 · Un piège qui se retourne contre son attaquant : le fait le plus marquant.
-  const reflected = ev.filter((e): e is Extract<RoundEvent, { t: 'retournee' }> => e.t === 'retournee')
-  const mine = reflected.find((e) => isMe(e.from)) ?? reflected[0]
-  if (mine) {
+  const retournees = ev.filter((e): e is Extract<RoundEvent, { t: 'retournee' }> => e.t === 'retournee')
+  const retour = retournees.find((e) => moi(e.from)) ?? retournees[0]
+  if (retour) {
+    // `from` a frappé, `to` avait piégé : c'est `from` qui perd la brique.
+    const vue = moi(retour.from) ? 'moiAuteur' : moi(retour.to) ? 'moiPiegeur' : 'autres'
+    const params = { auteur: nom(retour.from), piegeur: nom(retour.to) }
     return {
-      headline: isMe(mine.from)
-        ? `Le piège de ${name(mine.to)} a retourné ta frappe.`
-        : `Le piège${ofWhom(mine.to)} a retourné la frappe de ${name(mine.from)}.`,
-      detail: isMe(mine.from)
-        ? `Tu perds ${briques(mine.amount)}, ${name(mine.to)} n’a rien perdu${lockLine(mine.from)}`
-        : `${name(mine.from)} perd ${briques(mine.amount)} et ${isMe(mine.to) ? 'tu n’as' : `${name(mine.to)} n’a`} rien perdu.`,
+      headline: t(`recit.retourne.titre.${vue}` as const, params),
+      detail:
+        t.n(`recit.retourne.detail.${vue}` as const, retour.amount, params) +
+        (vue === 'moiAuteur' ? verrou(retour.from) : ''),
       tone: 'clay',
+      concerne: [retour.from, retour.to],
     }
   }
 
   // 2 · Un blocage qui annule plusieurs frappes.
-  const cancelledBy = new Map<PlayerId, number>()
-  for (const e of ev) if (e.t === 'annulee') cancelledBy.set(e.to, (cancelledBy.get(e.to) ?? 0) + 1)
-  const best = [...cancelledBy.entries()].sort((a, b) => b[1] - a[1])[0]
-  if (best && best[1] > 0) {
-    const [who, n] = best
+  const annuleesPar = new Map<PlayerId, number>()
+  for (const e of ev) if (e.t === 'annulee') annuleesPar.set(e.to, (annuleesPar.get(e.to) ?? 0) + 1)
+  const meilleur = [...annuleesPar.entries()].sort((a, b) => b[1] - a[1])[0]
+  if (meilleur && meilleur[1] > 0) {
+    const [qui, n] = meilleur
+    const vue = moi(qui) ? 'moi' : 'autre'
     return {
-      headline:
-        n > 1
-          ? `${subject(who)} ${isMe(who) ? 'as' : 'a'} tout arrêté d’un seul bloc.`
-          : `${subject(who)} ${isMe(who) ? 'as' : 'a'} bloqué la frappe.`,
-      detail:
-        (n > 1
-          ? `${n} frappes annulées. `
-          : `La frappe est annulée. `) +
-        `${isMe(who) ? 'Tu es' : `${name(who)} est`} maintenant à découvert : Bloquer ${isMe(who) ? 't’' : 'lui '}est interdit la manche prochaine.`,
+      headline: t(`recit.bloc.titre.${n > 1 ? 'tout' : 'une'}.${vue}` as const, { nom: nom(qui) }),
+      detail: t.n(`recit.bloc.detail.${vue}` as const, n, {
+        nom: nom(qui),
+        carte: t('carte.bloquer'),
+      }),
       tone: 'green',
+      concerne: [qui],
     }
   }
 
   // 3 · Des frappes qui passent.
-  const landed = ev.filter((e): e is Extract<RoundEvent, { t: 'frappe' }> => e.t === 'frappe')
-  if (landed.length > 0) {
-    const onMe = landed.find((e) => isMe(e.to))
-    const e = onMe ?? landed[0]
-    const total = landed.filter((x) => x.to === e.to).reduce((n, x) => n + x.amount, 0)
+  const passees = ev.filter((e): e is Extract<RoundEvent, { t: 'frappe' }> => e.t === 'frappe')
+  if (passees.length > 0) {
+    const surMoi = passees.find((e) => moi(e.to))
+    const e = surMoi ?? passees[0]
+    const total = passees.filter((x) => x.to === e.to).reduce((n, x) => n + x.amount, 0)
+    const params = { nom: nom(e.from), cible: nom(e.to) }
     return {
-      // `onMe` ne vaut que pour une frappe reçue : la cible, ici, c'est le
-      // lecteur. Le possessif s'accorde donc avec le nombre de briques, et non
-      // avec la personne — « ta briques » était la faute que l'écran affichait.
-      headline: onMe
-        ? `${subject(e.from)} ${isMe(e.from) ? 'as' : 'a'} cassé ${total > 1 ? 'tes briques' : 'ta brique'}.`
-        : `${subject(e.from)} ${isMe(e.from) ? 'as' : 'a'} frappé ${name(e.to)}.`,
+      // Le possessif du titre s'accorde avec le NOMBRE de briques, jamais avec
+      // la personne : « tes briques » quand il en tombe deux, « ta brique »
+      // quand il n'en tombe qu'une.
+      headline: surMoi
+        ? t.n('recit.frappe.titre.surMoi', total, params)
+        : t(`recit.frappe.titre.${moi(e.from) ? 'parMoi' : 'autres'}` as const, params),
       // Et le détail se dit au lecteur, comme tout le reste de ce fichier :
       // « Tu perds » quand c'est son mur, le prénom quand c'est celui d'un autre.
-      detail: `${isMe(e.to) ? 'Tu perds' : `${name(e.to)} perd`} ${briques(total)}.${lockLine(e.from)}`,
+      detail:
+        t.n(`recit.frappe.detail.${moi(e.to) ? 'moi' : 'autre'}` as const, total, {
+          nom: nom(e.to),
+        }) + verrou(e.from),
       tone: 'clay',
+      concerne: [e.from, e.to],
     }
   }
 
   // 4 · Une manche sans dégâts : ce sont les réparations qui comptent.
-  const repairs = ev.filter(
+  const reparations = ev.filter(
     (e): e is Extract<RoundEvent, { t: 'reparation' }> => e.t === 'reparation' && e.amount > 0,
   )
-  if (repairs.length > 0) {
-    const e = repairs.find((r) => isMe(r.who)) ?? repairs[0]
-    const teamMate = e.by !== e.who
+  if (reparations.length > 0) {
+    const e = reparations.find((r) => moi(r.who)) ?? reparations[0]
+    const params = { nom: nom(e.by), cible: nom(e.who) }
+    const titre =
+      e.by !== e.who
+        ? moi(e.by)
+          ? t('recit.repare.titre.equipe.parMoi', params)
+          : moi(e.who)
+            ? t('recit.repare.titre.equipe.pourMoi', params)
+            : t('recit.repare.titre.equipe.autres', params)
+        : t(`recit.repare.titre.seul.${moi(e.who) ? 'moi' : 'autre'}` as const, params)
     return {
-      headline: teamMate
-        ? `${subject(e.by)} ${isMe(e.by) ? 'as' : 'a'} réparé le mur de ${isMe(e.who) ? 'ton équipe' : name(e.who)}.`
-        : `${subject(e.who)} ${isMe(e.who) ? 'as' : 'a'} remonté ${isMe(e.who) ? 'ton' : 'son'} mur.`,
-      detail: `+${e.amount} brique${e.amount > 1 ? 's' : ''}, et personne n’a frappé cette manche.`,
+      headline: titre,
+      detail: t.n('recit.repare.detail', e.amount),
       tone: 'green',
+      concerne: e.by === e.who ? [e.who] : [e.by, e.who],
     }
   }
 
   // 5 · Personne n'a rien fait passer.
   return {
-    headline: 'Rien n’est tombé.',
-    detail: 'Aucune frappe n’a porté. Les verrous changent quand même : trois choix au tour prochain.',
+    headline: t('recit.rien.titre'),
+    detail: t('recit.rien.detail'),
     tone: 'ink',
+    concerne: [],
   }
 }
 
-function briques(n: number): string {
-  return n > 1 ? `${n} briques` : 'une brique'
-}
-
 /** La ligne « Frapper sur Nour » affichée sur chaque joueur à la révélation. */
-export function playedLabel(state: GameState, playerId: PlayerId, outcome: RoundOutcome): string {
+export function playedLabel(
+  state: GameState,
+  playerId: PlayerId,
+  outcome: RoundOutcome,
+  t: T,
+): string {
   const o = outcome.outcomes.find((x) => x.playerId === playerId)
-  if (!o || o.played.length === 0) return o ? 'n’a pas joué' : ''
+  if (!o || o.played.length === 0) return o ? t('recit.joue.rien') : ''
   return o.played
     .map((c) => {
-      const label = CARD_LABEL[c.card]
-      if (c.card !== 'frapper' || !c.target) return label
-      const target = state.players.find((p) => p.id === c.target)
-      return target ? `${label} sur ${target.name}` : label
+      const carte = t(`carte.${c.card}` as const)
+      if (c.card !== 'frapper' || !c.target) return carte
+      const cible = state.players.find((p) => p.id === c.target)
+      return cible ? t('recit.joue.sur', { carte, cible: cible.name }) : carte
     })
     .join(' + ')
 }

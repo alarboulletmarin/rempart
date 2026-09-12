@@ -11,6 +11,21 @@
  *    ombre dure sans flou (0 Npx 0). Jamais de blur, jamais de dégradé.
  *  - jamais de transparence pour porter un état : un état se lit à la matière.
  *  - la couleur ne fait que confirmer : forme + nom + position identifient un joueur.
+ *
+ * ## Ce que dit chaque accent — une ligne chacun, et pas deux
+ *
+ * Une couleur qui sert à deux choses ne dit plus rien. Le jaune a servi à la
+ * fois à la victoire, à un bouton radio et à un bloc de réglage ; la terre
+ * cuite à la fois à « tu as perdu une brique » et à « ton piège a fonctionné »,
+ * c'est-à-dire à un dégât et à son contraire.
+ *
+ *  - **terre cuite** — une brique tombe. Rien d'autre : ni une défense qui a
+ *    marché, ni un piège qui s'est déclenché sans rien coûter à personne.
+ *  - **vert atelier** — une défense a tenu, ou un mur est remonté.
+ *  - **ocre** — ce qui concerne toute la table à la fois : la carte de manche,
+ *    et la fin de partie.
+ *  - **encre pleine** — ce que TU as choisi. Un choix n'est pas un accent : il
+ *    se lit à la matière du carton, pas à une couleur de plus.
  */
 
 export type ThemeName = 'etabli' | 'veillee'
@@ -41,11 +56,23 @@ export interface Theme {
   /** Vert atelier — les réparations. */
   green: string
   greenEdge: string
+  /** Vert atelier porteur de petit texte (contraste AA). */
+  greenText: string
   /** Ocre — les cartes de manche, et rien d'autre. */
   ochre: string
   ochreEdge: string
   /** Texte sur ocre. */
   ochreInk: string
+  /**
+   * La pièce sombre posée SUR l'ocre, et son encre.
+   *
+   * L'ocre est clair dans les deux thèmes — c'est la même bande de carte de
+   * manche —, donc ce qui se pose dessus ne suit pas le thème : une pastille
+   * « Retour » en `panel` devenait, en veillée, du brun sur du brun, à 1,08
+   * contre 1.
+   */
+  ochreFort: string
+  ochreFortInk: string
   /** Brique cassée : creuse et pâle, elle garde sa place. */
   off: string
   offEdge: string
@@ -84,9 +111,12 @@ export const ETABLI: Theme = {
   clayTextEdge: '#7A3315',
   green: '#2F6B4F',
   greenEdge: '#1D4A35',
+  greenText: '#2F6B4F',
   ochre: '#E0A62E',
   ochreEdge: '#A9761A',
   ochreInk: '#4A3B10',
+  ochreFort: '#2E2418',
+  ochreFortInk: '#FCF7EC',
   off: '#EFE2C8',
   offEdge: '#DCC9A6',
   crack: '#C6AF88',
@@ -118,9 +148,14 @@ export const VEILLEE: Theme = {
   clayTextEdge: '#A34A28',
   green: '#4E9370',
   greenEdge: '#2F6B4F',
+  // Plus clair que le vert des briques : à dix pixels sur le carton de nuit,
+  // celui-ci tombait à 4,15 contre 1.
+  greenText: '#6FBE95',
   ochre: '#E6B85C',
   ochreEdge: '#A9761A',
   ochreInk: '#3A2810',
+  ochreFort: '#2E2418',
+  ochreFortInk: '#FCF7EC',
   off: '#3A2E1F',
   offEdge: '#4A3B29',
   crack: '#6B5942',

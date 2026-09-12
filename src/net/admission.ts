@@ -26,7 +26,7 @@
  * survit au rechargement précisément pour ça.
  */
 
-import type { Salon } from './room.ts'
+import { placeDisponible, type Salon } from './room.ts'
 
 export type Accueil =
   /** Ce siège est déjà le sien : il le reprend sans rien demander. */
@@ -56,7 +56,8 @@ export type Admission = {
 export function accueilPour(etat: Admission, clientId: string): Accueil {
   if (etat.salon.joueurs.some((j) => j.clientId === clientId)) return { kind: 'retour' }
   if (etat.refuses.has(clientId)) return { kind: 'refuse' }
-  if (etat.salon.lancee || etat.salon.joueurs.length >= etat.salon.places) {
+  // Un siège tenu par un bot n'est pas une place prise : le bot se lève.
+  if (etat.salon.lancee || !placeDisponible(etat.salon)) {
     return { kind: 'spectateur' }
   }
   // `demande` vaut aussi pour une demande déjà en attente : le pair se
@@ -75,6 +76,7 @@ export function accueilPour(etat: Admission, clientId: string): Accueil {
 export function peutAdmettre(etat: Admission, clientId: string): boolean {
   if (!etat.attente.has(clientId)) return false
   if (etat.salon.lancee) return false
-  if (etat.salon.joueurs.length >= etat.salon.places) return false
+  // Un bot assis ne bloque personne : il rend sa place à qui arrive.
+  if (!placeDisponible(etat.salon)) return false
   return !etat.salon.joueurs.some((j) => j.clientId === clientId)
 }

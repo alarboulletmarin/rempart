@@ -3,7 +3,7 @@ import { NIVEAU_DEFAUT } from '../game/bot'
 import { choicesRequired, legalCards, possibleTargets, readyCount } from '../game/engine'
 import type { Choice } from '../game/types'
 import { creerTable, salonNeuf } from './table'
-import { ouvrirCanal, type Canal } from './room'
+import { bots, humains, ouvrirCanal, placeDisponible, type Canal } from './room'
 import { Session } from './session'
 
 /**
@@ -71,7 +71,7 @@ describe('le salon avec des bots', () => {
     const bot = t.ajouterBot()!
     expect(t.retirerBot(bot)).toBe(true)
     expect(t.salon.joueurs).toHaveLength(1)
-    expect(t.admettre('b', 'Malo', 'peer-b')).toBe(true)
+    expect(t.admettre('b', 'Malo', 'peer-b').admis).toBe(true)
   })
 
   it('ne relève pas un bot d’une partie commencée : son mur est en jeu', () => {
@@ -255,5 +255,98 @@ describe('le canal', () => {
     // ci-dessus n'en dépendent jamais — une partie contre des bots se joue
     // sans relais joignable.
     expect(typeof ouvrirCanal).toBe('function')
+  })
+})
+
+describe('un bot réserve une place, il ne la prend pas', () => {
+  /** Un salon plein de bots : une personne, trois sièges réservés. */
+  function salonPleinDeBots() {
+    const t = creerTable(salonNeuf('K7P2M9XR', 'a', 'Léa'))
+    t.ajouterBot()
+    t.ajouterBot()
+    t.ajouterBot()
+    return t
+  }
+
+  it('laisse entrer un ami alors que les quatre sièges sont occupés', () => {
+    const t = salonPleinDeBots()
+    expect(t.salon.joueurs).toHaveLength(4)
+    // C'est la contradiction que le salon affichait : un code à partager, et
+    // « 4 / 4 » juste dessous. Le code gagne, le bot se lève.
+    const { admis, botLeve } = t.admettre('b', 'Malo', 'peer-b')
+    expect(admis).toBe(true)
+    expect(botLeve).not.toBeNull()
+    expect(t.salon.joueurs).toHaveLength(4)
+    expect(humains(t.salon)).toHaveLength(2)
+    expect(bots(t.salon)).toHaveLength(2)
+  })
+
+  it('ne lève un bot que s’il le faut', () => {
+    const t = creerTable(salonNeuf('K7P2M9XR', 'a', 'Léa'))
+    t.ajouterBot()
+    const { admis, botLeve } = t.admettre('b', 'Malo', 'peer-b')
+    expect(admis).toBe(true)
+    // Il restait un siège vide : le bot garde le sien.
+    expect(botLeve).toBeNull()
+    expect(bots(t.salon)).toHaveLength(1)
+  })
+
+  it('refuse quand ce sont des personnes qui tiennent les quatre sièges', () => {
+    const t = creerTable(salonNeuf('K7P2M9XR', 'a', 'Léa'))
+    t.admettre('b', 'Malo', null)
+    t.admettre('c', 'Nour', null)
+    t.admettre('d', 'Iris', null)
+    expect(t.admettre('e', 'Sam', null).admis).toBe(false)
+  })
+
+  it('ne compte pas une place réservée comme une place prise', () => {
+    const t = salonPleinDeBots()
+    expect(placeDisponible(t.salon)).toBe(true)
+    t.admettre('b', 'Malo', null)
+    t.admettre('c', 'Nour', null)
+    t.admettre('d', 'Iris', null)
+    expect(placeDisponible(t.salon)).toBe(false)
+  })
+})
+
+describe('l’identité se prend à un bot', () => {
+  it('fait glisser le bot sur la forme qu’on libère', () => {
+    const t = creerTable(salonNeuf('K7P2M9XR', 'a', 'Léa'))
+    const bot = t.ajouterBot()!
+    const forme = t.salon.joueurs.find((j) => j.clientId === bot)!.ci
+    const mienne = t.salon.joueurs.find((j) => j.clientId === 'a')!.ci
+
+    expect(t.appliquer('a', { t: 'identite', ci: forme })).toBe(true)
+    expect(t.salon.joueurs.find((j) => j.clientId === 'a')!.ci).toBe(forme)
+    // Le bot n'a aucune préférence : il prend celle qu'on lui laisse.
+    expect(t.salon.joueurs.find((j) => j.clientId === bot)!.ci).toBe(mienne)
+  })
+
+  it('refuse toujours de voler la forme d’une personne', () => {
+    const t = creerTable(salonNeuf('K7P2M9XR', 'a', 'Léa'))
+    t.admettre('b', 'Malo', null)
+    const sienne = t.salon.joueurs.find((j) => j.clientId === 'b')!.ci
+    expect(t.appliquer('a', { t: 'identite', ci: sienne })).toBe(false)
+  })
+})
+
+describe('le niveau des bots se règle pour toute la table', () => {
+  it('aligne les bots déjà assis et ceux qui suivront', () => {
+    const t = creerTable(salonNeuf('K7P2M9XR', 'a', 'Léa'))
+    const premier = t.ajouterBot()!
+    expect(t.reglerNiveauBots('redoutable')).toBe(true)
+    expect(t.salon.joueurs.find((j) => j.clientId === premier)!.niveau).toBe('redoutable')
+    const second = t.ajouterBot()!
+    expect(t.salon.joueurs.find((j) => j.clientId === second)!.niveau).toBe('redoutable')
+  })
+
+  it('laisse un siège garder son réglage propre', () => {
+    const t = creerTable(salonNeuf('K7P2M9XR', 'a', 'Léa'))
+    const a = t.ajouterBot()!
+    const b = t.ajouterBot()!
+    t.reglerNiveauBots('tranquille')
+    t.reglerNiveauBot(b, 'redoutable')
+    expect(t.salon.joueurs.find((j) => j.clientId === a)!.niveau).toBe('tranquille')
+    expect(t.salon.joueurs.find((j) => j.clientId === b)!.niveau).toBe('redoutable')
   })
 })

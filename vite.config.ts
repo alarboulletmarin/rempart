@@ -9,7 +9,28 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'autoUpdate',
+      /*
+       * « prompt » et non « autoUpdate ».
+       *
+       * En `autoUpdate`, la page se recharge d'elle-même dès qu'une version
+       * finit de se mettre en cache. Dans ce jeu, une partie est un lien
+       * WebRTC entre plusieurs téléphones : recharger le rompt, pour soi et
+       * pour les autres qui attendent l'arbitre — au milieu d'une manche, sans
+       * que personne n'ait rien demandé. La nouvelle version s'installe donc,
+       * précache, puis **attend** : c'est `ui/miseajour.ts` qui lui donne la
+       * main, quand quelqu'un le demande.
+       *
+       * Corollaire : aucun `skipWaiting` ci-dessous. Il annulerait l'attente,
+       * et avec elle le choix.
+       */
+      registerType: 'prompt',
+      /*
+       * L'enregistrement passe par `ui/miseajour.ts`, qui a besoin de la
+       * `registration` pour redemander la mise à jour au retour au premier
+       * plan. Le script que le greffon injecte d'office referait le travail
+       * sans rien à quoi s'accrocher.
+       */
+      injectRegister: null,
       includeAssets: [
         'assets/*.svg',
         'icon.svg',

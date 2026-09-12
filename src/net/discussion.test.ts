@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest'
+import { ICONE_REACTION } from '../ui/discussion'
 import {
   BULLES_MAX,
   Discussion,
+  EMOJI_PROPOSE,
   EVENTAIL,
   REPOS_ENVOI_MS,
   VIE_BULLE_MS,
@@ -121,5 +123,23 @@ describe('les bulles à l’écran', () => {
     const vivantes = bullesVivantes(d.liste(), 1000 + VIE_BULLE_MS)
     expect(vivantes.get('b')).toBeUndefined()
     expect(vivantes.get('c')).toHaveLength(1)
+  })
+})
+
+describe('l’éventail', () => {
+  it('a six réactions, et pas une de plus', () => {
+    expect(EVENTAIL).toHaveLength(6)
+    expect(new Set(EVENTAIL).size).toBe(6)
+  })
+
+  it('propose une réaction qui appartient bien à l’éventail', () => {
+    expect(EVENTAIL).toContain(EMOJI_PROPOSE)
+  })
+
+  it('a un dessin pour chacune', () => {
+    // Le jeton qui voyage reste l'emoji — le format du canal ne change pas —
+    // mais rien ne s'affiche à l'écran qui n'ait son dessin. Ajouter une
+    // réaction sans la dessiner casse ici plutôt qu'en production.
+    for (const e of EVENTAIL) expect(ICONE_REACTION[e]).toBeTruthy()
   })
 })

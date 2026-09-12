@@ -1,5 +1,8 @@
 import { TEXTE, TITRE } from '../theme'
 import type { Format } from '../game/types'
+import { MAX_SIEGES } from '../net/room'
+import { useT } from '../i18n'
+import { Icone } from '../ui/Icone'
 import { Bouton, Etiquette, Texte } from '../ui/atoms'
 import { Corps, Ecran, EnTete } from '../ui/shell'
 import { useTheme } from '../ui/theme'
@@ -29,22 +32,23 @@ export function Creation({
   onRetour: () => void
 }) {
   const t = useTheme()
+  const tr = useT()
 
   return (
     <Ecran>
-      <EnTete titre="Nouvelle partie" onRetour={onRetour} hauteur={102} />
+      <EnTete titre={tr('creation.titre')} onRetour={onRetour} hauteur={102} />
       <Corps pad={20} gap={22} scroll>
         {/* Le nom se donne ici plutôt qu'au salon : la planche du salon ne
             porte que le code, les joueurs et les identités, et un champ de
             saisie de plus y aurait chassé les pastilles d'identité. */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <Etiquette>Ton nom</Etiquette>
+          <Etiquette>{tr('creation.nom.titre')}</Etiquette>
           <input
             value={nom}
             onChange={(e) => onNom(e.target.value)}
             maxLength={14}
-            placeholder="Léa"
-            aria-label="Ton nom dans la partie"
+            placeholder={tr('creation.nom.exemple')}
+            aria-label={tr('creation.nom.aria')}
             style={{
               height: 60,
               borderRadius: 16,
@@ -60,8 +64,17 @@ export function Creation({
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <Etiquette>Nombre de joueurs</Etiquette>
-          <div style={{ display: 'flex', gap: 10 }}>
+          <Etiquette id="titre-joueurs">{tr('creation.joueurs.titre')}</Etiquette>
+          {/*
+           * Un vrai groupe de boutons radio.
+           *
+           * L'état « choisi » s'écrivait en toutes lettres sous le chiffre,
+           * en plus du carton foncé qui le disait déjà — deux fois la même
+           * chose, et un mot de plus à lire sur chacune des trois pastilles.
+           * `aria-checked` le dit maintenant à qui ne voit pas l'écran, et une
+           * coche discrète à qui le voit.
+           */}
+          <div style={{ display: 'flex', gap: 10 }} role="radiogroup" aria-labelledby="titre-joueurs">
             {[2, 3, 4].map((n) => {
               const choisi = n === places
               // Le mode équipes demande quatre murs.
@@ -70,9 +83,10 @@ export function Creation({
                 <button
                   key={n}
                   type="button"
+                  role="radio"
+                  aria-checked={choisi}
                   onClick={() => possible && onPlaces(n)}
-                  aria-pressed={choisi}
-                  disabled={!possible}
+                  aria-disabled={!possible}
                   style={{
                     flex: 1,
                     height: 72,
@@ -93,11 +107,7 @@ export function Creation({
                   <span style={{ font: `700 27px/1 ${TITRE}`, color: choisi ? t.selFg : t.ink2 }}>
                     {n}
                   </span>
-                  {choisi && (
-                    <Etiquette size={9} color={t.ink2} style={{ letterSpacing: '0.1em' }}>
-                      choisi
-                    </Etiquette>
-                  )}
+                  {choisi && <Icone nom="coche" size={13} color={t.ochre} />}
                 </button>
               )
             })}
@@ -105,26 +115,34 @@ export function Creation({
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <Etiquette>Format</Etiquette>
+          <Etiquette id="titre-format">{tr('creation.format.titre')}</Etiquette>
+          <div
+            role="radiogroup"
+            aria-labelledby="titre-format"
+            style={{ display: 'flex', flexDirection: 'column', gap: 10 }}
+          >
           <OptionFormat
-            titre="Chacun pour soi"
-            detail="Quatre murs, quatre scores. Le plus de briques debout gagne."
+            titre={tr('creation.format.chacun.titre')}
+            detail={tr('creation.format.chacun.detail')}
             choisi={format === 'chacun'}
             onClick={() => onFormat('chacun')}
           />
+          {/* Le deux contre deux demande quatre murs. Il changeait le nombre
+              de joueurs dans le dos de qui le choisissait ; il dit maintenant
+              pourquoi il n'est pas disponible, et ne fait rien tant que ce
+              n'est pas réglé. */}
           <OptionFormat
-            titre="Équipes 2 contre 2"
-            detail="Score commun. On peut bloquer ou réparer pour son coéquipier."
+            titre={tr('creation.format.equipes.titre')}
+            detail={tr('creation.format.equipes.detail')}
             choisi={format === 'equipes'}
-            onClick={() => {
-              onFormat('equipes')
-              onPlaces(4)
-            }}
+            empeche={places !== MAX_SIEGES ? tr('creation.format.equipes.raison') : undefined}
+            onClick={() => onFormat('equipes')}
           />
+          </div>
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <Etiquette>Cartes de manche</Etiquette>
+          <Etiquette>{tr('creation.cartesManche.titre')}</Etiquette>
           <button
             type="button"
             onClick={() => onCartesManche(!cartesManche)}
@@ -143,15 +161,15 @@ export function Creation({
               WebkitTapHighlightColor: 'transparent',
             }}
           >
-            <span style={{ font: `500 13px/1.4 ${TEXTE}`, color: '#2E2418', flex: 1 }}>
-              Toutes les trois manches, une règle tirée au sort pour tout le monde.
+            <span style={{ font: `500 13px/1.4 ${TEXTE}`, color: t.ochreFort, flex: 1 }}>
+              {tr('creation.cartesManche.detail')}
             </span>
             <span
               style={{
                 width: 48,
                 height: 28,
                 borderRadius: 999,
-                background: cartesManche ? '#2E2418' : t.ochreEdge,
+                background: cartesManche ? t.ochreFort : t.ochreEdge,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: cartesManche ? 'flex-end' : 'flex-start',
@@ -167,7 +185,7 @@ export function Creation({
         </div>
 
         <Bouton onClick={onOuvrir} style={{ marginTop: 'auto' }}>
-          Ouvrir le salon
+          {tr('creation.ouvrir')}
         </Bouton>
       </Corps>
     </Ecran>
@@ -178,19 +196,24 @@ function OptionFormat({
   titre,
   detail,
   choisi,
+  empeche,
   onClick,
 }: {
   titre: string
   detail: string
   choisi: boolean
+  /** La raison pour laquelle cette option ne peut pas être prise, s'il y en a une. */
+  empeche?: string
   onClick: () => void
 }) {
   const t = useTheme()
   return (
     <button
       type="button"
-      onClick={onClick}
-      aria-pressed={choisi}
+      role="radio"
+      aria-checked={choisi}
+      aria-disabled={!!empeche}
+      onClick={() => !empeche && onClick()}
       style={{
         borderRadius: 16,
         background: choisi ? t.selBg : t.panel,
@@ -201,7 +224,8 @@ function OptionFormat({
         flexDirection: 'column',
         gap: 6,
         textAlign: 'left',
-        cursor: 'pointer',
+        cursor: empeche ? 'default' : 'pointer',
+        opacity: empeche ? 0.6 : 1,
         WebkitTapHighlightColor: 'transparent',
       }}
     >
@@ -218,14 +242,19 @@ function OptionFormat({
         />
         <span style={{ font: `700 16px/1 ${TITRE}`, color: choisi ? t.selFg : t.ink }}>{titre}</span>
         {choisi && (
-          <Etiquette size={9} color={t.ink2} style={{ letterSpacing: '0.1em', marginLeft: 'auto' }}>
-            choisi
-          </Etiquette>
+          <span style={{ marginLeft: 'auto', display: 'flex' }}>
+            <Icone nom="coche" size={15} color={t.ochre} />
+          </span>
         )}
       </span>
       <Texte size={13} weight={400} color={choisi ? t.table : t.ink2} style={{ lineHeight: 1.4 }}>
         {detail}
       </Texte>
+      {empeche && (
+        <Texte size={12} weight={500} color={t.clayText} style={{ lineHeight: 1.35 }}>
+          {empeche}
+        </Texte>
+      )}
     </button>
   )
 }

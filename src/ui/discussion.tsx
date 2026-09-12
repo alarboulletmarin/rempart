@@ -17,7 +17,9 @@ import {
   type Emoji,
   type Message,
 } from '../net/discussion'
+import { useT, type Cle, type T } from '../i18n'
 import { Etiquette, Forme, Texte } from './atoms'
+import { Icone, type NomIcone } from './Icone'
 import { DUREE, anime, useMouvement } from './mouvement'
 import { useTheme } from './theme'
 
@@ -61,14 +63,44 @@ export function useSalle(): Salle | null {
   return useContext(SalleCtx)
 }
 
-/** Ce que chaque emoji veut dire, pour qui ne voit pas l'écran. */
-const NOM_EMOJI: Record<Emoji, string> = {
+/**
+ * Ce que chaque réaction veut dire, pour qui ne voit pas l'écran.
+ *
+ * Une CLÉ et non un mot : le jeton qui voyage sur le réseau reste l'emoji —
+ * c'est le format du canal, et le changer romprait avec les versions déjà
+ * installées — mais ce qu'un lecteur d'écran en dit se lit dans la langue de
+ * qui écoute.
+ */
+const NOM_REACTION: Record<Emoji, Cle> = {
+  '😂': 'chat.reaction.rire',
+  '😱': 'chat.reaction.aie',
+  '🎉': 'chat.reaction.bravo',
+  '👏': 'chat.reaction.bienJoue',
+  '😤': 'chat.reaction.grr',
+  '🙏': 'chat.reaction.pitie',
+}
+
+/**
+ * Le dessin de chaque réaction.
+ *
+ * Le jeton qui voyage reste l'emoji — c'est le format du canal, et en changer
+ * romprait avec les versions déjà installées — mais rien n'oblige à
+ * l'AFFICHER. Un emoji se rend différemment sur chaque téléphone, il n'a pas
+ * la matière du reste du jeu, et la convention du projet est de ne jamais en
+ * poser dans l'interface.
+ */
+export const ICONE_REACTION: Record<Emoji, NomIcone> = {
   '😂': 'rire',
-  '😱': 'aïe',
+  '😱': 'aie',
   '🎉': 'bravo',
-  '👏': 'bien joué',
+  '👏': 'bienJoue',
   '😤': 'grr',
-  '🙏': 'pitié',
+  '🙏': 'pitie',
+}
+
+/** Le nom d'une réaction, dit dans la langue de qui lit. */
+function direReaction(tr: T, e: Emoji): string {
+  return tr(NOM_REACTION[e])
 }
 
 /* ------------------------------------------------------------- les bulles */
@@ -106,6 +138,7 @@ function useVivantes(messages: readonly Message[]): Map<string, Message[]> {
 export function Bulles({ de }: { de: string }) {
   const salle = useSalle()
   const t = useTheme()
+  const tr = useT()
   const bouge = useMouvement()
   const vivantes = useVivantes(salle?.messages ?? [])
   if (!salle) return null
@@ -114,10 +147,19 @@ export function Bulles({ de }: { de: string }) {
   const nom = salle.auteurs.find((a) => a.id === de)?.nom ?? ''
 
   return (
+    /*
+     * Les bulles se posent en BAS de la ligne, au-dessus du mur.
+     *
+     * Elles sortaient du haut, donc du jeton — et couvraient au passage le nom
+     * du joueur et sa contrainte, c'est-à-dire tout ce que cette ligne sert à
+     * lire. Le mur est un aplat sans texte : une réaction peut y passer sans
+     * rien masquer, et elle sort toujours du bon côté de l'écran puisqu'elle
+     * reste alignée sur le jeton.
+     */
     <div
       role="status"
       aria-live="polite"
-      style={{ position: 'absolute', left: 10, top: 2, pointerEvents: 'none', zIndex: 4 }}
+      style={{ position: 'absolute', left: 10, bottom: 6, pointerEvents: 'none', zIndex: 4 }}
     >
       {miennes.map((m, i) => {
         const reaction = estReaction(m.texte)
@@ -137,10 +179,19 @@ export function Bulles({ de }: { de: string }) {
               animation: anime(bouge, 'rempart-bulle', DUREE.bulle, { courbe: 'ease-out' }),
             }}
           >
-            <span aria-hidden="true" style={{ font: reaction ? '22px/1 serif' : `600 12px/1.3 ${TEXTE}`, color: t.ink }}>
-              {m.texte}
+            {reaction ? (
+              <Icone nom={ICONE_REACTION[m.texte as Emoji]} size={22} color={t.ink} />
+            ) : (
+              <span aria-hidden="true" style={{ font: `600 12px/1.3 ${TEXTE}`, color: t.ink }}>
+                {m.texte}
+              </span>
+            )}
+            <span style={SR_ONLY}>
+              {tr('chat.dit', {
+                nom,
+                texte: reaction ? direReaction(tr, m.texte as Emoji) : m.texte,
+              })}
             </span>
-            <span style={SR_ONLY}>{`${nom} : ${reaction ? NOM_EMOJI[m.texte as Emoji] : m.texte}`}</span>
           </div>
         )
       })}
@@ -166,13 +217,14 @@ const SR_ONLY = {
  * feuille de conversation, elle, ne s'ouvre jamais en partie.
  *
  * `propose` est l'ouverture que la table offre : quand ton mur vient d'être
- * frappé, l'éventail s'ouvre seul deux secondes avec 😱 entouré. Une
+ * frappé, l'éventail s'ouvre seul deux secondes avec « aïe » entouré. Une
  * proposition, jamais une interruption — rien n'est envoyé sans un doigt, et
  * elle ne se déclenche jamais pendant ton propre choix de carte.
  */
 export function Eventail({ propose }: { propose?: boolean }) {
   const salle = useSalle()
   const t = useTheme()
+  const tr = useT()
   const bouge = useMouvement()
   const [ouvert, setOuvert] = useState(false)
   const [offert, setOffert] = useState(false)
@@ -214,7 +266,7 @@ export function Eventail({ propose }: { propose?: boolean }) {
           setOuvert((o) => !o)
         }}
         aria-expanded={ouvert}
-        aria-label={ouvert ? 'Fermer les réactions' : 'Réagir'}
+        aria-label={tr(ouvert ? 'chat.reaction.fermer' : 'chat.reaction.ouvrir')}
         style={{
           width: 38,
           height: 34,
@@ -222,12 +274,17 @@ export function Eventail({ propose }: { propose?: boolean }) {
           background: ouvert ? t.selBg : t.cardOff,
           boxShadow: ouvert ? `0 3px 0 ${t.selEdge}` : undefined,
           border: 'none',
-          font: '17px/1 serif',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
           cursor: 'pointer',
           WebkitTapHighlightColor: 'transparent',
         }}
       >
-        <span aria-hidden="true">😀</span>
+        {/* Une bulle dessinée, et non un visage emprunté à la police système :
+            on ne savait pas si ce bouton ouvrait un menu, un profil ou une
+            réaction, et il ne se rendait pas pareil d'un téléphone à l'autre. */}
+        <Icone nom="reaction" size={20} color={ouvert ? t.selFg : t.ink2} />
       </button>
 
       {ouvert && (
@@ -252,21 +309,24 @@ export function Eventail({ propose }: { propose?: boolean }) {
                 <button
                   type="button"
                   onClick={() => envoyer(e)}
-                  aria-label={`Envoyer ${NOM_EMOJI[e]}`}
+                  aria-label={tr('chat.reaction.envoyer', { nom: direReaction(tr, e) })}
+                  title={direReaction(tr, e)}
                   style={{
-                    width: 42,
+                    width: 44,
                     height: 44,
                     borderRadius: R.carte,
                     background: mis ? t.selBg : t.cardBg,
                     boxShadow: `0 4px 0 ${mis ? t.selEdge : t.cardEdge}`,
                     border: 'none',
-                    font: '21px/1 serif',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
                     cursor: 'pointer',
                     WebkitTapHighlightColor: 'transparent',
                     animation: anime(bouge, 'rempart-eventail', 180, { delai: i * 35 }),
                   }}
                 >
-                  <span aria-hidden="true">{e}</span>
+                  <Icone nom={ICONE_REACTION[e]} size={23} color={mis ? t.selFg : t.ink} />
                 </button>
               </div>
             )
@@ -282,6 +342,7 @@ export function Eventail({ propose }: { propose?: boolean }) {
 /** Le bouton qui ouvre la conversation, au salon. */
 export function BoutonConversation({ nonLus, onOuvrir }: { nonLus: number; onOuvrir: () => void }) {
   const t = useTheme()
+  const tr = useT()
   return (
     <button
       type="button"
@@ -304,7 +365,7 @@ export function BoutonConversation({ nonLus, onOuvrir }: { nonLus: number; onOuv
         WebkitTapHighlightColor: 'transparent',
       }}
     >
-      Conversation
+      {tr('chat.bouton')}
       <span
         style={{
           marginLeft: 'auto',
@@ -313,7 +374,7 @@ export function BoutonConversation({ nonLus, onOuvrir }: { nonLus: number; onOuv
           color: nonLus > 0 ? t.clayText : t.ink2,
         }}
       >
-        {nonLus > 0 ? `${nonLus} nouveau${nonLus > 1 ? 'x' : ''}` : 'on a le temps'}
+        {nonLus > 0 ? tr.n('chat.nonLus', nonLus) : tr('chat.calme')}
       </span>
     </button>
   )
@@ -329,6 +390,7 @@ export function BoutonConversation({ nonLus, onOuvrir }: { nonLus: number; onOuv
 export function FeuilleDiscussion({ onFermer }: { onFermer: () => void }) {
   const salle = useSalle()
   const t = useTheme()
+  const tr = useT()
   const bouge = useMouvement()
   const [texte, setTexte] = useState('')
   const bas = useRef<HTMLDivElement>(null)
@@ -347,7 +409,7 @@ export function FeuilleDiscussion({ onFermer }: { onFermer: () => void }) {
     <div
       role="dialog"
       aria-modal="false"
-      aria-label="Conversation de la table"
+      aria-label={tr('chat.aria')}
       style={{
         position: 'absolute',
         left: 0,
@@ -357,7 +419,7 @@ export function FeuilleDiscussion({ onFermer }: { onFermer: () => void }) {
         background: t.panel,
         borderRadius: '26px 26px 30px 30px',
         boxShadow: `0 -3px 0 ${t.edge}`,
-        padding: '16px 16px calc(16px + env(safe-area-inset-bottom))',
+        padding: '16px 16px 16px',
         display: 'flex',
         flexDirection: 'column',
         gap: 12,
@@ -366,14 +428,14 @@ export function FeuilleDiscussion({ onFermer }: { onFermer: () => void }) {
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-        <div style={{ font: `700 21px/1 ${TITRE}`, color: t.ink }}>Conversation</div>
+        <div style={{ font: `700 21px/1 ${TITRE}`, color: t.ink }}>{tr('chat.titre')}</div>
         <Etiquette size={10} style={{ letterSpacing: '0.1em' }}>
-          pendant qu’on attend
+          {tr('chat.surtitre')}
         </Etiquette>
         <button
           type="button"
           onClick={onFermer}
-          aria-label="Fermer la conversation"
+          aria-label={tr('chat.fermer')}
           style={{
             marginLeft: 'auto',
             width: 38,
@@ -381,13 +443,17 @@ export function FeuilleDiscussion({ onFermer }: { onFermer: () => void }) {
             borderRadius: R.pastille,
             background: t.cardOff,
             border: 'none',
-            font: `600 15px/1 ${TEXTE}`,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
             color: t.ink2,
             cursor: 'pointer',
             WebkitTapHighlightColor: 'transparent',
           }}
         >
-          <span aria-hidden="true">✕</span>
+          {/* Une croix dessinée : « de la matière et un mot, jamais un glyphe
+              de police » vaut aussi pour celle-ci. */}
+          <Icone nom="fermer" size={16} color={t.ink2} />
         </button>
       </div>
 
@@ -403,7 +469,7 @@ export function FeuilleDiscussion({ onFermer }: { onFermer: () => void }) {
       >
         {salle.messages.length === 0 ? (
           <Texte size={13} style={{ padding: '6px 2px' }}>
-            Personne n’a rien dit. C’est le seul moment de la partie où l’on a le temps.
+            {tr('chat.vide')}
           </Texte>
         ) : (
           salle.messages.map((m) => <Ligne key={m.id} message={m} salle={salle} />)
@@ -417,20 +483,33 @@ export function FeuilleDiscussion({ onFermer }: { onFermer: () => void }) {
             key={e}
             type="button"
             onClick={() => envoyer(e)}
-            aria-label={`Envoyer ${NOM_EMOJI[e]}`}
+            aria-label={tr('chat.reaction.envoyer', { nom: direReaction(tr, e) })}
             style={{
               flex: 1,
-              height: 40,
+              // Dans la feuille il y a de la place : le dessin porte son mot,
+              // donc il n'a pas à se faire deviner.
+              minHeight: 48,
               borderRadius: 13,
               background: t.cardBg,
               boxShadow: `0 3px 0 ${t.cardEdge}`,
               border: 'none',
-              font: '19px/1 serif',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 2,
+              padding: '5px 2px',
               cursor: 'pointer',
               WebkitTapHighlightColor: 'transparent',
             }}
           >
-            <span aria-hidden="true">{e}</span>
+            <Icone nom={ICONE_REACTION[e]} size={19} color={t.ink} />
+            <span
+              aria-hidden="true"
+              style={{ font: `500 8px/1.1 ${TEXTE}`, color: t.ink2, textAlign: 'center' }}
+            >
+              {direReaction(tr, e)}
+            </span>
           </button>
         ))}
       </div>
@@ -447,8 +526,8 @@ export function FeuilleDiscussion({ onFermer }: { onFermer: () => void }) {
           onChange={(ev) => setTexte(ev.target.value)}
           maxLength={LONGUEUR_MAX}
           enterKeyHint="send"
-          aria-label="Ton message"
-          placeholder="Dis quelque chose…"
+          aria-label={tr('chat.champ.aria')}
+          placeholder={tr('chat.champ.exemple')}
           style={{
             flex: 1,
             minWidth: 0,
@@ -479,7 +558,7 @@ export function FeuilleDiscussion({ onFermer }: { onFermer: () => void }) {
             WebkitTapHighlightColor: 'transparent',
           }}
         >
-          Envoyer
+          {tr('chat.envoyer')}
         </button>
       </form>
     </div>
@@ -489,6 +568,7 @@ export function FeuilleDiscussion({ onFermer }: { onFermer: () => void }) {
 /** Une ligne de la feuille : qui, et quoi. Une réaction y tient sa place. */
 function Ligne({ message, salle }: { message: Message; salle: Salle }) {
   const t = useTheme()
+  const tr = useT()
   const auteur = salle.auteurs.find((a) => a.id === message.de)
   const moi = message.de === salle.moi
   const reaction = estReaction(message.texte)
@@ -505,19 +585,27 @@ function Ligne({ message, salle }: { message: Message; salle: Salle }) {
     >
       {auteur && <Forme ci={auteur.ci} size={16} />}
       <span style={{ font: `700 13px/1 ${TITRE}`, color: t.ink, flex: '0 0 auto' }}>
-        {moi ? 'toi' : (auteur?.nom ?? '?')}
+        {moi ? tr('chat.moi') : (auteur?.nom ?? '?')}
       </span>
-      <span
-        style={{
-          font: reaction ? '20px/1 serif' : `500 14px/1.35 ${TEXTE}`,
-          color: t.ink,
-          textWrap: 'pretty',
-          minWidth: 0,
-        }}
-      >
-        <span aria-hidden={reaction}>{message.texte}</span>
-        {reaction && <span style={SR_ONLY}>{NOM_EMOJI[message.texte as Emoji]}</span>}
-      </span>
+      {reaction ? (
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 7, minWidth: 0 }}>
+          <Icone nom={ICONE_REACTION[message.texte as Emoji]} size={19} color={t.ink} />
+          <span style={{ font: `500 13px/1.35 ${TEXTE}`, color: t.ink2 }}>
+            {direReaction(tr, message.texte as Emoji)}
+          </span>
+        </span>
+      ) : (
+        <span
+          style={{
+            font: `500 14px/1.35 ${TEXTE}`,
+            color: t.ink,
+            textWrap: 'pretty',
+            minWidth: 0,
+          }}
+        >
+          {message.texte}
+        </span>
+      )}
     </div>
   )
 }

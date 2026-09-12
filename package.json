@@ -14,6 +14,7 @@
     "icons": "python3 scripts/icone.py public"
   },
   "dependencies": {
+    "qrcode-generator": "^2.0.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "trystero": "^0.25.3"

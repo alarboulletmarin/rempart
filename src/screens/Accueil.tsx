@@ -1,13 +1,14 @@
 import { SAFE_TOP, TEXTE, TITRE } from '../theme'
-import { DECK } from '../game/content'
-import { CARD_LABEL } from '../game/types'
+import { CARD_KEYS } from '../game/types'
+import { useT } from '../i18n'
 import { Bouton, BoutonCreux, Etiquette, Panneau, Texte } from '../ui/atoms'
 import { LONGUEUR_CODE } from '../net/room'
 import { Logo, MurMiniature } from '../ui/Logo'
 import { Pictogramme } from '../ui/Pictogramme'
 import { Ecran } from '../ui/shell'
 import { useTheme } from '../ui/theme'
-import { lire, quand, type PartieEnregistree } from '../store/palmares'
+import { quand } from '../i18n/dates'
+import { lire, type PartieEnregistree } from '../store/palmares'
 
 /**
  * 01 · Accueil.
@@ -34,6 +35,7 @@ export function Accueil({
   onReglages: () => void
 }) {
   const t = useTheme()
+  const tr = useT()
   const derniere: PartieEnregistree | undefined = lire().parties[0]
 
   return (
@@ -63,11 +65,10 @@ export function Accueil({
             Rempart
           </h1>
           <Texte size={16} color={t.ink2} style={{ marginTop: 22, lineHeight: 1.4 }}>
-            Chacun choisit en secret une carte parmi quatre. La carte jouée est interdite la manche
-            suivante.
+            {tr('accueil.baseline')}
           </Texte>
           <Etiquette size={11} style={{ letterSpacing: '0.1em', marginTop: 12 }}>
-            2–4 joueurs · 10 manches · 4 minutes
+            {tr('accueil.format')}
           </Etiquette>
         </div>
 
@@ -85,12 +86,12 @@ export function Accueil({
         >
           <Panneau radius={18} pad={16} gap={13}>
             <Etiquette size={11} style={{ letterSpacing: '0.1em' }}>
-              Tout le jeu tient dans ces quatre cartes
+              {tr('accueil.cartes.titre')}
             </Etiquette>
             <div style={{ display: 'flex', gap: 10 }}>
-              {DECK.map((c) => (
+              {CARD_KEYS.map((k) => (
                 <div
-                  key={c.k}
+                  key={k}
                   style={{
                     flex: 1,
                     display: 'flex',
@@ -99,9 +100,9 @@ export function Accueil({
                     gap: 8,
                   }}
                 >
-                  <Pictogramme card={c.k} size={38} />
+                  <Pictogramme card={k} size={38} />
                   <span style={{ font: `700 12px/1 ${TITRE}`, color: t.ink }}>
-                    {CARD_LABEL[c.k]}
+                    {tr(`carte.${k}` as const)}
                   </span>
                 </div>
               ))}
@@ -118,11 +119,13 @@ export function Accueil({
                 style={{ display: 'flex', flexDirection: 'column', gap: 4, flex: 1, minWidth: 0 }}
               >
                 <Etiquette size={11} style={{ letterSpacing: '0.1em' }}>
-                  Ta dernière partie
+                  {tr('accueil.derniere.titre')}
                 </Etiquette>
                 <div style={{ font: `600 14px/1.3 ${TEXTE}`, color: t.ink }}>
-                  {derniere.gagnee ? 'Gagnée' : 'Perdue'} contre {autresQueMoi(derniere)} ·{' '}
-                  {quand(derniere.at)}
+                  {tr(derniere.gagnee ? 'accueil.derniere.gagnee' : 'accueil.derniere.perdue', {
+                    adversaire: autresQueMoi(derniere),
+                    quand: quand(tr, derniere.at),
+                  })}
                 </div>
               </div>
               <MurMiniature briques={derniere.mesBriques} />
@@ -131,17 +134,21 @@ export function Accueil({
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <Bouton onClick={onCreer}>Créer une partie</Bouton>
-          <Bouton ton="panel" onClick={onRejoindre} note={`code à ${LONGUEUR_CODE}`}>
-            Rejoindre
+          <Bouton onClick={onCreer}>{tr('accueil.creer')}</Bouton>
+          <Bouton
+            ton="panel"
+            onClick={onRejoindre}
+            note={tr('accueil.rejoindre.note', { n: LONGUEUR_CODE })}
+          >
+            {tr('accueil.rejoindre')}
           </Bouton>
           <div style={{ display: 'flex', gap: 10 }}>
-            <BoutonCreux onClick={onRegles}>Règles</BoutonCreux>
-            <BoutonCreux onClick={onPalmares}>Palmarès</BoutonCreux>
-            <BoutonCreux onClick={onReglages}>Réglages</BoutonCreux>
+            <BoutonCreux onClick={onRegles}>{tr('accueil.regles')}</BoutonCreux>
+            <BoutonCreux onClick={onPalmares}>{tr('accueil.palmares')}</BoutonCreux>
+            <BoutonCreux onClick={onReglages}>{tr('accueil.reglages')}</BoutonCreux>
           </div>
           <Texte size={11} color={t.ink2} style={{ textAlign: 'center', paddingTop: 2, lineHeight: 1.5 }}>
-            Sans compte · sans pub · sans tracking · fonctionne hors ligne
+            {tr('accueil.pied')}
           </Texte>
         </div>
       </div>

@@ -1,6 +1,7 @@
 import type { CSSProperties, ReactNode } from 'react'
 import { R, TEXTE, TITRE } from '../theme'
-import type { Slot } from '../game/types'
+import type { CardKey, Slot } from '../game/types'
+import { useT, type Cle } from '../i18n'
 import { DUREE, anime, useMouvement } from './mouvement'
 import { useTheme } from './theme'
 
@@ -12,13 +13,17 @@ import { useTheme } from './theme'
  * quatre formes restent distinctes en niveaux de gris.
  */
 const SHAPES = [
-  { radius: '50%', clip: 'none', nom: 'Cercle' },
-  { radius: '3px', clip: 'none', nom: 'Carré' },
-  { radius: '0', clip: 'polygon(50% 0, 100% 100%, 0 100%)', nom: 'Triangle' },
-  { radius: '0', clip: 'polygon(50% 0, 100% 38%, 82% 100%, 18% 100%, 0 38%)', nom: 'Pentagone' },
+  { radius: '50%', clip: 'none' },
+  { radius: '3px', clip: 'none' },
+  { radius: '0', clip: 'polygon(50% 0, 100% 100%, 0 100%)' },
+  { radius: '0', clip: 'polygon(50% 0, 100% 38%, 82% 100%, 18% 100%, 0 38%)' },
 ] as const
 
-export const shapeName = (ci: number) => SHAPES[ci].nom
+/** Le nom d'une forme, dans la langue de qui lit. */
+export function useShapeName(): (ci: number) => string {
+  const tr = useT()
+  return (ci) => tr(`forme.${Math.min(3, Math.max(0, ci))}` as Cle)
+}
 
 export function Forme({ ci, size = 20, color }: { ci: number; size?: number; color?: string }) {
   const t = useTheme()
@@ -147,9 +152,35 @@ export function Mur({
   )
 }
 
-/** Le compte de briques, dit en toutes lettres pour les lecteurs d'écran. */
-export function MurAccessible({ nom, wall }: { nom: string; wall: Slot[] }) {
+/**
+ * Ce que dit une ligne de joueur à qui ne voit pas l'écran : son mur, et sa
+ * contrainte de la manche.
+ *
+ * Les deux dans la même phrase et sous le même nom. Séparés, la pastille de
+ * contrainte s'annonçait « Interdit : Frapper » sans dire de qui — trois fois
+ * de suite, sur trois lignes, sans moyen de les rattacher à quelqu'un.
+ */
+export function LigneAccessible({
+  nom,
+  wall,
+  locked,
+}: {
+  nom: string
+  wall: Slot[]
+  /** Absente quand la ligne ne montre pas de contrainte (la révélation). */
+  locked?: CardKey[]
+}) {
+  const tr = useT()
   const debout = wall.filter((s) => s !== 'broken').length
+  const mur = tr.n('mur.aria', debout, { nom, total: wall.length })
+  const contrainte = !locked
+    ? ''
+    : locked.length === 0
+      ? tr('jeu.contrainte.aria.libre', { nom })
+      : tr('jeu.contrainte.aria.interdit', {
+          nom,
+          cartes: tr.liste(locked.map((k) => tr(`carte.${k}` as const))),
+        })
   return (
     <span
       style={{
@@ -161,7 +192,7 @@ export function MurAccessible({ nom, wall }: { nom: string; wall: Slot[] }) {
         whiteSpace: 'nowrap',
       }}
     >
-      {`Mur de ${nom} : ${debout} brique${debout > 1 ? 's' : ''} sur ${wall.length}.`}
+      {contrainte ? `${mur} ${contrainte}` : mur}
     </span>
   )
 }
@@ -259,15 +290,19 @@ export function Pastille({
   bg,
   fg,
   style,
+  'aria-hidden': ariaHidden,
 }: {
   children: ReactNode
   bg?: string
   fg?: string
   style?: CSSProperties
+  /** La pastille double une phrase déjà dite ailleurs pour les lecteurs d'écran. */
+  'aria-hidden'?: boolean | 'true' | 'false'
 }) {
   const t = useTheme()
   return (
     <span
+      aria-hidden={ariaHidden}
       style={{
         background: bg ?? t.panel2,
         color: fg ?? t.ink2,
@@ -292,15 +327,19 @@ export function Etiquette({
   color,
   size = 11,
   style,
+  id,
 }: {
   children: ReactNode
   color?: string
   size?: number
   style?: CSSProperties
+  /** Pour qu'un groupe de boutons radio puisse nommer son titre de section. */
+  id?: string
 }) {
   const t = useTheme()
   return (
     <div
+      id={id}
       style={{
         font: `600 ${size}px/1 ${TEXTE}`,
         letterSpacing: '0.12em',

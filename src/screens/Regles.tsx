@@ -1,16 +1,15 @@
 import { useMemo, useState } from 'react'
 import { SAFE_TOP, TEXTE, TITRE } from '../theme'
 import {
-  CARD_DETAIL,
-  CHAPITRE_TITRE,
   EDGE_CASES,
   RESOLUTION_ORDER,
   SOMMAIRE,
   TURN_STEPS,
   type ChapitreId,
 } from '../game/content'
-import { ROUND_CARDS } from '../game/roundCards'
-import { CARD_LABEL, WALL_SIZE, type Slot } from '../game/types'
+import { ROUND_CARD_IDS } from '../game/roundCards'
+import { CARD_KEYS, WALL_SIZE, type RoundCardId, type Slot } from '../game/types'
+import { useT, type Cle } from '../i18n'
 import { Etiquette, Forme, Mur, Panneau, Texte } from '../ui/atoms'
 import { Pictogramme } from '../ui/Pictogramme'
 import { Corps, Ecran, EnTete, Retour } from '../ui/shell'
@@ -32,27 +31,40 @@ export function ReglesSommaire({
   onRetour: () => void
 }) {
   const t = useTheme()
+  const tr = useT()
   const [q, setQ] = useState('')
 
+  /*
+   * La recherche porte sur le texte AFFICHÉ, donc sur celui de la langue
+   * courante : chercher « lock » en anglais doit trouver le chapitre du
+   * verrou, et chercher « verrou » en français aussi. Comparer des clés
+   * n'aurait rien trouvé dans ni l'une ni l'autre.
+   */
   const resultats = useMemo(() => {
-    const s = q.trim().toLowerCase()
-    if (!s) return { chapitres: SOMMAIRE, cartes: [] as typeof ROUND_CARDS }
-    const norm = (x: string) => x.toLowerCase()
+    const q2 = q.trim().toLowerCase()
+    if (!q2) return { chapitres: SOMMAIRE, cartes: [] as readonly RoundCardId[] }
+    const dit = (cle: Cle) => tr(cle).toLowerCase()
     return {
-      chapitres: SOMMAIRE.filter((c) => norm(c.t).includes(s) || norm(c.d).includes(s)),
-      cartes: ROUND_CARDS.filter((c) => norm(c.n).includes(s) || norm(c.d).includes(s)),
+      chapitres: SOMMAIRE.filter(
+        (id) =>
+          dit(`regles.sommaire.${id}.titre`).includes(q2) ||
+          dit(`regles.sommaire.${id}.detail`).includes(q2),
+      ),
+      cartes: ROUND_CARD_IDS.filter(
+        (id) => dit(`manche.${id}.nom`).includes(q2) || dit(`manche.${id}.detail`).includes(q2),
+      ),
     }
-  }, [q])
+  }, [q, tr])
 
   return (
     <Ecran>
       <EnTete
-        titre="Règles"
+        titre={tr('regles.titre')}
         onRetour={onRetour}
         hauteur={104}
         droite={
           <Etiquette size={11} style={{ letterSpacing: '0.08em' }}>
-            4 min de lecture
+            {tr('regles.duree')}
           </Etiquette>
         }
       />
@@ -72,8 +84,8 @@ export function ReglesSommaire({
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Chercher une règle, une carte…"
-            aria-label="Chercher une règle ou une carte"
+            placeholder={tr('regles.chercher')}
+            aria-label={tr('regles.chercher.aria')}
             style={{
               border: 'none',
               background: 'transparent',
@@ -86,34 +98,40 @@ export function ReglesSommaire({
           />
         </Panneau>
 
-        {resultats.chapitres.map((s) => (
+        {resultats.chapitres.map((id) => (
           <Panneau
-            key={s.id}
+            key={id}
             radius={16}
             pad="14px 16px"
-            onClick={() => onChapitre(s.id)}
+            onClick={() => onChapitre(id)}
             style={{ gap: 3 }}
           >
-            <span style={{ font: `700 17px/1 ${TITRE}`, color: t.ink }}>{s.t}</span>
+            <span style={{ font: `700 17px/1 ${TITRE}`, color: t.ink }}>
+              {tr(`regles.sommaire.${id}.titre`)}
+            </span>
             <span style={{ font: `400 12px/1.35 ${TEXTE}`, color: t.ink2, textWrap: 'pretty' }}>
-              {s.d}
+              {tr(`regles.sommaire.${id}.detail`)}
             </span>
           </Panneau>
         ))}
 
         {resultats.cartes.length > 0 && (
           <>
-            <Etiquette style={{ marginTop: 4 }}>Cartes de manche trouvées</Etiquette>
-            {resultats.cartes.map((c) => (
+            <Etiquette style={{ marginTop: 4 }}>{tr('regles.trouvees')}</Etiquette>
+            {resultats.cartes.map((id) => (
               <Panneau
-                key={c.id}
+                key={id}
                 radius={16}
                 pad="14px 16px"
                 onClick={() => onChapitre('manches')}
                 style={{ gap: 3 }}
               >
-                <span style={{ font: `700 16px/1 ${TITRE}`, color: t.ink }}>{c.n}</span>
-                <span style={{ font: `400 12px/1.35 ${TEXTE}`, color: t.ink2 }}>{c.d}</span>
+                <span style={{ font: `700 16px/1 ${TITRE}`, color: t.ink }}>
+                  {tr(`manche.${id}.nom`)}
+                </span>
+                <span style={{ font: `400 12px/1.35 ${TEXTE}`, color: t.ink2 }}>
+                  {tr(`manche.${id}.detail`)}
+                </span>
               </Panneau>
             ))}
           </>
@@ -121,12 +139,12 @@ export function ReglesSommaire({
 
         {resultats.chapitres.length === 0 && resultats.cartes.length === 0 && (
           <Texte size={14} style={{ padding: '8px 2px' }}>
-            Rien à ce mot-là. Essaie « verrou », « piège » ou « égalité ».
+            {tr('regles.rien')}
           </Texte>
         )}
 
         <Texte size={12} style={{ textAlign: 'center', marginTop: 'auto', lineHeight: 1.45 }}>
-          Chaque chapitre reste accessible depuis n’importe quel autre. Aucun ordre imposé.
+          {tr('regles.sansOrdre')}
         </Texte>
       </Corps>
     </Ecran>
@@ -144,13 +162,14 @@ export function ReglesChapitre({
   onRetour: () => void
 }) {
   const t = useTheme()
+  const tr = useT()
 
   if (chapitre === 'manches') return <CartesDeManche onRetour={onRetour} onSommaire={onSommaire} />
 
   return (
     <Ecran>
       <EnTete
-        titre={CHAPITRE_TITRE[chapitre]}
+        titre={tr(`regles.chapitre.${chapitre}`)}
         onRetour={onRetour}
         hauteur={106}
         pad={16}
@@ -171,7 +190,7 @@ export function ReglesChapitre({
               cursor: 'pointer',
             }}
           >
-            Chapitres
+            {tr('regles.chapitres')}
           </button>
         }
       />
@@ -208,24 +227,16 @@ function Fiche({ children }: { children: React.ReactNode }) {
 }
 
 function ChapitreBut() {
+  const tr = useT()
   return (
     <>
-      <GrosTitre>Garde le plus de briques debout au bout de dix manches.</GrosTitre>
+      <GrosTitre>{tr('regles.but.titre')}</GrosTitre>
       <Mur wall={MUR_PLEIN} ci={0} height={66} gap={8} radius={9} chant={8} />
-      <Texte size={15}>
-        Ton mur, c’est ton score : cinq briques au départ, lisibles sans chiffre. On ne construit
-        pas, on protège.
-      </Texte>
+      <Texte size={15}>{tr('regles.but.mur')}</Texte>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-        <Fiche>
-          Quatre cartes identiques pour tout le monde. Aucune pioche : le seul inconnu, c’est le
-          choix des autres.
-        </Fiche>
-        <Fiche>
-          Dix manches, quatre minutes. Personne n’attend son tour : tout le monde choisit en même
-          temps.
-        </Fiche>
-        <Fiche>De deux à quatre joueurs, ou en équipes de deux avec un score commun.</Fiche>
+        <Fiche>{tr('regles.but.cartes')}</Fiche>
+        <Fiche>{tr('regles.but.duree')}</Fiche>
+        <Fiche>{tr('regles.but.joueurs')}</Fiche>
       </div>
     </>
   )
@@ -233,10 +244,11 @@ function ChapitreBut() {
 
 function ChapitreManche() {
   const t = useTheme()
+  const tr = useT()
   return (
     <>
-      {TURN_STEPS.map((s) => (
-        <Panneau key={s.n} radius={18} pad={16} style={{ flexDirection: 'row', gap: 14, alignItems: 'flex-start' }}>
+      {TURN_STEPS.map((n) => (
+        <Panneau key={n} radius={18} pad={16} style={{ flexDirection: 'row', gap: 14, alignItems: 'flex-start' }}>
           <span
             style={{
               width: 40,
@@ -252,12 +264,14 @@ function ChapitreManche() {
               color: t.selFg,
             }}
           >
-            {s.n}
+            {n}
           </span>
           <span style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-            <span style={{ font: `700 20px/1 ${TITRE}`, color: t.ink }}>{s.t}</span>
+            <span style={{ font: `700 20px/1 ${TITRE}`, color: t.ink }}>
+              {tr(`regles.tour.${n}.titre`)}
+            </span>
             <span style={{ font: `400 14px/1.45 ${TEXTE}`, color: t.ink2, textWrap: 'pretty' }}>
-              {s.d}
+              {tr(`regles.tour.${n}.detail`)}
             </span>
           </span>
         </Panneau>
@@ -269,10 +283,10 @@ function ChapitreManche() {
           boxShadow: `0 4px 0 ${t.ochreEdge}`,
           padding: '14px 16px',
           font: `500 14px/1.45 ${TEXTE}`,
-          color: '#2E2418',
+          color: t.ochreFort,
         }}
       >
-        Une manche dure le temps que le plus lent choisisse : douze à vingt secondes.
+        {tr('regles.tour.duree')}
       </div>
     </>
   )
@@ -280,15 +294,16 @@ function ChapitreManche() {
 
 function ChapitreVerrou() {
   const t = useTheme()
+  const tr = useT()
   return (
     <>
       <h1 style={{ font: `700 30px/1.12 ${TITRE}`, color: t.ink, margin: 0, textWrap: 'pretty' }}>
-        La carte que tu joues t’est interdite la manche suivante.
+        {tr('regles.verrou.titre')}
       </h1>
       <Panneau radius={18} pad={16} style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
         <span style={{ display: 'flex', flexDirection: 'column', gap: 7, alignItems: 'center' }}>
           <Etiquette size={10} style={{ letterSpacing: '0.1em' }}>
-            manche 4
+            {tr('regles.verrou.manche', { n: 4 })}
           </Etiquette>
           <span
             style={{
@@ -299,14 +314,14 @@ function ChapitreVerrou() {
               color: t.panel,
             }}
           >
-            Bloquer
+            {tr('carte.bloquer')}
           </span>
         </span>
         {/* Un chant, pas une flèche : même vocabulaire que les briques. */}
         <span style={{ width: 28, height: 6, borderRadius: 3, background: t.edge, flex: '0 0 28px' }} />
         <span style={{ display: 'flex', flexDirection: 'column', gap: 7, alignItems: 'center' }}>
           <Etiquette size={10} style={{ letterSpacing: '0.1em' }}>
-            manche 5
+            {tr('regles.verrou.manche', { n: 5 })}
           </Etiquette>
           <span
             style={{
@@ -317,24 +332,19 @@ function ChapitreVerrou() {
               color: t.ink2,
             }}
           >
-            Bloquer
+            {tr('carte.bloquer')}
           </span>
           <Etiquette size={10} color={t.clayText} style={{ letterSpacing: '0.08em' }}>
-            interdite
+            {tr('regles.verrou.interdite')}
           </Etiquette>
         </span>
       </Panneau>
       <Texte size={15}>
-        C’est la seule règle qui fait le jeu : après une défense, tu es toujours à découvert. Bloquer
-        deux fois de suite est impossible.
+        {tr('regles.verrou.detail')}
       </Texte>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-        <Fiche>
-          Ta ligne affiche ce que tu viens de jouer : les autres savent ce que tu ne peux plus jouer.
-        </Fiche>
-        <Fiche>
-          Trois choix au lieu de quatre — et tout le monde le sait. C’est là que le bluff commence.
-        </Fiche>
+        <Fiche>{tr('regles.verrou.ligne')}</Fiche>
+        <Fiche>{tr('regles.verrou.bluff')}</Fiche>
       </div>
     </>
   )
@@ -342,25 +352,28 @@ function ChapitreVerrou() {
 
 function ChapitreCartes() {
   const t = useTheme()
+  const tr = useT()
   return (
     <>
-      {CARD_DETAIL.map((c) => (
+      {CARD_KEYS.map((k) => (
         <Panneau
-          key={c.k}
+          key={k}
           radius={18}
           pad={14}
           style={{ flexDirection: 'row', gap: 14, alignItems: 'flex-start' }}
         >
-          <Pictogramme card={c.k} size={52} />
+          <Pictogramme card={k} size={52} />
           <span style={{ display: 'flex', flexDirection: 'column', gap: 5, flex: 1, minWidth: 0 }}>
-            <span style={{ font: `700 19px/1 ${TITRE}`, color: t.ink }}>{CARD_LABEL[c.k]}</span>
+            <span style={{ font: `700 19px/1 ${TITRE}`, color: t.ink }}>
+              {tr(`carte.${k}` as const)}
+            </span>
             <span style={{ font: `600 14px/1.35 ${TEXTE}`, color: t.ink, textWrap: 'pretty' }}>
-              {c.effect}
+              {tr(`carte.${k}.effet` as const)}
             </span>
             {/* Le « quand la jouer » reste dans la planche de référence :
                 sur 844 px, les quatre cartes ne tiennent qu'avec effet + coût. */}
             <span style={{ font: `400 12px/1.35 ${TEXTE}`, color: t.ink2, textWrap: 'pretty' }}>
-              {c.cost}
+              {tr(`carte.${k}.cout` as const)}
             </span>
           </span>
         </Panneau>
@@ -371,11 +384,12 @@ function ChapitreCartes() {
 
 function ChapitreOrdre() {
   const t = useTheme()
+  const tr = useT()
   return (
     <>
-      <Texte size={15}>Toujours le même ordre, quels que soient les joueurs.</Texte>
-      {RESOLUTION_ORDER.map((o) => (
-        <Panneau key={o.n} radius={18} pad={15} style={{ flexDirection: 'row', gap: 13, alignItems: 'flex-start' }}>
+      <Texte size={15}>{tr('regles.ordre.intro')}</Texte>
+      {RESOLUTION_ORDER.map((n) => (
+        <Panneau key={n} radius={18} pad={15} style={{ flexDirection: 'row', gap: 13, alignItems: 'flex-start' }}>
           <span
             style={{
               width: 32,
@@ -391,12 +405,14 @@ function ChapitreOrdre() {
               color: t.panel,
             }}
           >
-            {o.n}
+            {n}
           </span>
           <span style={{ display: 'flex', flexDirection: 'column', gap: 4, flex: 1, minWidth: 0 }}>
-            <span style={{ font: `700 17px/1 ${TITRE}`, color: t.ink }}>{o.t}</span>
+            <span style={{ font: `700 17px/1 ${TITRE}`, color: t.ink }}>
+              {tr(`regles.ordre.${n}.titre`)}
+            </span>
             <span style={{ font: `400 13px/1.4 ${TEXTE}`, color: t.ink2, textWrap: 'pretty' }}>
-              {o.d}
+              {tr(`regles.ordre.${n}.detail`)}
             </span>
           </span>
         </Panneau>
@@ -407,13 +423,16 @@ function ChapitreOrdre() {
 
 function ChapitreCas() {
   const t = useTheme()
+  const tr = useT()
   return (
     <>
-      {EDGE_CASES.map((e) => (
-        <Panneau key={e.t} radius={16} pad="13px 15px" gap={4}>
-          <span style={{ font: `700 16px/1.1 ${TITRE}`, color: t.ink }}>{e.t}</span>
+      {EDGE_CASES.map((id) => (
+        <Panneau key={id} radius={16} pad="13px 15px" gap={4}>
+          <span style={{ font: `700 16px/1.1 ${TITRE}`, color: t.ink }}>
+            {tr(`regles.cas.${id}.titre`)}
+          </span>
           <span style={{ font: `400 13px/1.4 ${TEXTE}`, color: t.ink2, textWrap: 'pretty' }}>
-            {e.d}
+            {tr(`regles.cas.${id}.detail`)}
           </span>
         </Panneau>
       ))}
@@ -423,30 +442,26 @@ function ChapitreCas() {
 
 function ChapitreFin() {
   const t = useTheme()
+  const tr = useT()
   return (
     <>
-      <GrosTitre>Le mur est le score.</GrosTitre>
-      <Texte size={15}>
-        À la fin de la dixième manche, on compte les briques debout. Le plus haut mur gagne ; en
-        équipes, on additionne les deux murs.
-      </Texte>
+      <GrosTitre>{tr('regles.fin.titre')}</GrosTitre>
+      <Texte size={15}>{tr('regles.fin.detail')}</Texte>
       <Panneau radius={18} pad={16} gap={11}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 11 }}>
           <Forme ci={1} size={22} />
-          <span style={{ font: `700 19px/1 ${TITRE}`, color: t.ink }}>Malo</span>
+          <span style={{ font: `700 19px/1 ${TITRE}`, color: t.ink }}>
+            {tr('regles.fin.exemple.nom')}
+          </span>
           <span style={{ font: `600 13px/1 ${TEXTE}`, color: t.ink2, marginLeft: 'auto' }}>
-            5 briques · gagne
+            {tr('regles.fin.exemple.score', { briques: tr.n('brique', WALL_SIZE) })}
           </span>
         </div>
         <Mur wall={MUR_PLEIN} ci={1} height={32} />
       </Panneau>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-        <Fiche>
-          Aucun bonus, aucun malus : le classement est déjà à l’écran depuis la première manche.
-        </Fiche>
-        <Fiche>
-          « Rejouer avec les mêmes » relance aussitôt : même salon, murs remis à cinq.
-        </Fiche>
+        <Fiche>{tr('regles.fin.sansBonus')}</Fiche>
+        <Fiche>{tr('regles.fin.rejouer')}</Fiche>
       </div>
     </>
   )
@@ -461,6 +476,7 @@ export function CartesDeManche({
   onSommaire?: () => void
 }) {
   const t = useTheme()
+  const tr = useT()
   return (
     <Ecran>
       <div
@@ -475,9 +491,12 @@ export function CartesDeManche({
           padding: `${SAFE_TOP} 18px 0 18px`,
         }}
       >
-        <Retour onClick={onRetour} bg={t.panel} fg={t.ochreInk} />
-        <div style={{ font: `700 21px/1 ${TITRE}`, color: '#2E2418', whiteSpace: 'nowrap' }}>
-          Cartes de manche
+        {/* Sur l'ocre, la pastille ne suit pas le thème : la bande est claire
+            dans les deux, donc ce qui s'y pose est sombre dans les deux. En
+            `panel`, elle devenait du brun sur du brun en veillée. */}
+        <Retour onClick={onRetour} bg={t.ochreFort} fg={t.ochreFortInk} />
+        <div style={{ font: `700 21px/1 ${TITRE}`, color: t.ochreFort, whiteSpace: 'nowrap' }}>
+          {tr('regles.chapitre.manches')}
         </div>
         {onSommaire && (
           <button
@@ -485,29 +504,29 @@ export function CartesDeManche({
             onClick={onSommaire}
             style={{
               marginLeft: 'auto',
-              background: '#2E2418',
+              background: t.ochreFort,
               borderRadius: 12,
               padding: '9px 13px',
               border: 'none',
               font: `600 12px/1 ${TEXTE}`,
               letterSpacing: '0.06em',
-              color: t.panel,
+              color: t.ochreFortInk,
               textTransform: 'uppercase',
               whiteSpace: 'nowrap',
               cursor: 'pointer',
             }}
           >
-            Chapitres
+            {tr('regles.chapitres')}
           </button>
         )}
       </div>
       <Corps pad="16px 16px 8px 16px" gap={8} scroll>
         <Texte size={13} style={{ padding: '0 2px', lineHeight: 1.4 }}>
-          Une seule manche, la même pour tout le monde, jamais deux fois par partie.
+          {tr('regles.manches.intro')}
         </Texte>
-        {ROUND_CARDS.map((r) => (
+        {ROUND_CARD_IDS.map((id) => (
           <Panneau
-            key={r.id}
+            key={id}
             radius={14}
             pad="11px 13px"
             style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}
@@ -524,13 +543,15 @@ export function CartesDeManche({
               }}
             />
             <span style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1, minWidth: 0 }}>
-              <span style={{ font: `700 16px/1 ${TITRE}`, color: t.ink }}>{r.n}</span>
+              <span style={{ font: `700 16px/1 ${TITRE}`, color: t.ink }}>
+                {tr(`manche.${id}.nom`)}
+              </span>
               <span style={{ font: `400 12px/1.3 ${TEXTE}`, color: t.ink2, textWrap: 'pretty' }}>
-                {r.d}
+                {tr(`manche.${id}.detail`)}
               </span>
             </span>
             <Etiquette size={9} style={{ letterSpacing: '0.08em' }}>
-              {r.axis}
+              {tr(`manche.${id}.axe`)}
             </Etiquette>
           </Panneau>
         ))}
