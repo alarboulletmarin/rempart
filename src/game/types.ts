@@ -3,13 +3,6 @@ export type CardKey = 'frapper' | 'bloquer' | 'reparer' | 'pieger'
 
 export const CARD_KEYS: readonly CardKey[] = ['frapper', 'bloquer', 'reparer', 'pieger']
 
-export const CARD_LABEL: Record<CardKey, string> = {
-  frapper: 'Frapper',
-  bloquer: 'Bloquer',
-  reparer: 'Réparer',
-  pieger: 'Piéger',
-}
-
 export type PlayerId = string
 
 /** Nombre de briques au départ, et plafond d'une réparation. */

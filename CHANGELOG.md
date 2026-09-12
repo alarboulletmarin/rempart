@@ -1,0 +1,67 @@
+# Journal des versions
+
+Écrit à la main, dans la voix du projet : ce que chaque version change pour la
+personne qui joue, pas quels fichiers ont bougé. Les dates sont celles de la
+publication.
+
+## Non publié
+
+### Ajouté : la langue
+
+- **Rempart parle anglais.** Les sept écrans, les huit chapitres de règles, les
+  neuf cartes de manche et le récit de chaque manche existent maintenant dans
+  les deux langues. Un réglage **Langue** s'ajoute sous le thème, avec les
+  mêmes trois états : français, English, ou comme le téléphone. Il n'y a rien à
+  redémarrer — la partie en cours change de langue sous les doigts, l'avis de
+  connexion affiché compris.
+- **Rien ne se fabrique plus par collage.** « Tu bloques » se tirait du nom de
+  la carte moins son « r » plus un « s » ; « Ta main — Frapper est interdite »
+  accordait son verbe en comptant les cartes ; le récit de la révélation
+  assemblait un sujet, un verbe et un possessif à la main. Chaque phrase
+  s'écrit désormais entière, avec autant de versions qu'elle a de lecteurs
+  possibles — celui qui a frappé, celui qui a pris le coup, celui qui regarde
+  les deux.
+- **Le zéro s'accorde tout seul.** « 0 brique » en français, « 0 bricks » en
+  anglais : c'est le navigateur qui connaît la règle de chaque langue, et non
+  un `n > 1` écrit dans un composant.
+
+### Corrigé
+
+- **« 1er », et non « 1ᵉ ».** L'écran de fin affichait une abréviation qui
+  n'existe dans aucune des deux langues. Les rangs se disent maintenant
+  « 1er », « 2e », « 3e », « 4e » — et « 1st », « 2nd », « 3rd », « 4th ».
+- **« cet après-midi », et non « ce après-midi ».** Le palmarès collait un
+  démonstratif devant un moment de la journée ; les six formes s'écrivent
+  maintenant entières, une par cas, donc l'élision est juste par construction.
+- **Un joueur n'a plus de genre.** Le conseil de ciblage disait « il ne peut
+  pas bloquer deux fois de suite ». Un prénom ne dit pas le genre de la
+  personne qui le porte — c'était déjà la règle de l'écran de déconnexion, elle
+  vaut maintenant partout.
+
+### Changé : ce qui voyage entre les téléphones
+
+Trois choses partaient de l'arbitre **déjà rédigées** et arrivaient en français
+sur les autres téléphones, quelle que soit leur langue. Elles voyagent
+désormais sous forme de motif, et c'est l'écran qui met les mots :
+
+- l'étiquette de chaque ligne de révélation (« retourné −1 », « 2 frappes
+  annulées ») ;
+- la carte de manche en vigueur : c'est `dernier-mur` qui part sur le réseau,
+  jamais « Dernier mur » ;
+- les avis de connexion, qui étaient traduits dès leur réception.
+
+C'est la règle que la couche réseau suivait déjà pour les codes d'erreur, et
+qui manquait aux trois autres. Une partie entre un téléphone en français et un
+téléphone en anglais se lit correctement des deux côtés.
+
+### Pour qui lit le code
+
+- Le catalogue anglais est **typé sur le français** : une clé ajoutée d'un côté
+  et oubliée de l'autre arrête la compilation. Quatre tests couvrent ce que le
+  typage ne voit pas — une phrase vide, un paramètre oublié dans une
+  traduction, une paire de pluriel à moitié écrite, une phrase recopiée telle
+  quelle d'une langue à l'autre.
+- La galerie de contrôle (`/apercu.html`) gagne un axe « langue » à côté du
+  thème : un libellé plus long déplace une géométrie, et ça se regarde.
+- Aucune dépendance ajoutée. Les pluriels et les énumérations passent par
+  `Intl`, que le navigateur porte déjà.

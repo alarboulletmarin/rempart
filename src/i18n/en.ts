@@ -131,8 +131,8 @@ export const en: Catalogue = {
 
   'recit.verrou.moi_un': '— and {cartes} is locked for you next round.',
   'recit.verrou.moi_autre': '— and {cartes} are locked for you next round.',
-  'recit.verrou.autre_un': '— {cartes} is locked for {nom} next round.',
-  'recit.verrou.autre_autre': '— {cartes} are locked for {nom} next round.',
+  'recit.verrou.autre_un': '— {cartes} is locked for them next round.',
+  'recit.verrou.autre_autre': '— {cartes} are locked for them next round.',
 
   'recit.joue.sur': '{carte} on {cible}',
   'recit.joue.rien': 'did not play',

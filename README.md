@@ -2,7 +2,7 @@
 
 PWA de jeu de plateau multijoueur, 2 à 4 joueurs, dix manches, quatre minutes.
 Front-only : aucun compte, aucune publicité, aucune mesure d'audience, **aucun
-serveur de jeu**. Interface en français, thèmes clair et sombre.
+serveur de jeu**. Interface en français et en anglais, thèmes clair et sombre.
 
 Implémentation de la planche de design **« Chantier de papier » / direction
 Établi**, conservée dans `design/` avec les transcriptions qui l'ont produite.
@@ -19,7 +19,7 @@ suivante** : c'est le verrou, et c'est lui qui porte tout le jeu.
 ```bash
 npm install
 npm run dev          # l'app, sur http://localhost:5173
-npm test             # moteur, bots, table, admission, secret des choix, conversation
+npm test             # moteur, bots, table, admission, secret des choix, conversation, catalogues
 npm run typecheck
 npm run build        # dist/ prêt à servir en statique
 npm run icons        # régénère les icônes depuis scripts/icone.py
