@@ -253,3 +253,144 @@ input:focus-visible,
     opacity: 1;
   }
 }
+
+/* ─────────────────────── Les groupes de choix ───────────────────────
+ *
+ * Deux formes pour deux natures de choix, et un seul mécanisme dessous : de
+ * VRAIS boutons radio. Les flèches parcourent le groupe, le lecteur d'écran
+ * annonce « 2 sur 3 », et rien de tout cela n'est à écrire — c'est ce que
+ * `<input type="radio">` fait déjà et qu'une liste de `<button>` refait mal.
+ *
+ * Les radios sont sortis du flux plutôt que masqués : `display: none` les
+ * retirerait du groupe, et `visibility: hidden` du parcours clavier.
+ *
+ * Aucune couleur n'est écrite ici : elles arrivent en variables, posées par
+ * le composant depuis les jetons du thème.
+ */
+
+.rempart-groupe {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  /* Un `fieldset` se donne d'office `min-width: min-content` : sans cela, une
+     description longue élargit le groupe au-delà du cadre. */
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* La légende porte l'en-tête de section : le titre visible EST le nom du
+   groupe, donc il n'est pas dit deux fois à qui écoute. */
+.rempart-legende {
+  display: block;
+  float: none;
+  padding: 0;
+}
+
+.rempart-segmente,
+.rempart-cartes {
+  position: relative;
+  margin: 0;
+}
+
+.rempart-segmente > input,
+.rempart-cartes > input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.rempart-segmente > input:focus-visible + label,
+.rempart-cartes > input:focus-visible + label {
+  outline: 3px solid var(--choix-focus);
+  outline-offset: 3px;
+}
+
+/*
+ * Le contrôle segmenté — la langue.
+ *
+ * Trois segments de largeur égale sur une ligne : un choix qui s'explique tout
+ * seul n'a pas besoin d'une carte chacun. `Français` n'a pas à préciser que le
+ * jeu sera en français.
+ *
+ * Il encaisse QUATRE segments au maximum — les colonnes se déduisent du nombre
+ * d'options, il n'y a rien à changer pour passer de trois à quatre. Au-delà,
+ * les libellés passent sur deux lignes et le contrôle cesse de se lire d'un
+ * coup d'œil : il faudra alors une ligne qui ouvre une feuille de sélection,
+ * pas un cinquième segment.
+ */
+.rempart-segmente {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 14px;
+  background: var(--seg-piste);
+  /* Un creux, pas un contour : la piste est enfoncée dans la table. */
+  box-shadow: inset 0 2px 0 var(--seg-creux);
+}
+
+.rempart-segmente > label {
+  /* La cible tactile réglementaire, portée par le segment lui-même. */
+  min-height: 44px;
+  display: grid;
+  place-items: center;
+  padding: 6px 8px;
+  /* 14 (la piste) moins 4 (son retrait) : le rayon d'un coin posé dans un
+     autre coin, faute de quoi les deux arrondis ne sont pas concentriques. */
+  border-radius: 10px;
+  text-align: center;
+  /* Casse proprement si un libellé passe sur deux lignes. */
+  text-wrap: balance;
+  font: 600 14px/1.2 var(--choix-police);
+  color: var(--seg-encre);
+  cursor: pointer;
+}
+
+/*
+ * Le segment retenu s'inverse.
+ *
+ * Une inversion de valeur, pas une couleur de plus : elle se distingue en
+ * niveaux de gris, et elle ne peut pas se confondre avec la terre cuite des
+ * boutons d'action — un segment coché n'est pas un « Lancer ».
+ */
+.rempart-segmente > input:checked + label {
+  background: var(--seg-choix);
+  color: var(--seg-choix-encre);
+  font-weight: 700;
+}
+
+/* ───────────────────────── Le repli ─────────────────────────
+ *
+ * Un `<details>` nu plutôt qu'un composant : l'ouverture, la fermeture, le
+ * clavier et l'annonce « replié / déplié » sont déjà dans le navigateur.
+ */
+
+.rempart-repli > summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  /* Le triangle par défaut du navigateur s'en va : le chevron dessiné le
+     remplace, à la même épaisseur de trait que le reste de l'app. */
+  list-style: none;
+  font: 600 13px/1.2 var(--choix-police);
+  color: var(--repli-encre);
+}
+
+.rempart-repli > summary::-webkit-details-marker {
+  display: none;
+}
+
+.rempart-repli-chevron {
+  display: flex;
+  transition: transform 140ms ease;
+}
+
+/* La forme dit l'état : un quart de tour, pas un changement de couleur. */
+.rempart-repli[open] .rempart-repli-chevron {
+  transform: rotate(90deg);
+}

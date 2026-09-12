@@ -89,6 +89,26 @@ export interface Theme {
   selBg: string
   selEdge: string
   selFg: string
+  /**
+   * L'anneau d'un contrôle NON coché.
+   *
+   * Le seul jeton dont le travail est d'être vu sans rien dire : il dessine le
+   * cercle vide d'un bouton radio, donc il porte à lui seul « ceci est un
+   * choix ». En `edge`, comme il l'était, il mesurait 1,4 contre 1 sur le
+   * carton de veillée — du brun sur du brun, c'est-à-dire rien. Il tient le
+   * 3:1 des éléments d'interface sur `panel` ET sur `panel2`.
+   */
+  anneau: string
+  /**
+   * Ce que TU as choisi, en pleine encre — et l'encre qui se pose dessus.
+   *
+   * Distinct de `selBg` : celui-là vaut terre cuite en veillée, c'est-à-dire
+   * la couleur d'une brique qui tombe et celle des boutons d'action. Un
+   * réglage coché n'est ni un dégât ni un appel à l'action, donc il prend
+   * l'encre du thème et rien d'autre.
+   */
+  choix: string
+  choixInk: string
   /** Les quatre couleurs de joueur, dans l'ordre des identités. */
   pc: readonly [string, string, string, string]
   /** Le chant de chaque couleur de joueur. */
@@ -128,6 +148,9 @@ export const ETABLI: Theme = {
   selBg: '#2E2418',
   selEdge: '#170F06',
   selFg: '#FCF7EC',
+  anneau: '#8A7B63',
+  choix: '#2E2418',
+  choixInk: '#FCF7EC',
   pc: ['#C0562F', '#2F5D8C', '#1F6B4F', '#7A4A86'],
   pe: ['#8E3A1C', '#1F3F63', '#124B36', '#54305D'],
 }
@@ -167,6 +190,9 @@ export const VEILLEE: Theme = {
   selBg: '#E0714A',
   selEdge: '#A34A28',
   selFg: '#2E2418',
+  anneau: '#9A886E',
+  choix: '#F6EDDC',
+  choixInk: '#221A12',
   pc: ['#E0714A', '#7EA6D8', '#57A57E', '#B58AC4'],
   pe: ['#A34A28', '#4A6D96', '#2F6B4F', '#7C5A8C'],
 }

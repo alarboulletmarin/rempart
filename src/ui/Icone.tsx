@@ -21,6 +21,10 @@ export type NomIcone =
   | 'fermer'
   /** La coche d'un choix retenu. */
   | 'coche'
+  /** Le chevron d'une ligne qui mène ailleurs dans l'app. */
+  | 'chevron'
+  /** Ce qui sort de l'app : le même trait, mais la flèche part du cadre. */
+  | 'lienExterne'
   /* Les six réactions. Dessinées et non empruntées à une police d'emoji : un
      emoji ne se rend pas pareil d'un téléphone à l'autre, il n'a pas la
      matière du reste du jeu, et il ne dit rien à qui ne le voit pas. Chacune
@@ -96,6 +100,30 @@ export function Icone({
     /* La coche d'un réglage retenu : la même que « bien joué », sans son
        emphase — elle confirme, elle ne félicite pas. */
     coche: <path d="M5 12.5 L9.8 17.5 L19 7" {...trait} strokeWidth={w * 1.25} />,
+
+    /*
+     * Le chevron : il dit « ça continue par là », et il sert deux fois.
+     *
+     * Couché, il ouvre une ligne de navigation ; tourné d'un quart de tour par
+     * le CSS du repli, il dit qu'un bloc est déplié. La même forme pour le même
+     * sens, et l'état ne passe donc jamais par la couleur.
+     */
+    chevron: <path d="M9.5 5 L16.5 12 L9.5 19" {...trait} strokeWidth={w * 1.2} />,
+
+    /*
+     * Le lien qui sort : un cadre ouvert, et la flèche qui s'en échappe.
+     *
+     * Distinct du chevron, et c'est le but : l'un reste dans l'app, l'autre
+     * ouvre le navigateur. Deux destinations différentes ne peuvent pas porter
+     * le même dessin.
+     */
+    lienExterne: (
+      <>
+        <path d="M18.5 13.5 V18 a2.5 2.5 0 0 1-2.5 2.5 H6 A2.5 2.5 0 0 1 3.5 18 V8 A2.5 2.5 0 0 1 6 5.5 h4.5" {...trait} />
+        <path d="M13.5 3.5 H20.5 V10.5" {...trait} />
+        <path d="M20.5 3.5 L11 13" {...trait} />
+      </>
+    ),
 
     /* La croix : deux traits, à la même épaisseur que le reste. */
     fermer: (
