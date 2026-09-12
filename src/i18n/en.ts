@@ -377,7 +377,7 @@ export const en: Catalogue = {
   'chat.envoyer': 'Send',
   'chat.moi': 'you',
   'chat.reaction.envoyer': 'Send {nom}',
-  'chat.reaction.ouvrir': 'React',
+  'chat.reaction.ouvrir': 'Send a reaction',
   'chat.reaction.fermer': 'Close the reactions',
   'chat.reaction.rire': 'laughing',
   'chat.reaction.aie': 'ouch',

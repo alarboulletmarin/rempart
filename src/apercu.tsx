@@ -16,6 +16,7 @@ import { createGame, resolveRound } from './game/engine'
 import { roundCardById } from './game/roundCards'
 import type { CardKey, Choice, GameState, PlayerId, Slot } from './game/types'
 import { LangueScope, type Langue } from './i18n'
+import { Icone } from './ui/Icone'
 import { ThemeScope } from './ui/theme'
 import type { VueSession } from './net/session'
 import type { ThemeName } from './theme'
@@ -120,6 +121,7 @@ const CONVERSATION = [
   { id: 'b:1', de: 'b', texte: 'je prends le carré', at: Date.now() + 1e6 },
   { id: 'a:1', de: 'a', texte: 'on lance dès que Nour est là', at: Date.now() + 1e6 },
   { id: 'c:1', de: 'c', texte: '🙏', at: Date.now() + 1e6 },
+  { id: 'a:2', de: 'a', texte: '👏', at: Date.now() + 1e6 },
 ]
 
 function AvecSalle({ children }: { children: ReactNode }) {
@@ -593,6 +595,39 @@ function Galerie() {
             onRetour={noop}
           />
         </Cadre>
+      </Section>
+
+      {/* La planche des icônes : elles se jugent à leur taille d'emploi, pas
+          agrandies. */}
+      <Section titre="Les icônes dessinées">
+        <div
+          style={{
+            display: 'flex',
+            gap: 26,
+            flexWrap: 'wrap',
+            background: '#FCF7EC',
+            borderRadius: 20,
+            padding: 24,
+          }}
+        >
+          {(['reaction', 'rire', 'aie', 'bravo', 'bienJoue', 'grr', 'pitie', 'cadenas'] as const).map(
+            (nom) => (
+              <div
+                key={nom}
+                style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}
+              >
+                <ThemeScope name="etabli">
+                  <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12 }}>
+                    <Icone nom={nom} size={44} />
+                    <Icone nom={nom} size={22} />
+                    <Icone nom={nom} size={13} />
+                  </div>
+                </ThemeScope>
+                <span style={{ font: '600 11px/1 Outfit, sans-serif', color: '#5F5342' }}>{nom}</span>
+              </div>
+            ),
+          )}
+        </div>
       </Section>
 
       <Section titre="Les règles dans l’app">

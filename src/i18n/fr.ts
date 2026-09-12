@@ -412,7 +412,7 @@ export const fr = {
   'chat.envoyer': 'Envoyer',
   'chat.moi': 'toi',
   'chat.reaction.envoyer': 'Envoyer {nom}',
-  'chat.reaction.ouvrir': 'Réagir',
+  'chat.reaction.ouvrir': 'Envoyer une réaction',
   'chat.reaction.fermer': 'Fermer les réactions',
   'chat.reaction.rire': 'rire',
   'chat.reaction.aie': 'aïe',
