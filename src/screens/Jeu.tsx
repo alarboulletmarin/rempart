@@ -344,7 +344,10 @@ export function Jeu({
       />
       <Corps pad={cadre.pad} gap={cadre.gap}>
         {state.activeRoundCard && (
-          <BandeauManche nom={state.activeRoundCard.n} detail={state.activeRoundCard.d} />
+          <BandeauManche
+            nom={tr(`manche.${state.activeRoundCard.id}.nom`)}
+            detail={tr(`manche.${state.activeRoundCard.id}.detail`)}
+          />
         )}
 
         <div
@@ -612,15 +615,17 @@ export function FicheCarteManche({
           <Etiquette size={11} color={t.ochreInk} style={{ letterSpacing: '0.12em' }}>
             {tr('jeu.manche.surtitre')}
           </Etiquette>
-          <div style={{ font: `700 38px/1.05 ${TITRE}`, color: '#2E2418' }}>{carte.n}</div>
+          <div style={{ font: `700 38px/1.05 ${TITRE}`, color: '#2E2418' }}>
+            {tr(`manche.${carte.id}.nom`)}
+          </div>
           <div style={{ font: `600 17px/1.35 ${TEXTE}`, color: '#2E2418', textWrap: 'pretty' }}>
-            {carte.d}
+            {tr(`manche.${carte.id}.detail`)}
           </div>
         </div>
 
         <Panneau radius={16} pad={15}>
           <Texte size={14} color={t.ink}>
-            {carte.why}
+            {tr(`manche.${carte.id}.pourquoi`)}
           </Texte>
         </Panneau>
 

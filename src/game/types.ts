@@ -73,16 +73,27 @@ export type Phase =
   | 'mort-subite'
   | 'fin'
 
+/** Les neuf cartes de manche. Le texte de chacune vit au catalogue. */
+export type RoundCardId =
+  | 'double-frappe'
+  | 'mur-nu'
+  | 'treve'
+  | 'ricochet'
+  | 'requisition'
+  | 'memoire-courte'
+  | 'contre-attaque'
+  | 'cartes-sur-table'
+  | 'dernier-mur'
+
+/**
+ * La carte de manche en vigueur — son identifiant, et rien d'autre.
+ *
+ * Elle voyage dans l'état de la partie : l'arbitre la tire et l'envoie aux
+ * autres téléphones, qui ne lisent pas forcément sa langue. Son nom et sa
+ * description se lisent donc au catalogue, chez celui qui regarde l'écran.
+ */
 export interface RoundCard {
-  id: string
-  /** Le nom affiché sur le bandeau ocre. */
-  n: string
-  /** L'axe de jeu qu'elle déplace. */
-  axis: string
-  /** Ce qu'elle change, tel qu'annoncé au joueur. */
-  d: string
-  /** Pourquoi elle existe — texte de la planche de règles. */
-  why: string
+  id: RoundCardId
 }
 
 /**

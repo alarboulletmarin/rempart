@@ -382,4 +382,198 @@ export const en: Catalogue = {
   'avis.hotePris':
     'Someone else is refereeing the table: you are a guest again, and your wall is untouched.',
   'avis.gestRefuse': 'That move is not playable.',
+
+  /* ------------------------------------------------- les quatre cartes, au long */
+
+  'carte.frapper.court': 'break a brick',
+  'carte.bloquer.court': 'cancel strikes',
+  'carte.reparer.court': 'put a brick back',
+  'carte.pieger.court': 'send the strike back',
+
+  'carte.frapper.long': 'Breaks a brick on the target’s wall.',
+  'carte.bloquer.long': 'Cancels every strike aimed at you this round.',
+  'carte.reparer.long': 'Puts a brick back. No defence this round.',
+  'carte.pieger.long': 'Whoever strikes you takes the hit instead.',
+
+  'carte.frapper.effet': 'Breaks a brick on the wall you aim at.',
+  'carte.frapper.cout': 'You are wide open: nothing protects you this round.',
+  'carte.frapper.quand':
+    'When the target has just repaired or struck — they cannot block twice in a row.',
+  'carte.bloquer.effet': 'Cancels every strike aimed at you this round.',
+  'carte.bloquer.cout': 'You gain nothing and you give up your attack.',
+  'carte.bloquer.quand': 'When two players have Strike available and your wall is low.',
+  'carte.reparer.effet': 'Puts a brick back on your wall, up to five.',
+  'carte.reparer.cout': 'No defence: a strike goes straight through.',
+  'carte.reparer.quand':
+    'When nobody has a reason to aim at you — or when you think everyone is fighting elsewhere.',
+  'carte.pieger.effet': 'Whoever strikes you this round takes the hit instead.',
+  'carte.pieger.cout': 'Useless if nobody strikes you: a wasted round.',
+  'carte.pieger.quand': 'When yours is the lowest wall and you know they are coming to finish it.',
+
+  /* ------------------------------------------------------------- les règles */
+
+  'regles.titre': 'Rules',
+  'regles.duree': '4 min read',
+  'regles.chapitres': 'Chapters',
+  'regles.chercher': 'Search a rule, a card…',
+  'regles.chercher.aria': 'Search a rule or a card',
+  'regles.trouvees': 'Round cards found',
+  'regles.rien': 'Nothing under that word. Try “lock”, “trap” or “tie”.',
+  'regles.sansOrdre': 'Every chapter is reachable from any other. No order imposed.',
+
+  'regles.chapitre.but': 'Rules',
+  'regles.chapitre.manche': 'One round',
+  'regles.chapitre.verrou': 'The lock',
+  'regles.chapitre.cartes': 'Your cards',
+  'regles.chapitre.ordre': 'Resolution',
+  'regles.chapitre.cas': 'Edge cases',
+  'regles.chapitre.fin': 'End of the game',
+  'regles.chapitre.manches': 'Round cards',
+
+  'regles.sommaire.but.titre': 'The goal',
+  'regles.sommaire.but.detail': 'Ten rounds, five bricks, one wall to keep standing.',
+  'regles.sommaire.manche.titre': 'One round',
+  'regles.sommaire.manche.detail': 'Choose in secret, reveal, resolve.',
+  'regles.sommaire.verrou.titre': 'The lock',
+  'regles.sommaire.verrou.detail': 'The card you play is locked next round.',
+  'regles.sommaire.cartes.titre': 'Your four cards',
+  'regles.sommaire.cartes.detail': 'Strike, Block, Repair, Trap — effect and cost.',
+  'regles.sommaire.ordre.titre': 'Resolution order',
+  'regles.sommaire.ordre.detail': 'Blocks, traps, strikes, repairs.',
+  'regles.sommaire.cas.titre': 'Edge cases',
+  'regles.sommaire.cas.detail': 'Wall at zero, stacked strikes, ties…',
+  'regles.sommaire.fin.titre': 'End of the game',
+  'regles.sommaire.fin.detail': 'The wall is the score.',
+  'regles.sommaire.manches.titre': 'Round cards',
+  'regles.sommaire.manches.detail': 'The nine cards of rounds 3, 6 and 9.',
+
+  'regles.but.titre': 'Keep the most bricks standing after ten rounds.',
+  'regles.but.mur':
+    'Your wall is your score: five bricks to start, readable without a number. You do not build, you protect.',
+  'regles.but.cartes':
+    'Four identical cards for everyone. No deck to draw from: the only unknown is what the others choose.',
+  'regles.but.duree':
+    'Ten rounds, four minutes. Nobody waits their turn: everyone chooses at the same time.',
+  'regles.but.joueurs': 'Two to four players, or teams of two with a shared score.',
+
+  'regles.tour.1.titre': 'Choose',
+  'regles.tour.1.detail':
+    'Everyone secretly picks one of their cards, and a target if the card needs one. No turn order, no waiting: all four choices happen at once.',
+  'regles.tour.2.titre': 'Reveal',
+  'regles.tour.2.detail':
+    'The four cards turn over together. You see who played what and at whom — the only moment of information in the round.',
+  'regles.tour.3.titre': 'Resolve',
+  'regles.tour.3.detail':
+    'Effects apply in a fixed order, never in player order. Then each card played is locked for the next round.',
+  'regles.tour.duree': 'A round lasts as long as the slowest choice: twelve to twenty seconds.',
+
+  'regles.verrou.titre': 'The card you play is locked for you next round.',
+  'regles.verrou.manche': 'round {n}',
+  'regles.verrou.interdite': 'locked',
+  'regles.verrou.detail':
+    'This is the one rule that makes the game: after a defence you are always wide open. Blocking twice in a row is impossible.',
+  'regles.verrou.ligne':
+    'Your row shows what you just played: the others know what you can no longer play.',
+  'regles.verrou.bluff':
+    'Three choices instead of four — and everyone knows it. That is where the bluff starts.',
+
+  'regles.ordre.intro': 'Always the same order, whoever is playing.',
+  'regles.ordre.1.titre': 'Blocks go up',
+  'regles.ordre.1.detail': 'Everyone who played Block becomes untouchable for this round.',
+  'regles.ordre.2.titre': 'Traps are armed',
+  'regles.ordre.2.detail':
+    'Everyone who played Trap will send the first strike they take back to whoever threw it.',
+  'regles.ordre.3.titre': 'Strikes land',
+  'regles.ordre.3.detail':
+    'Blocked: the strike is cancelled. Trapped: the attacker loses the brick. Otherwise: the target loses the brick.',
+  'regles.ordre.4.titre': 'Repairs count',
+  'regles.ordre.4.detail':
+    'Bricks come back last — so a repair never saves you from a strike in the same round.',
+
+  'regles.cas.murZero.titre': 'Wall at zero',
+  'regles.cas.murZero.detail':
+    'Nobody is eliminated. A player at zero bricks keeps playing, can repair, and can win by climbing back: the game only lasts ten rounds.',
+  'regles.cas.deuxFrappes.titre': 'Two strikes on the same wall',
+  'regles.cas.deuxFrappes.detail':
+    'They add up: two bricks fall. A single Block cancels both — the most profitable card when you are the obvious target.',
+  'regles.cas.piegeFrappe.titre': 'A strike on a trap, a trap on a strike',
+  'regles.cas.piegeFrappe.detail':
+    'The trap always wins. If two players strike each other and one of them trapped, only the trapper comes out intact.',
+  'regles.cas.murPlein.titre': 'Repairing a full wall',
+  'regles.cas.murPlein.detail':
+    'The card is playable but gives nothing. It stays useful for one reason: locking Repair and letting people believe your wall is full.',
+  'regles.cas.egalite.titre': 'A tie in the tenth round',
+  'regles.cas.egalite.detail':
+    'Tied players play a sudden-death round: Strike compulsory, any target. The first to lose a brick loses the game. Since everyone chooses at once, a tie can hold: after three rounds the highest wall wins, then the seat at the table.',
+
+  'regles.fin.titre': 'The wall is the score.',
+  'regles.fin.detail':
+    'At the end of the tenth round you count the bricks left standing. The highest wall wins; in teams the two walls are added together.',
+  'regles.fin.exemple.nom': 'Malo',
+  'regles.fin.exemple.score': '{briques} · wins',
+  'regles.fin.sansBonus':
+    'No bonus, no penalty: the standings have been on screen since the first round.',
+  'regles.fin.rejouer': '“Play again with the same people” restarts at once: same room, walls back to five.',
+
+  'regles.manches.intro': 'One round only, the same for everyone, never twice in a game.',
+
+  /* --------------------------------------------------------- règles rapides */
+
+  'rapides.titre': 'Keep the most bricks standing after ten rounds.',
+  'rapides.resume':
+    'Everyone picks a card at the same time, plus a target. Reveal, resolve. That is all.',
+  'rapides.verrou.titre': 'The lock',
+  'rapides.verrou.detail':
+    'The card you just played is set aside: locked next round. Your opponents can see it — and so can you, on their row.',
+  'rapides.manches.titre': 'Round cards',
+  'rapides.manches.detail':
+    'Rounds 3, 6 and 9: a shared rule appears in a banner. It applies to everyone, for one round only.',
+  'rapides.compris': 'Got it',
+
+  /* --------------------------------------------------- les cartes de manche */
+
+  'manche.double-frappe.nom': 'Double strike',
+  'manche.double-frappe.axe': 'damage',
+  'manche.double-frappe.detail': 'Strike breaks two bricks. Repair puts two back.',
+  'manche.double-frappe.pourquoi': 'The most violent round in the game: everyone wants to block, so striking pays.',
+
+  'manche.mur-nu.nom': 'Bare wall',
+  'manche.mur-nu.axe': 'defence',
+  'manche.mur-nu.detail': 'Block has no effect this round.',
+  'manche.mur-nu.pourquoi': 'Removes the only safe card. Trap becomes the real defence — and it shows on people’s faces.',
+
+  'manche.treve.nom': 'Truce',
+  'manche.treve.axe': 'damage',
+  'manche.treve.detail': 'Strike is forbidden. Only Block, Repair and Trap can be played.',
+  'manche.treve.pourquoi': 'A breathing round where low walls climb back: the standings tighten all at once.',
+
+  'manche.ricochet.nom': 'Ricochet',
+  'manche.ricochet.axe': 'target',
+  'manche.ricochet.detail': 'Every strike also hits the player sitting just after the target.',
+  'manche.ricochet.pourquoi': 'Impossible to aim cleanly: you make enemies without meaning to.',
+
+  'manche.requisition.nom': 'Requisition',
+  'manche.requisition.axe': 'economy',
+  'manche.requisition.detail': 'The broken brick is not destroyed: it moves onto the attacker’s wall.',
+  'manche.requisition.pourquoi': 'Striking becomes a gain, not only a loss for the other. The gaps blow open.',
+
+  'manche.memoire-courte.nom': 'Short memory',
+  'manche.memoire-courte.axe': 'lock',
+  'manche.memoire-courte.detail': 'The lock is lifted: anyone can replay last round’s card.',
+  'manche.memoire-courte.pourquoi': 'The only moment you can block twice in a row — and where last round’s bluff is worth nothing.',
+
+  'manche.contre-attaque.nom': 'Counter-attack',
+  'manche.contre-attaque.axe': 'defence',
+  'manche.contre-attaque.detail': 'Traps send back two bricks instead of one.',
+  'manche.contre-attaque.pourquoi': 'Makes the lowest wall dangerous to finish off: the round where you spare the wounded.',
+
+  'manche.cartes-sur-table.nom': 'Cards on the table',
+  'manche.cartes-sur-table.axe': 'information',
+  'manche.cartes-sur-table.detail': 'Cards are revealed one by one, from the lowest wall to the highest.',
+  'manche.cartes-sur-table.pourquoi': 'The last to reveal plays with everyone else’s information: being ahead costs.',
+
+  'manche.dernier-mur.nom': 'Last wall',
+  'manche.dernier-mur.axe': 'catching up',
+  'manche.dernier-mur.detail': 'The player with the fewest bricks plays two cards this round.',
+  'manche.dernier-mur.pourquoi': 'The game’s safety net: nobody is dropped before the tenth round.',
 }

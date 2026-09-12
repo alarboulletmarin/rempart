@@ -416,4 +416,198 @@ export const fr = {
   'avis.hotePris':
     'Quelqu’un d’autre arbitre la table : tu redeviens invité, ton mur reste intact.',
   'avis.gestRefuse': 'Ce coup n’est pas jouable.',
+
+  /* ------------------------------------------------- les quatre cartes, au long */
+
+  'carte.frapper.court': 'casse une brique',
+  'carte.bloquer.court': 'annule les frappes',
+  'carte.reparer.court': 'remets une brique',
+  'carte.pieger.court': 'renvoie la frappe',
+
+  'carte.frapper.long': 'Casse une brique chez la cible.',
+  'carte.bloquer.long': 'Annule toutes les frappes sur toi cette manche.',
+  'carte.reparer.long': 'Remets une brique. Aucune défense ce tour.',
+  'carte.pieger.long': 'Qui te frappe prend le coup à sa place.',
+
+  'carte.frapper.effet': 'Casse une brique du mur visé.',
+  'carte.frapper.cout': 'Tu es à découvert : rien ne te protège cette manche.',
+  'carte.frapper.quand':
+    'Quand la cible vient de réparer ou de frapper — elle ne peut pas bloquer deux fois de suite.',
+  'carte.bloquer.effet': 'Annule toutes les frappes qui te visent cette manche.',
+  'carte.bloquer.cout': 'Tu ne gagnes rien et tu perds ton tour d’attaque.',
+  'carte.bloquer.quand': 'Quand deux joueurs ont Frapper disponible et que ton mur est bas.',
+  'carte.reparer.effet': 'Remet une brique sur ton mur, jusqu’à cinq maximum.',
+  'carte.reparer.cout': 'Aucune défense : une frappe passe entièrement.',
+  'carte.reparer.quand':
+    'Quand personne n’a intérêt à te viser — ou quand tu penses que tout le monde se bat ailleurs.',
+  'carte.pieger.effet': 'Qui te frappe cette manche prend le coup à sa place.',
+  'carte.pieger.cout': 'Sans effet si personne ne te frappe : une manche perdue.',
+  'carte.pieger.quand': 'Quand tu es le mur le plus bas et que tu sais qu’on va t’achever.',
+
+  /* ------------------------------------------------------------- les règles */
+
+  'regles.titre': 'Règles',
+  'regles.duree': '4 min de lecture',
+  'regles.chapitres': 'Chapitres',
+  'regles.chercher': 'Chercher une règle, une carte…',
+  'regles.chercher.aria': 'Chercher une règle ou une carte',
+  'regles.trouvees': 'Cartes de manche trouvées',
+  'regles.rien': 'Rien à ce mot-là. Essaie « verrou », « piège » ou « égalité ».',
+  'regles.sansOrdre': 'Chaque chapitre reste accessible depuis n’importe quel autre. Aucun ordre imposé.',
+
+  'regles.chapitre.but': 'Règles',
+  'regles.chapitre.manche': 'Une manche',
+  'regles.chapitre.verrou': 'Le verrou',
+  'regles.chapitre.cartes': 'Tes cartes',
+  'regles.chapitre.ordre': 'Résolution',
+  'regles.chapitre.cas': 'Cas particuliers',
+  'regles.chapitre.fin': 'Fin de partie',
+  'regles.chapitre.manches': 'Cartes de manche',
+
+  'regles.sommaire.but.titre': 'But du jeu',
+  'regles.sommaire.but.detail': 'Dix manches, cinq briques, un mur à garder debout.',
+  'regles.sommaire.manche.titre': 'Une manche',
+  'regles.sommaire.manche.detail': 'Choisir en secret, révéler, résoudre.',
+  'regles.sommaire.verrou.titre': 'Le verrou',
+  'regles.sommaire.verrou.detail': 'La carte jouée est interdite au tour suivant.',
+  'regles.sommaire.cartes.titre': 'Tes quatre cartes',
+  'regles.sommaire.cartes.detail': 'Frapper, Bloquer, Réparer, Piéger — effet et coût.',
+  'regles.sommaire.ordre.titre': 'Ordre de résolution',
+  'regles.sommaire.ordre.detail': 'Blocages, pièges, frappes, réparations.',
+  'regles.sommaire.cas.titre': 'Cas particuliers',
+  'regles.sommaire.cas.detail': 'Mur à zéro, frappes cumulées, égalité…',
+  'regles.sommaire.fin.titre': 'Fin de partie',
+  'regles.sommaire.fin.detail': 'Le mur est le score.',
+  'regles.sommaire.manches.titre': 'Cartes de manche',
+  'regles.sommaire.manches.detail': 'Les neuf cartes des manches 3, 6 et 9.',
+
+  'regles.but.titre': 'Garde le plus de briques debout au bout de dix manches.',
+  'regles.but.mur':
+    'Ton mur, c’est ton score : cinq briques au départ, lisibles sans chiffre. On ne construit pas, on protège.',
+  'regles.but.cartes':
+    'Quatre cartes identiques pour tout le monde. Aucune pioche : le seul inconnu, c’est le choix des autres.',
+  'regles.but.duree':
+    'Dix manches, quatre minutes. Personne n’attend son tour : tout le monde choisit en même temps.',
+  'regles.but.joueurs': 'De deux à quatre joueurs, ou en équipes de deux avec un score commun.',
+
+  'regles.tour.1.titre': 'Choisir',
+  'regles.tour.1.detail':
+    'Tout le monde choisit en secret une carte parmi les siennes, et une cible si la carte en demande une. Pas d’ordre de tour, pas d’attente : les quatre choix se font en même temps.',
+  'regles.tour.2.titre': 'Révéler',
+  'regles.tour.2.detail':
+    'Les quatre cartes se retournent d’un coup. On voit qui a joué quoi et sur qui — c’est le seul moment d’information de la manche.',
+  'regles.tour.3.titre': 'Résoudre',
+  'regles.tour.3.detail':
+    'Les effets s’appliquent dans un ordre fixe, jamais dans l’ordre des joueurs. Puis chaque carte jouée se verrouille pour la manche suivante.',
+  'regles.tour.duree': 'Une manche dure le temps que le plus lent choisisse : douze à vingt secondes.',
+
+  'regles.verrou.titre': 'La carte que tu joues t’est interdite la manche suivante.',
+  'regles.verrou.manche': 'manche {n}',
+  'regles.verrou.interdite': 'interdite',
+  'regles.verrou.detail':
+    'C’est la seule règle qui fait le jeu : après une défense, tu es toujours à découvert. Bloquer deux fois de suite est impossible.',
+  'regles.verrou.ligne':
+    'Ta ligne affiche ce que tu viens de jouer : les autres savent ce que tu ne peux plus jouer.',
+  'regles.verrou.bluff':
+    'Trois choix au lieu de quatre — et tout le monde le sait. C’est là que le bluff commence.',
+
+  'regles.ordre.intro': 'Toujours le même ordre, quels que soient les joueurs.',
+  'regles.ordre.1.titre': 'Les blocages se posent',
+  'regles.ordre.1.detail': 'Chaque joueur ayant joué Bloquer devient intouchable pour cette manche.',
+  'regles.ordre.2.titre': 'Les pièges s’arment',
+  'regles.ordre.2.detail':
+    'Chaque joueur ayant joué Piéger renverra la première frappe reçue sur son auteur.',
+  'regles.ordre.3.titre': 'Les frappes partent',
+  'regles.ordre.3.detail':
+    'Bloqué : la frappe est annulée. Piégé : l’attaquant perd la brique. Sinon : la cible perd la brique.',
+  'regles.ordre.4.titre': 'Les réparations comptent',
+  'regles.ordre.4.detail':
+    'Les briques reviennent en dernier — donc une réparation ne sauve jamais d’une frappe de la même manche.',
+
+  'regles.cas.murZero.titre': 'Mur à zéro',
+  'regles.cas.murZero.detail':
+    'Personne n’est éliminé. Un joueur à zéro brique continue de jouer, peut réparer et peut gagner s’il remonte : la partie ne dure que dix manches.',
+  'regles.cas.deuxFrappes.titre': 'Deux frappes sur le même mur',
+  'regles.cas.deuxFrappes.detail':
+    'Elles s’additionnent : deux briques tombent. Un seul Bloquer les annule toutes les deux — c’est la carte la plus rentable quand on est la cible évidente.',
+  'regles.cas.piegeFrappe.titre': 'Frappe sur un piège, piège sur une frappe',
+  'regles.cas.piegeFrappe.detail':
+    'Le piège gagne toujours. Si deux joueurs se frappent mutuellement et que l’un a piégé, seul le piégeur ressort intact.',
+  'regles.cas.murPlein.titre': 'Réparer un mur plein',
+  'regles.cas.murPlein.detail':
+    'La carte est jouable mais ne donne rien. Elle reste utile pour une seule raison : verrouiller Réparer et faire croire à un mur plein.',
+  'regles.cas.egalite.titre': 'Égalité à la dixième manche',
+  'regles.cas.egalite.detail':
+    'Les joueurs à égalité jouent une manche de mort subite : Frapper obligatoire, cible libre. Le premier qui perd une brique perd la partie. Comme tout le monde choisit en même temps, l’égalité peut tenir : au bout de trois manches, c’est le mur le plus haut qui l’emporte, puis la place à la table.',
+
+  'regles.fin.titre': 'Le mur est le score.',
+  'regles.fin.detail':
+    'À la fin de la dixième manche, on compte les briques debout. Le plus haut mur gagne ; en équipes, on additionne les deux murs.',
+  'regles.fin.exemple.nom': 'Malo',
+  'regles.fin.exemple.score': '{briques} · gagne',
+  'regles.fin.sansBonus':
+    'Aucun bonus, aucun malus : le classement est déjà à l’écran depuis la première manche.',
+  'regles.fin.rejouer': '« Rejouer avec les mêmes » relance aussitôt : même salon, murs remis à cinq.',
+
+  'regles.manches.intro': 'Une seule manche, la même pour tout le monde, jamais deux fois par partie.',
+
+  /* --------------------------------------------------------- règles rapides */
+
+  'rapides.titre': 'Garde le plus de briques debout au bout de dix manches.',
+  'rapides.resume':
+    'Tout le monde choisit une carte en même temps, plus une cible. On révèle, on résout. C’est tout.',
+  'rapides.verrou.titre': 'Le verrou',
+  'rapides.verrou.detail':
+    'La carte que tu viens de jouer est mise de côté : interdite la manche suivante. Tes adversaires le voient — et toi aussi, sur leur ligne.',
+  'rapides.manches.titre': 'Cartes de manche',
+  'rapides.manches.detail':
+    'Manches 3, 6 et 9 : une règle commune s’affiche en bandeau. Elle vaut pour tout le monde, une seule manche.',
+  'rapides.compris': 'J’ai compris',
+
+  /* --------------------------------------------------- les cartes de manche */
+
+  'manche.double-frappe.nom': 'Double frappe',
+  'manche.double-frappe.axe': 'dégâts',
+  'manche.double-frappe.detail': 'Frapper casse deux briques. Réparer en remet deux.',
+  'manche.double-frappe.pourquoi': 'La manche la plus violente du jeu : tout le monde veut bloquer, donc frapper devient rentable.',
+
+  'manche.mur-nu.nom': 'Mur nu',
+  'manche.mur-nu.axe': 'défense',
+  'manche.mur-nu.detail': 'Bloquer n’a aucun effet cette manche.',
+  'manche.mur-nu.pourquoi': 'Enlève la seule carte sûre. Piéger devient la vraie défense — et se lit sur les visages.',
+
+  'manche.treve.nom': 'Trêve',
+  'manche.treve.axe': 'dégâts',
+  'manche.treve.detail': 'Frapper est interdit. Seuls Bloquer, Réparer et Piéger sont jouables.',
+  'manche.treve.pourquoi': 'Une manche de respiration où les murs bas remontent : le classement se resserre d’un coup.',
+
+  'manche.ricochet.nom': 'Ricochet',
+  'manche.ricochet.axe': 'cible',
+  'manche.ricochet.detail': 'Chaque frappe touche aussi le joueur assis juste après la cible.',
+  'manche.ricochet.pourquoi': 'Impossible de viser proprement : on se fait des ennemis sans le vouloir.',
+
+  'manche.requisition.nom': 'Réquisition',
+  'manche.requisition.axe': 'économie',
+  'manche.requisition.detail': 'La brique cassée n’est pas détruite : elle passe sur le mur de l’attaquant.',
+  'manche.requisition.pourquoi': 'Frapper devient un gain, pas seulement une perte pour l’autre. Les écarts explosent.',
+
+  'manche.memoire-courte.nom': 'Mémoire courte',
+  'manche.memoire-courte.axe': 'verrou',
+  'manche.memoire-courte.detail': 'Le verrou est levé : chacun peut rejouer la carte de la manche passée.',
+  'manche.memoire-courte.pourquoi': 'Le seul moment où l’on peut bloquer deux fois de suite — et où le bluff du tour d’avant ne vaut plus rien.',
+
+  'manche.contre-attaque.nom': 'Contre-attaque',
+  'manche.contre-attaque.axe': 'défense',
+  'manche.contre-attaque.detail': 'Les pièges renvoient deux briques au lieu d’une.',
+  'manche.contre-attaque.pourquoi': 'Rend le mur le plus bas dangereux à achever : la manche où l’on épargne les blessés.',
+
+  'manche.cartes-sur-table.nom': 'Cartes sur table',
+  'manche.cartes-sur-table.axe': 'information',
+  'manche.cartes-sur-table.detail': 'Les cartes se révèlent une par une, du mur le plus bas au plus haut.',
+  'manche.cartes-sur-table.pourquoi': 'Le dernier à se révéler joue avec l’information des autres : être en tête coûte cher.',
+
+  'manche.dernier-mur.nom': 'Dernier mur',
+  'manche.dernier-mur.axe': 'rattrapage',
+  'manche.dernier-mur.detail': 'Le joueur qui a le moins de briques joue deux cartes cette manche.',
+  'manche.dernier-mur.pourquoi': 'Le filet de sécurité du jeu : personne n’est décroché avant la dixième manche.',
 } as const

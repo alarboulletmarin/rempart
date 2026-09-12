@@ -81,7 +81,7 @@ describe('le bot', () => {
 
     const dernierMur: GameState = {
       ...avecMurs(jeu, { b: 'IBBBB' }),
-      activeRoundCard: { id: 'dernier-mur', n: 'Dernier mur', axis: '', d: '', why: '' },
+      activeRoundCard: { id: 'dernier-mur' },
     }
     const deux = choisirBot(dernierMur, 'b')
     expect(deux).toHaveLength(2)

@@ -1,5 +1,5 @@
 import { SAFE_TOP, TEXTE, TITRE } from '../theme'
-import { DECK } from '../game/content'
+import { CARD_KEYS } from '../game/types'
 import { useT } from '../i18n'
 import { Bouton, BoutonCreux, Etiquette, Panneau, Texte } from '../ui/atoms'
 import { LONGUEUR_CODE } from '../net/room'
@@ -89,9 +89,9 @@ export function Accueil({
               {tr('accueil.cartes.titre')}
             </Etiquette>
             <div style={{ display: 'flex', gap: 10 }}>
-              {DECK.map((c) => (
+              {CARD_KEYS.map((k) => (
                 <div
-                  key={c.k}
+                  key={k}
                   style={{
                     flex: 1,
                     display: 'flex',
@@ -100,9 +100,9 @@ export function Accueil({
                     gap: 8,
                   }}
                 >
-                  <Pictogramme card={c.k} size={38} />
+                  <Pictogramme card={k} size={38} />
                   <span style={{ font: `700 12px/1 ${TITRE}`, color: t.ink }}>
-                    {tr(`carte.${c.k}` as const)}
+                    {tr(`carte.${k}` as const)}
                   </span>
                 </div>
               ))}
