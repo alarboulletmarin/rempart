@@ -8,9 +8,11 @@ import {
   choicesRequired,
   createGame,
   doubleCardPlayer,
+  forbiddenCards,
   legalCards,
   MORT_SUBITE_MAX,
   possibleTargets,
+  ricochetTarget,
   readyCount,
   replay,
   resolveRound,
@@ -21,7 +23,7 @@ import {
   trancheeAuxPoints,
 } from './engine'
 import { roundCardById } from './roundCards'
-import { WALL_SIZE, type Choice, type GameState, type PlayerId } from './types'
+import { CARD_KEYS, WALL_SIZE, type Choice, type GameState, type PlayerId } from './types'
 
 const SEATS = [
   { id: 'a', name: 'Léa', ci: 0 as const },
@@ -199,6 +201,57 @@ describe('les cartes de manche', () => {
     expect(wallOf(s, 'd')).toBe(5)
   })
 
+  /*
+   * Ce que l'écran de ciblage annonce avant le coup.
+   *
+   * La même fonction sert à résoudre la manche et à l'annoncer : deux copies
+   * de cette arithmétique-là auraient fini par diverger, et c'est l'écran qui
+   * aurait menti — il ne disait déjà rien du second mur touché.
+   */
+  describe('Ricochet : le mur qui encaisse en plus', () => {
+    it('c’est la place suivante', () => {
+      const s = withCard('ricochet')
+      expect(ricochetTarget(s, 'b')).toBe('c')
+    })
+
+    it('le tour se referme : après la dernière place vient la première', () => {
+      const s = withCard('ricochet')
+      expect(ricochetTarget(s, 'd')).toBe('a')
+    })
+
+    it('une place vide est sautée, alors que sa ligne reste à l’écran', () => {
+      const s = withCard('ricochet')
+      const sansC = {
+        ...s,
+        players: s.players.map((p) => (p.id === 'c' ? { ...p, connected: false } : p)),
+      }
+      expect(ricochetTarget(sansC, 'b')).toBe('d')
+    })
+
+    it('à deux joueurs le rebond revient sur l’attaquant', () => {
+      const g = createGame(SEATS.slice(0, 2), { format: 'chacun', roundCards: true }, 1)
+      const duo: GameState = {
+        ...g,
+        phase: 'choix',
+        round: 3,
+        activeRoundCard: roundCardById('ricochet')!,
+      }
+      expect(ricochetTarget(duo, 'b')).toBe('a')
+    })
+
+    it('sans la carte, rien ne rebondit', () => {
+      expect(ricochetTarget(game(), 'b')).toBe(null)
+    })
+
+    it('ce qu’il annonce est ce que la manche applique', () => {
+      const s = withCard('ricochet')
+      const rebond = ricochetTarget(s, 'b')!
+      const apres = resolveRound(play(s, { a: { card: 'frapper', target: 'b' } }))
+      expect(wallOf(apres, 'b')).toBe(4)
+      expect(wallOf(apres, rebond)).toBe(4)
+    })
+  })
+
   it('Réquisition : la brique cassée passe sur le mur de l’attaquant', () => {
     let s = resolveRound(play(game(), { b: { card: 'frapper', target: 'a' } }))
     expect(wallOf(s, 'a')).toBe(4)
@@ -213,6 +266,53 @@ describe('les cartes de manche', () => {
     let s = resolveRound(play(game(), { a: { card: 'bloquer' } }))
     s = { ...beginRound({ ...s, round: 3 }), activeRoundCard: roundCardById('memoire-courte')!, phase: 'choix' }
     expect(legalCards(s, 'a')).toContain('bloquer')
+  })
+
+  /*
+   * Ce que l'écran a le droit de peindre.
+   *
+   * L'affichage lisait `player.locked` — le verrou POSÉ la manche passée — là
+   * où il aurait fallu demander ce qui s'applique CETTE manche. Les deux ne
+   * divergent que sous une carte de manche, c'est-à-dire trois manches sur
+   * dix, et c'est précisément là que la pastille mentait.
+   */
+  describe('ce qu’une carte de manche interdit vraiment', () => {
+    it('Mémoire courte : la pastille n’annonce plus le verrou qu’elle vient de lever', () => {
+      let s = resolveRound(play(game(), { a: { card: 'bloquer' } }))
+      // Le champ brut garde bien la trace de la manche passée…
+      expect(s.players.find((p) => p.id === 'a')!.locked).toEqual(['bloquer'])
+      s = { ...beginRound({ ...s, round: 3 }), activeRoundCard: roundCardById('memoire-courte')!, phase: 'choix' }
+      // … mais plus rien n'est interdit cette manche-ci.
+      expect(forbiddenCards(s, 'a')).toEqual([])
+    })
+
+    it('Trêve : Frapper est interdit à tout le monde, verrou ou pas', () => {
+      const s = withCard('treve')
+      for (const p of s.players) expect(forbiddenCards(s, p.id)).toEqual(['frapper'])
+    })
+
+    it('Trêve : le verrou de la manche passée s’y ajoute, il ne s’y substitue pas', () => {
+      let s = resolveRound(play(game(), { a: { card: 'bloquer' } }))
+      s = { ...beginRound({ ...s, round: 3 }), activeRoundCard: roundCardById('treve')!, phase: 'choix' }
+      expect(forbiddenCards(s, 'a').sort()).toEqual(['bloquer', 'frapper'])
+    })
+
+    it('sans carte de manche, l’interdit se réduit au verrou', () => {
+      let s = resolveRound(play(game(), { a: { card: 'pieger' } }))
+      s = { ...beginRound({ ...s, round: 2 }), phase: 'choix' }
+      expect(forbiddenCards(s, 'a')).toEqual(['pieger'])
+      expect(forbiddenCards(s, 'b')).toEqual([])
+    })
+
+    it('le complément de legalCards, toujours', () => {
+      for (const id of ['double-frappe', 'mur-nu', 'treve', 'memoire-courte', 'dernier-mur']) {
+        const s = withCard(id)
+        for (const p of s.players) {
+          const dit = [...legalCards(s, p.id), ...forbiddenCards(s, p.id)].sort()
+          expect(dit).toEqual([...CARD_KEYS].sort())
+        }
+      }
+    })
   })
 
   it('Contre-attaque : les pièges renvoient deux briques', () => {

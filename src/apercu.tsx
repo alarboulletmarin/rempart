@@ -127,13 +127,42 @@ const CONVERSATION = [
   { id: 'a:2', de: 'a', texte: '👏', at: Date.now() + 1e6 },
 ]
 
-function AvecSalle({ children }: { children: ReactNode }) {
+/**
+ * La salle de la galerie.
+ *
+ * Tous les cadres de jeu et de révélation la portent, et pas seulement ceux
+ * qui montrent la conversation : hors session ces écrans n'existent pas, donc
+ * un cadre sans salle rendait une barre du haut que personne ne verra jamais.
+ * L'éventail y manquait — 44 px et son écart —, et c'est justement lui que la
+ * barre de la révélation poussait hors de l'écran. La galerie déclarait donc
+ * conforme une géométrie qui débordait sur le vrai téléphone.
+ *
+ * Le salon, lui, garde ses deux cadres : la conversation y est une feuille
+ * qu'on ouvre, et l'écran sans elle est un état qui existe pour de bon.
+ */
+function AvecSalle({
+  children,
+  messages = [],
+}: {
+  children: ReactNode
+  /**
+   * La conversation, quand c'est elle qu'on vient regarder.
+   *
+   * Vide par défaut, et c'est le point : une salle sert d'abord à faire
+   * exister l'éventail dans la barre du haut. Peupler les vingt-quatre cadres
+   * de bulles poserait des formes claires sur chaque mur, et le cadre
+   * « une réaction en vol » — le seul qui existe pour vérifier qu'une bulle ne
+   * couvre ni un nom ni une contrainte — ne prouverait plus rien, puisqu'il
+   * ressemblerait à tous les autres.
+   */
+  messages?: typeof CONVERSATION
+}) {
   return (
     <DiscussionProvider
       valeur={{
         moi: 'a',
         auteurs: JOUEURS_SALON.map((j) => ({ id: j.clientId, nom: j.nom, ci: j.ci })),
-        messages: CONVERSATION,
+        messages,
         envoyer: () => true,
       }}
     >
@@ -387,7 +416,7 @@ function Galerie() {
           />
         </Cadre>
         <Cadre titre="03 quinquies · Salon · la conversation">
-          <AvecSalle>
+          <AvecSalle messages={CONVERSATION}>
             <Salon
               etat={vueSalon({ messages: CONVERSATION })}
               onIdentite={noop}
@@ -454,121 +483,249 @@ function Galerie() {
           <ReglesRapides onCompris={noop} onChapitres={noop} onRetour={noop} />
         </Cadre>
         <Cadre titre="05 · Jeu · état neutre">
-          <Jeu state={base()} moi={MOI} joues={[]} absentsDepuis={SANS_ABSENT} onJouer={noop} onSuite={noop} onDemanderQuitter={noop} onQuitter={noop} />
+          <AvecSalle>
+            <Jeu state={base()} moi={MOI} joues={[]} absentsDepuis={SANS_ABSENT} onJouer={noop} onSuite={noop} onDemanderQuitter={noop} onQuitter={noop} />
+          </AvecSalle>
         </Cadre>
         {/* Manche 1 : personne n'a encore joué, donc personne n'a de
             contrainte. C'est l'état que la ligne doit dire en toutes lettres
             plutôt que de laisser un vide. */}
         <Cadre titre="05 bis · Jeu · manche 1, aucune contrainte">
-          <Jeu
-            state={base({ round: 1, players: base().players.map((p) => ({ ...p, locked: [] })) })}
-            moi={MOI}
-            joues={[]}
-            absentsDepuis={SANS_ABSENT}
-            onJouer={noop}
-            onSuite={noop} onDemanderQuitter={noop}
-            onQuitter={noop}
-          />
+          <AvecSalle>
+            <Jeu
+              state={base({ round: 1, players: base().players.map((p) => ({ ...p, locked: [] })) })}
+              moi={MOI}
+              joues={[]}
+              absentsDepuis={SANS_ABSENT}
+              onJouer={noop}
+              onSuite={noop} onDemanderQuitter={noop}
+              onQuitter={noop}
+            />
+          </AvecSalle>
         </Cadre>
         <Cadre titre="05 ter · Jeu · noms les plus longs">
-          <Jeu
-            state={base({ choices: { a: [{ card: 'frapper', target: 'b' }] } }, SEATS_LONGS)}
-            moi={MOI}
-            joues={['a', 'b']}
-            absentsDepuis={SANS_ABSENT}
-            onJouer={noop}
-            onSuite={noop} onDemanderQuitter={noop}
-            onQuitter={noop}
-          />
+          <AvecSalle>
+            <Jeu
+              state={base({ choices: { a: [{ card: 'frapper', target: 'b' }] } }, SEATS_LONGS)}
+              moi={MOI}
+              joues={['a', 'b']}
+              absentsDepuis={SANS_ABSENT}
+              onJouer={noop}
+              onSuite={noop} onDemanderQuitter={noop}
+              onQuitter={noop}
+            />
+          </AvecSalle>
         </Cadre>
         <Cadre titre="05 quater · Jeu · noms les plus longs · anglais" langue="en">
-          <Jeu
-            state={base({ choices: { a: [{ card: 'frapper', target: 'b' }] } }, SEATS_LONGS)}
-            moi={MOI}
-            joues={['a', 'b']}
-            absentsDepuis={SANS_ABSENT}
-            onJouer={noop}
-            onSuite={noop} onDemanderQuitter={noop}
-            onQuitter={noop}
-          />
+          <AvecSalle>
+            <Jeu
+              state={base({ choices: { a: [{ card: 'frapper', target: 'b' }] } }, SEATS_LONGS)}
+              moi={MOI}
+              joues={['a', 'b']}
+              absentsDepuis={SANS_ABSENT}
+              onJouer={noop}
+              onSuite={noop} onDemanderQuitter={noop}
+              onQuitter={noop}
+            />
+          </AvecSalle>
         </Cadre>
         <Cadre titre="06 · Jeu · carte choisie, choix de la cible">
-          <Jeu
-            state={base()}
-            moi={MOI}
-            joues={[]}
-            absentsDepuis={SANS_ABSENT}
-            carteInitiale="frapper"
-            onJouer={noop}
-            onSuite={noop} onDemanderQuitter={noop}
-            onQuitter={noop}
-          />
+          <AvecSalle>
+            <Jeu
+              state={base()}
+              moi={MOI}
+              joues={[]}
+              absentsDepuis={SANS_ABSENT}
+              carteInitiale="frapper"
+              onJouer={noop}
+              onSuite={noop} onDemanderQuitter={noop}
+              onQuitter={noop}
+            />
+          </AvecSalle>
         </Cadre>
         <Cadre titre="07 · Jeu · en attente des autres">
-          <Jeu
-            state={base({ choices: { a: [{ card: 'frapper', target: 'b' }] } })}
-            moi={MOI}
-            joues={['a', 'b', 'c']}
-            absentsDepuis={SANS_ABSENT}
-            onJouer={noop}
-            onSuite={noop} onDemanderQuitter={noop}
-            onQuitter={noop}
-          />
+          <AvecSalle>
+            <Jeu
+              state={base({ choices: { a: [{ card: 'frapper', target: 'b' }] } })}
+              moi={MOI}
+              joues={['a', 'b', 'c']}
+              absentsDepuis={SANS_ABSENT}
+              onJouer={noop}
+              onSuite={noop} onDemanderQuitter={noop}
+              onQuitter={noop}
+            />
+          </AvecSalle>
         </Cadre>
         <Cadre titre="09 · Jeu · manche à carte commune">
-          <Jeu
-            state={base({ round: 6, activeRoundCard: roundCardById('double-frappe')! })}
-            moi={MOI}
-            joues={[]}
-            absentsDepuis={SANS_ABSENT}
-            onJouer={noop}
-            onSuite={noop} onDemanderQuitter={noop}
-            onQuitter={noop}
-          />
+          <AvecSalle>
+            <Jeu
+              state={base({ round: 6, activeRoundCard: roundCardById('double-frappe')! })}
+              moi={MOI}
+              joues={[]}
+              absentsDepuis={SANS_ABSENT}
+              onJouer={noop}
+              onSuite={noop} onDemanderQuitter={noop}
+              onQuitter={noop}
+            />
+          </AvecSalle>
+        </Cadre>
+        {/*
+            Les trois cartes de manche qui changent CE QUE L'ÉCRAN DOIT DIRE.
+
+            La galerie n'en rendait qu'une, « Double frappe », et c'est la
+            seule dont l'effet ne se voit nulle part avant la révélation : elle
+            double des nombres. Les trois ci-dessous, elles, contredisent ce
+            que la barre du haut, les pastilles et le libellé de la main
+            affichaient — et c'est ainsi qu'une pastille a pu annoncer pendant
+            des mois « Interdit : Bloquer » au-dessus d'une carte Bloquer
+            marquée « jouable ».
+
+            `base()` verrouille une carte par joueur : c'est ce verrou-là que
+            les deux premières doivent rendre ou recouvrir.
+        */}
+        {/* Le ciblage sous « Ricochet » : chaque mur qu'on peut viser annonce
+            celui qui encaissera la seconde brique. Le cadre 06 le montre sans
+            carte de manche, donc sans note — les deux se lisent l'un à côté
+            de l'autre. */}
+        <Cadre titre="06 bis · Ciblage sous Ricochet · qui encaisse en plus">
+          <AvecSalle>
+            <Jeu
+              state={base({ round: 6, activeRoundCard: roundCardById('ricochet')! })}
+              moi={MOI}
+              joues={[]}
+              absentsDepuis={SANS_ABSENT}
+              carteInitiale="frapper"
+              onJouer={noop}
+              onSuite={noop} onDemanderQuitter={noop}
+              onQuitter={noop}
+            />
+          </AvecSalle>
+        </Cadre>
+        <Cadre titre="09 bis · Mémoire courte · le verrou est levé">
+          <AvecSalle>
+            <Jeu
+              state={base({ round: 6, activeRoundCard: roundCardById('memoire-courte')! })}
+              moi={MOI}
+              joues={[]}
+              absentsDepuis={SANS_ABSENT}
+              onJouer={noop}
+              onSuite={noop} onDemanderQuitter={noop}
+              onQuitter={noop}
+            />
+          </AvecSalle>
+        </Cadre>
+        <Cadre titre="09 ter · Trêve · Frapper interdit à toute la table">
+          <AvecSalle>
+            <Jeu
+              state={base({ round: 6, activeRoundCard: roundCardById('treve')! })}
+              moi={MOI}
+              joues={[]}
+              absentsDepuis={SANS_ABSENT}
+              onJouer={noop}
+              onSuite={noop} onDemanderQuitter={noop}
+              onQuitter={noop}
+            />
+          </AvecSalle>
+        </Cadre>
+        {/* Le mur le plus bas est celui de MOI : c'est le seul point de vue
+            depuis lequel « tu joues deux cartes » est vérifiable. */}
+        <Cadre titre="09 quater · Dernier mur · tu joues deux cartes">
+          <AvecSalle>
+            <Jeu
+              state={base({
+                round: 6,
+                activeRoundCard: roundCardById('dernier-mur')!,
+                players: base().players.map((p, i) => ({
+                  ...p,
+                  wall: mur(['IBBBB', 'IIIII', 'IIBBI', 'IIIIB'][i]),
+                })),
+              })}
+              moi={MOI}
+              joues={[]}
+              absentsDepuis={SANS_ABSENT}
+              onJouer={noop}
+              onSuite={noop} onDemanderQuitter={noop}
+              onQuitter={noop}
+            />
+          </AvecSalle>
         </Cadre>
         <Cadre titre="C2 · Carte de manche · fiche tirée en jeu">
-          <Jeu
-            state={base({
-              round: 6,
-              phase: 'carte-manche',
-              activeRoundCard: roundCardById('double-frappe')!,
-            })}
-            moi={MOI}
-            joues={[]}
-            absentsDepuis={SANS_ABSENT}
-            onJouer={noop}
-            onSuite={noop} onDemanderQuitter={noop}
-            onQuitter={noop}
-          />
+          <AvecSalle>
+            <Jeu
+              state={base({
+                round: 6,
+                phase: 'carte-manche',
+                activeRoundCard: roundCardById('double-frappe')!,
+              })}
+              moi={MOI}
+              joues={[]}
+              absentsDepuis={SANS_ABSENT}
+              onJouer={noop}
+              onSuite={noop} onDemanderQuitter={noop}
+              onQuitter={noop}
+            />
+          </AvecSalle>
         </Cadre>
         <Cadre titre="10 · Jeu · équipes 2 contre 2">
-          <Jeu
-            state={{
-              ...equipes,
-              round: 4,
-              phase: 'choix',
-              players: equipes.players.map((p, i) => ({
-                ...p,
-                wall: mur(['IIIBI', 'IIIBB', 'IIBBI', 'IIIIB'][i]),
-                locked: [['bloquer'], ['frapper'], ['reparer'], ['pieger']][i] as never,
-              })),
-            }}
-            moi={MOI}
-            joues={[]}
-            absentsDepuis={SANS_ABSENT}
-            onJouer={noop}
-            onSuite={noop} onDemanderQuitter={noop}
-            onQuitter={noop}
-          />
+          <AvecSalle>
+            <Jeu
+              state={{
+                ...equipes,
+                round: 4,
+                phase: 'choix',
+                players: equipes.players.map((p, i) => ({
+                  ...p,
+                  wall: mur(['IIIBI', 'IIIBB', 'IIBBI', 'IIIIB'][i]),
+                  locked: [['bloquer'], ['frapper'], ['reparer'], ['pieger']][i] as never,
+                })),
+              }}
+              moi={MOI}
+              joues={[]}
+              absentsDepuis={SANS_ABSENT}
+              onJouer={noop}
+              onSuite={noop} onDemanderQuitter={noop}
+              onQuitter={noop}
+            />
+          </AvecSalle>
+        </Cadre>
+        {/* Les équipes gardent leur propre géométrie — deux murs par panneau —
+            et le ciblage y porte deux notes au lieu de trois. C'est le cadre
+            qui le vérifie : une note de plus non budgétée pousse un mur sous
+            la ligne de flottaison, et le plateau ne défile jamais. */}
+        <Cadre titre="10 bis · Équipes · ciblage sous Ricochet">
+          <AvecSalle>
+            <Jeu
+              state={{
+                ...equipes,
+                round: 6,
+                phase: 'choix',
+                activeRoundCard: roundCardById('ricochet')!,
+                players: equipes.players.map((p, i) => ({
+                  ...p,
+                  wall: mur(['IIIBI', 'IIIBB', 'IIBBI', 'IIIIB'][i]),
+                  locked: [['bloquer'], ['frapper'], ['reparer'], ['pieger']][i] as never,
+                })),
+              }}
+              moi={MOI}
+              joues={[]}
+              absentsDepuis={SANS_ABSENT}
+              carteInitiale="frapper"
+              onJouer={noop}
+              onSuite={noop} onDemanderQuitter={noop}
+              onQuitter={noop}
+            />
+          </AvecSalle>
         </Cadre>
         <Cadre titre="08 · Révélation (piège retourné)">
-          <Revelation state={revelationPiege()} moi={MOI} onSuivant={noop} onDemanderQuitter={noop} />
+          <AvecSalle>
+            <Revelation state={revelationPiege()} moi={MOI} onSuivant={noop} onDemanderQuitter={noop} />
+          </AvecSalle>
         </Cadre>
         {/* Une réaction en vol : c'est le seul moment où une forme claire
             passe au-dessus d'une ligne de joueur, donc le seul où l'on peut
             vérifier qu'elle ne couvre ni un nom ni une contrainte. */}
         <Cadre titre="05 quinquies · Jeu · une réaction en vol">
-          <AvecSalle>
+          <AvecSalle messages={CONVERSATION}>
             <Jeu
               state={base()}
               moi={MOI}
@@ -581,7 +738,9 @@ function Galerie() {
           </AvecSalle>
         </Cadre>
         <Cadre titre="08 bis · Révélation (un blocage annule deux frappes)">
-          <Revelation state={revelationBlocage()} moi={MOI} onSuivant={noop} onDemanderQuitter={noop} />
+          <AvecSalle>
+            <Revelation state={revelationBlocage()} moi={MOI} onSuivant={noop} onDemanderQuitter={noop} />
+          </AvecSalle>
         </Cadre>
         <Cadre titre="11 · Fin de partie">
           <Fin state={finDePartie()} moi={MOI} peutRejouer onRejouer={noop} onPalmares={noop} onQuitter={noop} />
@@ -612,18 +771,20 @@ function Galerie() {
           <Palmares onRetour={noop} />
         </Cadre>
         <Cadre titre="12 · Cas limite · déconnexion en pleine manche">
-          <Jeu
-            state={base({
-              round: 7,
-              players: base().players.map((p) => (p.id === 'd' ? { ...p, connected: false } : p)),
-            })}
-            moi={MOI}
-            joues={[]}
-            absentsDepuis={SANS_ABSENT}
-            onJouer={noop}
-            onSuite={noop} onDemanderQuitter={noop}
-            onQuitter={noop}
-          />
+          <AvecSalle>
+            <Jeu
+              state={base({
+                round: 7,
+                players: base().players.map((p) => (p.id === 'd' ? { ...p, connected: false } : p)),
+              })}
+              moi={MOI}
+              joues={[]}
+              absentsDepuis={SANS_ABSENT}
+              onJouer={noop}
+              onSuite={noop} onDemanderQuitter={noop}
+              onQuitter={noop}
+            />
+          </AvecSalle>
         </Cadre>
         <Cadre titre="Réglages">
           <Reglages
@@ -683,19 +844,27 @@ function Galerie() {
           <CartesDeManche onRetour={noop} />
         </Cadre>
         <Cadre titre="13 · Quitter · à plusieurs, arbitre">
-          <Jeu state={base()} moi={MOI} joues={[]} absentsDepuis={SANS_ABSENT} onJouer={noop} onSuite={noop} onDemanderQuitter={noop} onQuitter={noop} />
+          <AvecSalle>
+            <Jeu state={base()} moi={MOI} joues={[]} absentsDepuis={SANS_ABSENT} onJouer={noop} onSuite={noop} onDemanderQuitter={noop} onQuitter={noop} />
+          </AvecSalle>
           <FeuilleQuitter salon={salonADeux()} hote onRester={noop} onQuitter={noop} />
         </Cadre>
         <Cadre titre="13 bis · Quitter · à plusieurs, invité">
-          <Jeu state={base()} moi={MOI} joues={[]} absentsDepuis={SANS_ABSENT} onJouer={noop} onSuite={noop} onDemanderQuitter={noop} onQuitter={noop} />
+          <AvecSalle>
+            <Jeu state={base()} moi={MOI} joues={[]} absentsDepuis={SANS_ABSENT} onJouer={noop} onSuite={noop} onDemanderQuitter={noop} onQuitter={noop} />
+          </AvecSalle>
           <FeuilleQuitter salon={salonADeux()} hote={false} onRester={noop} onQuitter={noop} />
         </Cadre>
         <Cadre titre="13 ter · Quitter · seul contre des bots">
-          <Jeu state={base()} moi={MOI} joues={[]} absentsDepuis={SANS_ABSENT} onJouer={noop} onSuite={noop} onDemanderQuitter={noop} onQuitter={noop} />
+          <AvecSalle>
+            <Jeu state={base()} moi={MOI} joues={[]} absentsDepuis={SANS_ABSENT} onJouer={noop} onSuite={noop} onDemanderQuitter={noop} onQuitter={noop} />
+          </AvecSalle>
           <FeuilleQuitter salon={salonSolo()} hote onRester={noop} onQuitter={noop} />
         </Cadre>
         <Cadre titre="13 quater · Quitter · anglais" langue="en">
-          <Jeu state={base()} moi={MOI} joues={[]} absentsDepuis={SANS_ABSENT} onJouer={noop} onSuite={noop} onDemanderQuitter={noop} onQuitter={noop} />
+          <AvecSalle>
+            <Jeu state={base()} moi={MOI} joues={[]} absentsDepuis={SANS_ABSENT} onJouer={noop} onSuite={noop} onDemanderQuitter={noop} onQuitter={noop} />
+          </AvecSalle>
           <FeuilleQuitter salon={salonADeux()} hote onRester={noop} onQuitter={noop} />
         </Cadre>
         <Cadre titre="M1 · Mise à jour · hors partie">
@@ -703,11 +872,15 @@ function Galerie() {
           <VueMiseAJour enPartie={false} onRecharger={noop} onPlusTard={noop} />
         </Cadre>
         <Cadre titre="M2 · Mise à jour · en partie">
-          <Jeu state={base()} moi={MOI} joues={[]} absentsDepuis={SANS_ABSENT} onJouer={noop} onSuite={noop} onDemanderQuitter={noop} onQuitter={noop} />
+          <AvecSalle>
+            <Jeu state={base()} moi={MOI} joues={[]} absentsDepuis={SANS_ABSENT} onJouer={noop} onSuite={noop} onDemanderQuitter={noop} onQuitter={noop} />
+          </AvecSalle>
           <VueMiseAJour enPartie onRecharger={noop} onPlusTard={noop} />
         </Cadre>
         <Cadre titre="M3 · Mise à jour · en partie · anglais" langue="en">
-          <Jeu state={base()} moi={MOI} joues={[]} absentsDepuis={SANS_ABSENT} onJouer={noop} onSuite={noop} onDemanderQuitter={noop} onQuitter={noop} />
+          <AvecSalle>
+            <Jeu state={base()} moi={MOI} joues={[]} absentsDepuis={SANS_ABSENT} onJouer={noop} onSuite={noop} onDemanderQuitter={noop} onQuitter={noop} />
+          </AvecSalle>
           <VueMiseAJour enPartie onRecharger={noop} onPlusTard={noop} />
         </Cadre>
       </Section>
@@ -717,10 +890,14 @@ function Galerie() {
           <Accueil onCreer={noop} onRejoindre={noop} onRegles={noop} onPalmares={noop} onReglages={noop} />
         </Cadre>
         <Cadre titre="05 · Jeu · état neutre · veillée" theme="veillee">
-          <Jeu state={base()} moi={MOI} joues={[]} absentsDepuis={SANS_ABSENT} onJouer={noop} onSuite={noop} onDemanderQuitter={noop} onQuitter={noop} />
+          <AvecSalle>
+            <Jeu state={base()} moi={MOI} joues={[]} absentsDepuis={SANS_ABSENT} onJouer={noop} onSuite={noop} onDemanderQuitter={noop} onQuitter={noop} />
+          </AvecSalle>
         </Cadre>
         <Cadre titre="08 · Révélation · veillée" theme="veillee">
-          <Revelation state={revelationPiege()} moi={MOI} onSuivant={noop} onDemanderQuitter={noop} />
+          <AvecSalle>
+            <Revelation state={revelationPiege()} moi={MOI} onSuivant={noop} onDemanderQuitter={noop} />
+          </AvecSalle>
         </Cadre>
         <Cadre titre="11 · Fin de partie · veillée" theme="veillee">
           <Fin state={finDePartie()} moi={MOI} peutRejouer onRejouer={noop} onPalmares={noop} onQuitter={noop} />
@@ -752,11 +929,15 @@ function Galerie() {
           <CartesDeManche onRetour={noop} />
         </Cadre>
         <Cadre titre="13 · Quitter · veillée" theme="veillee">
-          <Jeu state={base()} moi={MOI} joues={[]} absentsDepuis={SANS_ABSENT} onJouer={noop} onSuite={noop} onDemanderQuitter={noop} onQuitter={noop} />
+          <AvecSalle>
+            <Jeu state={base()} moi={MOI} joues={[]} absentsDepuis={SANS_ABSENT} onJouer={noop} onSuite={noop} onDemanderQuitter={noop} onQuitter={noop} />
+          </AvecSalle>
           <FeuilleQuitter salon={salonADeux()} hote onRester={noop} onQuitter={noop} />
         </Cadre>
         <Cadre titre="M2 · Mise à jour · en partie · veillée" theme="veillee">
-          <Jeu state={base()} moi={MOI} joues={[]} absentsDepuis={SANS_ABSENT} onJouer={noop} onSuite={noop} onDemanderQuitter={noop} onQuitter={noop} />
+          <AvecSalle>
+            <Jeu state={base()} moi={MOI} joues={[]} absentsDepuis={SANS_ABSENT} onJouer={noop} onSuite={noop} onDemanderQuitter={noop} onQuitter={noop} />
+          </AvecSalle>
           <VueMiseAJour enPartie onRecharger={noop} onPlusTard={noop} />
         </Cadre>
         <Cadre titre="11 bis · Palmarès · veillée" theme="veillee">
@@ -773,28 +954,32 @@ function Galerie() {
           />
         </Cadre>
         <Cadre titre="12 · Déconnexion · veillée" theme="veillee">
-          <Jeu
-            state={base({
-              players: base().players.map((p, i) => (i === 2 ? { ...p, connected: false } : p)),
-            })}
-            moi={MOI}
-            joues={[]}
-            absentsDepuis={new Map([['c', Date.now()]])}
-            onJouer={noop}
-            onSuite={noop} onDemanderQuitter={noop}
-            onQuitter={noop}
-          />
+          <AvecSalle>
+            <Jeu
+              state={base({
+                players: base().players.map((p, i) => (i === 2 ? { ...p, connected: false } : p)),
+              })}
+              moi={MOI}
+              joues={[]}
+              absentsDepuis={new Map([['c', Date.now()]])}
+              onJouer={noop}
+              onSuite={noop} onDemanderQuitter={noop}
+              onQuitter={noop}
+            />
+          </AvecSalle>
         </Cadre>
         <Cadre titre="09 · Carte de manche · veillée" theme="veillee">
-          <Jeu
-            state={base({ round: 6, activeRoundCard: roundCardById('double-frappe')! })}
-            moi={MOI}
-            joues={[]}
-            absentsDepuis={SANS_ABSENT}
-            onJouer={noop}
-            onSuite={noop} onDemanderQuitter={noop}
-            onQuitter={noop}
-          />
+          <AvecSalle>
+            <Jeu
+              state={base({ round: 6, activeRoundCard: roundCardById('double-frappe')! })}
+              moi={MOI}
+              joues={[]}
+              absentsDepuis={SANS_ABSENT}
+              onJouer={noop}
+              onSuite={noop} onDemanderQuitter={noop}
+              onQuitter={noop}
+            />
+          </AvecSalle>
         </Cadre>
         <Cadre titre="03 · Salon · veillée" theme="veillee">
           <Salon

@@ -95,22 +95,29 @@ export function Revelation({
         retourBg={encre.inner}
         retourFg={encre.sub}
         titre={tr('revelation.titre')}
+        sousTitreFg={encre.sub}
+        sousTitre={
+          <>
+            {/* Pendant la révélation la phase vaut « revelation » : c'est le
+                compteur qui dit qu'on est en mort subite. */}
+            {state.mortSubite > 0
+              ? tr('revelation.mortSubite', { n: state.mortSubite })
+              : tr('revelation.tousJoue', { n: outcome.round })}
+            {/* Sous quelle règle la manche a été résolue. L'écran montrait le
+                résultat d'une frappe à deux briques, ou d'un blocage qui n'a
+                rien bloqué, sans jamais renommer la carte qui en décidait :
+                le bandeau ocre était deux écrans plus tôt. */}
+            {state.activeRoundCard &&
+              ` · ${tr(`manche.${state.activeRoundCard.id}.nom` as const)}`}
+          </>
+        }
         hauteur={104}
         droite={
-          <>
-            <span style={{ font: `500 11px/1 ${TEXTE}`, color: encre.sub, whiteSpace: 'nowrap' }}>
-              {/* Pendant la révélation la phase vaut « revelation » : c'est le
-                  compteur qui dit qu'on est en mort subite. */}
-              {state.mortSubite > 0
-                ? tr('revelation.mortSubite', { n: state.mortSubite })
-                : tr('revelation.tousJoue', { n: outcome.round })}
-            </span>
-            {/* La table propose : quand ton mur vient d'être frappé, l'éventail
-                s'ouvre seul deux secondes. Une proposition, jamais une
-                interruption — et jamais pendant un choix de carte, puisqu'il
-                n'y en a plus à faire ici. */}
-            <Eventail propose={tout && monDelta < 0} />
-          </>
+          /* La table propose : quand ton mur vient d'être frappé, l'éventail
+             s'ouvre seul deux secondes. Une proposition, jamais une
+             interruption — et jamais pendant un choix de carte, puisqu'il
+             n'y en a plus à faire ici. */
+          <Eventail propose={tout && monDelta < 0} />
         }
       />
       <Corps pad="14px 14px 8px 14px" gap={11}>
@@ -155,7 +162,6 @@ export function Revelation({
                   visible ? { slots: tombe.slots, sens: tombe.sens, avant, delai: 220 } : undefined
                 }
                 moi={id === moi}
-                verrou={false}
                 bulles={<Bulles de={id} />}
                 compte={
                   visible ? (

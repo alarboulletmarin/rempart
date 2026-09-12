@@ -221,6 +221,13 @@ export const fr = {
   'jeu.tag.coequipier': 'coéquipier',
 
   'jeu.bandeau.frappe': 'Ta frappe part sur ce mur',
+  /* « touche aussi » et non « perd aussi une brique » : le rebond part, mais
+     le mur d'à côté peut bloquer ou piéger comme n'importe quel autre. On
+     annonce une frappe, pas son résultat. */
+  'jeu.ricochet.aussi': 'Ricochet — touche aussi {nom}',
+  /* Le tour se referme : frapper le dernier renvoie sur le premier, et le
+     premier, ce peut être toi. */
+  'jeu.ricochet.aussi.moi': 'Ricochet — touche aussi ton mur',
   'jeu.viser.aria': 'Viser le mur de {nom} — {briques} debout',
 
   'jeu.pied.cibler': 'Touche un mur pour cibler',
@@ -231,8 +238,17 @@ export const fr = {
   'jeu.pied.spectateur': 'Tu regardes cette manche de mort subite.',
 
   'jeu.main.titre': 'Ta main — choisis une carte',
-  'jeu.main.verrou_un': 'Ta main — {cartes} est interdite depuis la manche passée',
-  'jeu.main.verrou_autre': 'Ta main — {cartes} sont interdites depuis la manche passée',
+  // « Dernier mur » : le mur le plus bas joue deux cartes. Le bandeau ocre
+  // l'annonce à toute la table ; ceci le dit à la seule personne qui doit
+  // agir dessus, au-dessus des cartes qu'elle est en train de toucher.
+  'jeu.main.double_un': 'Ta main — encore une carte',
+  'jeu.main.double_autre': 'Ta main — Dernier mur : tu joues {n} cartes',
+  /* « cette manche » et non « depuis la manche passée » : la phrase couvre
+     désormais les deux causes d'un interdit — le verrou, et la carte de manche
+     — et seule la première vient d'hier. Sous « Trêve », l'écran annonçait un
+     verrou de la manche passée sur une carte que personne n'avait jouée. */
+  'jeu.main.interdit_un': 'Ta main — {cartes} est interdite cette manche',
+  'jeu.main.interdit_autre': 'Ta main — {cartes} sont interdites cette manche',
 
   'jeu.choix.frapper': 'Tu frappes {cible}',
   'jeu.choix.bloquer': 'Tu bloques',
@@ -260,6 +276,9 @@ export const fr = {
   'jeu.manche.retour': 'À la manche {n}, on revient aux règles de base, verrous compris.',
   'jeu.manche.compris': 'Compris, je joue',
   'jeu.manche.bandeau': 'Carte de manche · pour tout le monde',
+  // Une carte de manche qui ne vise qu'une place ne peut pas s'annoncer
+  // « pour tout le monde » : le surtitre nomme alors qui elle change.
+  'jeu.manche.bandeau.pour': 'Carte de manche · {nom}',
 
   /* ------------------------------------------------------------- le salon */
 

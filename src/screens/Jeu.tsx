@@ -3,9 +3,12 @@ import { TEXTE, TITRE } from '../theme'
 import {
   bricks,
   choicesRequired,
+  doubleCardPlayer,
+  forbiddenCards,
   hasPlayed,
   legalCards,
   playersToAct,
+  ricochetTarget,
   possibleTargets,
   readyCount,
 } from '../game/engine'
@@ -20,7 +23,14 @@ import {
 import { useT, type Cle, type T } from '../i18n'
 import { Etiquette, Panneau, Texte } from '../ui/atoms'
 import { Bulles, Eventail } from '../ui/discussion'
-import { BandeauCible, BandeauManche, LigneJoueur, Main, type EtatCarte } from '../ui/jeu'
+import {
+  BandeauCible,
+  BandeauManche,
+  LigneJoueur,
+  Main,
+  NoteRicochet,
+  type EtatCarte,
+} from '../ui/jeu'
 import { DUREE, anime, useMouvement } from '../ui/mouvement'
 import { Pictogramme } from '../ui/Pictogramme'
 import { CompteurManche, Corps, Ecran, EnTete } from '../ui/shell'
@@ -48,6 +58,24 @@ const GEOMETRIE = {
   equipes: { pad: '14px', gap: 12, mur: 34, carte: 118, pied: 54 },
   /** 12 · déconnexion en pleine manche */
   pause: { pad: '14px', gap: 11, mur: 36, carte: 126, pied: 56 },
+  /**
+   * 06 ter · ciblage sous « Ricochet », quand chaque mur visable porte sa note.
+   *
+   * Trois notes de plus, c'est quatre-vingt-dix pixels que le cadre du ciblage
+   * n'a pas : le mur du bas — celui qu'on est justement en train de viser —
+   * passait sous la ligne de flottaison. Murs, cartes et barre du bas rendent
+   * ce qu'il faut, et le bandeau ocre se resserre à son nom.
+   */
+  rebond: { pad: '14px 14px 8px 14px', gap: 7, mur: 26, carte: 102, pied: 50 },
+  /**
+   * 10 bis · le même ciblage, mais en équipes.
+   *
+   * Deux notes seulement — on ne vise que le camp d'en face — mais elles se
+   * posent dans des lignes déjà emboîtées dans le panneau de leur équipe, et
+   * ce cadre-là partait de plus bas. Il lui faut sa propre mesure : lui
+   * laisser celle des équipes faisait passer treize pixels sous la ligne.
+   */
+  equipesRebond: { pad: '14px', gap: 10, mur: 26, carte: 106, pied: 52 },
 } as const
 
 /**
@@ -237,12 +265,46 @@ export function Jeu({
 
   const deconnecte = state.players.find((p) => !p.connected)
 
+  /** Qui joue deux cartes cette manche, sous « Dernier mur ». */
+  const doubleurId = doubleCardPlayer(state)
+  const doubleur = state.players.find((p) => p.id === doubleurId)
+
   const bandeauDe = (p: Player) => {
     // Le mur visé porte un bandeau qui nomme l'action : sans lui, on ne sait
     // pas si la ligne mise en avant est la cible ou soi-même.
     const c = choix.find((x) => x.target === p.id && x.card === 'frapper')
     if (!c || p.id === moi || !envoye) return undefined
     return <BandeauCible card="frapper" texte={tr('jeu.bandeau.frappe')} />
+  }
+
+  /*
+   * Ce que viser cette ligne-ci coûterait à une autre.
+   *
+   * Sous « Ricochet », la frappe part sur deux murs et l'écran de ciblage n'en
+   * montrait qu'un : la seconde brique tombait sur quelqu'un que personne
+   * n'avait visé, et on ne pouvait pas le prévoir — « le joueur assis juste
+   * après » n'est pas « la ligne d'en dessous » dès qu'une place est vide, et
+   * le tour se referme sur lui-même.
+   *
+   * La note ne se pose que sur les murs qu'on peut effectivement toucher, et
+   * seulement pendant qu'on vise : hors de ce geste elle n'aurait aucune
+   * question à laquelle répondre.
+   */
+  const noteRicochetDe = (p: Player) => {
+    if (carteEnCours !== 'frapper' || !cibles.includes(p.id)) return undefined
+    const rebond = ricochetTarget(state, p.id)
+    if (!rebond) return undefined
+    const nom = state.players.find((x) => x.id === rebond)?.name
+    return (
+      <NoteRicochet
+        fond={p.id === moi ? t.panel : t.panel2}
+        texte={
+          rebond === moi
+            ? tr('jeu.ricochet.aussi.moi')
+            : tr('jeu.ricochet.aussi', { nom: nom ?? '' })
+        }
+      />
+    )
   }
 
   /*
@@ -254,17 +316,28 @@ export function Jeu({
    * sa place sur les murs, les cartes et la barre du bas. Les approximer, c'est
    * faire déborder un cadre sur deux.
    */
+  /*
+   * Vise-t-on sous « Ricochet » ? Alors chaque cible possible porte une note,
+   * et le cadre doit leur faire de la place.
+   */
+  const notesRebond =
+    carteEnCours === 'frapper' && cibles.some((id) => ricochetTarget(state, id) !== null)
+
   const cadre = deconnecte
     ? GEOMETRIE.pause
-    : equipes
-      ? GEOMETRIE.equipes
-      : state.activeRoundCard
-        ? GEOMETRIE.manche
-        : carteEnCours
-          ? GEOMETRIE.cible
-          : envoye
-            ? GEOMETRIE.attente
-            : GEOMETRIE.neutre
+    : notesRebond
+      ? equipes
+        ? GEOMETRIE.equipesRebond
+        : GEOMETRIE.rebond
+      : equipes
+        ? GEOMETRIE.equipes
+        : state.activeRoundCard
+          ? GEOMETRIE.manche
+          : carteEnCours
+            ? GEOMETRIE.cible
+            : envoye
+              ? GEOMETRIE.attente
+              : GEOMETRIE.neutre
 
   const ligne = (p: Player, nu = false) => {
     const { tag, couleur, discret } = tagDe(p)
@@ -276,12 +349,23 @@ export function Jeu({
         moi={p.id === moi}
         bulles={<Bulles de={p.id} />}
         nu={nu}
-        verrou={!deconnecte}
+        /*
+         * La pastille se tait pendant une pause, et en mort subite.
+         *
+         * En pause, le plateau est en retrait et rien n'est à jouer. En mort
+         * subite, le verrou ne s'applique plus du tout (Frapper est imposé à
+         * tout le monde) : peindre « Interdit : Bloquer, Réparer et Piéger »
+         * sur chaque ligne répéterait trois fois ce que l'en-tête dit une.
+         */
+        interdites={
+          deconnecte || state.phase === 'mort-subite' ? undefined : forbiddenCards(state, p.id)
+        }
         tag={tag}
         tagColor={couleur}
         tagDiscret={discret}
         hauteurMur={nu ? GEOMETRIE.equipes.mur : cadre.mur}
         bandeau={bandeauDe(p)}
+        dessous={noteRicochetDe(p)}
         onClick={ciblable ? () => choisirCible(p.id) : undefined}
         ariaLabel={
           ciblable
@@ -319,16 +403,36 @@ export function Jeu({
   // c'est cinquante-six pixels que la main n'avait pas.
   null
 
-  // En temps normal la carte interdite se lit sur la carte elle-même, donc le
-  // libellé reste court. Sur une manche à carte commune, le joueur a une règle
-  // de plus à tenir en tête : on lui rappelle son verrou en toutes lettres.
-  const libelleMain = envoye
-    ? phraseChoix(state, choix, moi, tr)
-    : state.activeRoundCard && me.locked.length > 0
-      ? tr.n('jeu.main.verrou', me.locked.length, {
-          cartes: tr.liste(me.locked.map((k) => tr(`carte.${k}` as const))),
-        })
-      : tr('jeu.main.titre')
+  /*
+   * En temps normal la carte interdite se lit sur la carte elle-même, donc le
+   * libellé reste court. Sur une manche à carte commune, le joueur a une règle
+   * de plus à tenir en tête : on lui rappelle en toutes lettres ce qui ne part
+   * pas — et, sous « Dernier mur », qu'il en doit deux et non une.
+   *
+   * `mesInterdites` et non `me.locked` : sous « Mémoire courte » la phrase
+   * annonçait un verrou levé, et c'est justement la seule manche où elle
+   * s'affichait, puisqu'elle demande une carte de manche.
+   */
+  const mesInterdites = forbiddenCards(state, moi)
+  /*
+   * Le choix complet se dit dès qu'il l'est, sans attendre l'aller-retour.
+   *
+   * `envoye` ne bascule qu'une fois la partie au courant ; d'ici là il reste
+   * une image où la main est faite mais où l'écran demandait encore de
+   * choisir. Sous « Dernier mur » cette image annonçait « encore une carte »
+   * alors qu'il n'en restait aucune.
+   */
+  const restant = requis - choix.length
+  const libelleMain =
+    envoye || restant <= 0
+      ? phraseChoix(state, choix, moi, tr)
+      : requis > 1
+        ? tr.n('jeu.main.double', restant, { n: restant })
+        : state.activeRoundCard && mesInterdites.length > 0
+          ? tr.n('jeu.main.interdit', mesInterdites.length, {
+              cartes: tr.liste(mesInterdites.map((k) => tr(`carte.${k}` as const))),
+            })
+          : tr('jeu.main.titre')
 
   /* ------------------------------------------------- carte de manche */
 
@@ -349,13 +453,18 @@ export function Jeu({
     <Ecran>
       <EnTete
         /*
-         * La sortie s'efface le temps de choisir une cible.
+         * Le temps de choisir une cible, la barre appartient à l'action.
          *
-         * Le bandeau « Frapper · choisis une cible » fait à lui seul 212 px :
-         * avec le compteur de manches, la barre est pleine, et la pastille la
-         * ferait déborder. Ce n'est pas un piège — ce geste-là s'annule en
-         * touchant une autre carte — et la barre change déjà entièrement à cet
-         * instant, donc la pastille ne disparaît pas toute seule sous les yeux.
+         * « Frapper · choisis une cible » fait à lui seul 212 px ; avec le
+         * compteur de manches il ne reste rien, et la sortie s'effaçait déjà
+         * pour lui faire place. Ce n'était pas assez : l'éventail restait, et
+         * ses 38 px partaient hors de l'écran — coupés sans bruit, puisque
+         * `Ecran` ne défile pas. Il s'efface donc lui aussi.
+         *
+         * Rien ne se perd : le geste s'annule en touchant une autre carte, et
+         * les deux reviennent dès que la cible est choisie. C'est d'ailleurs
+         * la règle que l'éventail suit déjà partout ailleurs — il ne s'ouvre
+         * jamais de lui-même pendant un choix de carte.
          */
         onRetour={carteEnCours ? undefined : onDemanderQuitter}
         libelleRetour={tr('commun.quitter')}
@@ -373,7 +482,7 @@ export function Jeu({
             {droite}
             {/* Un doigt, dans la barre du haut : le jeu ne s'interrompt pas, et
                 la feuille de conversation ne s'ouvre jamais en partie. */}
-            <Eventail />
+            {!carteEnCours && <Eventail />}
           </>
         }
         hauteur={state.activeRoundCard ? 98 : 104}
@@ -384,6 +493,19 @@ export function Jeu({
           <BandeauManche
             nom={tr(`manche.${state.activeRoundCard.id}.nom`)}
             detail={tr(`manche.${state.activeRoundCard.id}.detail`)}
+            resserre={notesRebond}
+            /*
+             * « Dernier mur » ne change la manche que d'une seule personne, et
+             * son détail la désignait par une périphrase — « le joueur qui a le
+             * moins de briques » — qu'il fallait résoudre soi-même en comptant
+             * quatre murs, et qui reste ambiguë à égalité (le moteur départage
+             * alors par la place). Le surtitre la nomme.
+             */
+            surtitre={
+              doubleur
+                ? tr('jeu.manche.bandeau.pour', { nom: doubleur.name })
+                : undefined
+            }
           />
         )}
 
@@ -521,11 +643,24 @@ function phraseChoix(state: GameState, choix: Choice[], moi: PlayerId, tr: T): s
   return tr('jeu.choix.changer', { choix: parts.join(', ') })
 }
 
-/** Une ligne de conseil qui s'appuie sur les verrous visibles à l'écran. */
+/**
+ * Une ligne de conseil qui s'appuie sur les contraintes visibles à l'écran.
+ *
+ * Elle lit la même source que les pastilles (`forbiddenCards`), sans quoi elle
+ * conseillait de frapper un joueur « qui ne peut pas bloquer » alors que
+ * « Mémoire courte » venait de lui rendre la carte.
+ *
+ * Sous « Mur nu », Bloquer ne bloque plus personne : le conseil ne porte donc
+ * plus sur les bloqueurs mais sur le mur le plus bas, seule information qui
+ * garde un sens cette manche-là.
+ */
 function conseilCible(state: GameState, cibles: PlayerId[], tr: T): string {
-  const bloqueurs = state.players.filter(
-    (p) => cibles.includes(p.id) && p.locked.includes('bloquer'),
-  )
+  const bloqueurs =
+    state.activeRoundCard?.id === 'mur-nu'
+      ? []
+      : state.players.filter(
+          (p) => cibles.includes(p.id) && forbiddenCards(state, p.id).includes('bloquer'),
+        )
   if (bloqueurs.length === 1) {
     // Sans pronom personnel : le nom d'un joueur ne dit pas son genre, et
     // « il ne peut pas » se trompait sur une personne sur deux.

@@ -164,8 +164,9 @@ export function Main({
  *
  * **L'absence de contrainte se dit aussi.** Une ligne sans pastille se lit
  * comme une ligne dont on ne sait rien ; « Tout est jouable » est une
- * information, et c'en est une lourde en manche 1 ou après une carte
- * « Mémoire courte ».
+ * information, et c'en est une lourde en manche 1 ou sous une carte
+ * « Mémoire courte », qui lève le verrou de toute la table le temps d'une
+ * manche.
  *
  * Le pictogramme de la carte double le mot : en niveaux de gris, sur un écran
  * au soleil ou pour qui distingue mal les couleurs, la forme reste.
@@ -231,7 +232,7 @@ export function LigneJoueur({
   chant = 5,
   pad = 13,
   gap = 10,
-  verrou = true,
+  interdites,
   nu = false,
   bandeau,
   dessous,
@@ -260,7 +261,19 @@ export function LigneJoueur({
   chant?: number
   pad?: number | string
   gap?: number
-  verrou?: boolean
+  /**
+   * Ce que ce joueur ne peut pas jouer CETTE manche — `forbiddenCards`, et
+   * jamais `player.locked`.
+   *
+   * La ligne reçoit la liste déjà calculée plutôt que de la déduire du champ
+   * brut : le verrou n'est qu'une des raisons d'interdire une carte, la carte
+   * de manche en est une autre, et seul le moteur sait les additionner. Une
+   * liste vide dit « Tout est jouable » — c'est une information, pas une
+   * absence. Absente, la pastille ne se peint pas du tout : c'est le cas de
+   * la révélation, où les verrous de la manche à venir ne sont pas encore
+   * posés.
+   */
+  interdites?: CardKey[]
   /**
    * Sans panneau : le mur nu, posé dans un panneau qui l'englobe déjà.
    *
@@ -314,7 +327,7 @@ export function LigneJoueur({
         WebkitTapHighlightColor: 'transparent',
       }}
     >
-      <LigneAccessible nom={player.name} wall={w} locked={verrou ? player.locked : undefined} />
+      <LigneAccessible nom={player.name} wall={w} locked={interdites} />
       {bulles}
       <div style={{ display: 'flex', alignItems: 'center', gap: 9, flexWrap: 'nowrap' }}>
         <Forme ci={player.ci} size={nu ? 17 : 20} />
@@ -339,7 +352,7 @@ export function LigneJoueur({
         >
           {player.name}
         </span>
-        {verrou && <Contrainte locked={player.locked} chipBg={chipBg} petit={nu} />}
+        {interdites && <Contrainte locked={interdites} chipBg={chipBg} petit={nu} />}
         {compte}
         {tag &&
           (tagDiscret ? (
@@ -413,15 +426,71 @@ export function BandeauCible({ card, texte }: { card: CardKey; texte: string }) 
   )
 }
 
+/**
+ * La note de ricochet, posée sur un mur qu'on peut viser.
+ *
+ * Discrète, et non en terre cuite : rien n'est encore parti. Le bandeau terre
+ * cuite dit « ta frappe part sur ce mur » — un fait —, alors que celle-ci dit
+ * ce qui arriverait si l'on touchait CETTE ligne-ci. Lui donner la même
+ * matière ferait croire à quatre frappes simultanées.
+ *
+ * Elle se répète sur chaque cible possible parce que la réponse change avec la
+ * cible : c'est une information par ligne, pas une règle générale. La règle
+ * générale, elle, est déjà écrite sur le bandeau ocre.
+ */
+export function NoteRicochet({ texte, fond }: { texte: string; fond?: string }) {
+  const t = useTheme()
+  /*
+   * Une seule ligne, et sans pictogramme.
+   *
+   * Elle se répète sur chaque cible possible : ce qui coûte trente-huit pixels
+   * sur une ligne en coûte cent quatorze sur trois, et le plateau du tour de
+   * jeu ne défile jamais — le mur du bas passait sous la ligne de flottaison,
+   * c'est-à-dire le mur qu'on est en train de viser. Le pictogramme doublait
+   * d'ailleurs le mot « Frapper » déjà peint en grand dans la barre du haut.
+   */
+  return (
+    <div
+      style={{
+        background: fond ?? t.panel2,
+        borderRadius: 10,
+        padding: '5px 9px',
+        font: `500 11px/1.3 ${TEXTE}`,
+        color: t.ink2,
+        minWidth: 0,
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap',
+      }}
+    >
+      {texte}
+    </div>
+  )
+}
+
 /** Le bandeau ocre d'une carte de manche : la seule chose ocre du jeu. */
 export function BandeauManche({
   nom,
   detail,
   surtitre,
+  resserre,
 }: {
   nom: string
   detail: string
   surtitre?: string
+  /**
+   * Le bandeau réduit à son nom, quand l'écran dit sa règle mieux que lui.
+   *
+   * C'est le cas pendant qu'on vise sous « Ricochet » : chaque mur visable
+   * porte déjà le nom de celui qui encaissera la seconde brique, ce qui est la
+   * même règle rendue à la ligne près. Garder les deux coûtait deux lignes de
+   * texte — et le plateau du tour de jeu ne défile jamais, donc ces deux
+   * lignes-là se prenaient sur un mur.
+   *
+   * Le nom reste : c'est lui qui rattache les notes à la carte, sans quoi
+   * elles arriveraient sans cause.
+   */
+  resserre?: boolean
 }) {
   const t = useTheme()
   const tr = useT()
@@ -441,7 +510,9 @@ export function BandeauManche({
         {surtitre ?? tr('jeu.manche.bandeau')}
       </Etiquette>
       <div style={{ font: `700 19px/1.1 ${TITRE}`, color: t.ochreFort }}>{nom}</div>
-      <div style={{ font: `500 12px/1.35 ${TEXTE}`, color: t.ochreInk }}>{detail}</div>
+      {!resserre && (
+        <div style={{ font: `500 12px/1.35 ${TEXTE}`, color: t.ochreInk }}>{detail}</div>
+      )}
     </div>
   )
 }

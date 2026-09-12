@@ -138,21 +138,48 @@ export function Retour({
  * bande-là qu'on retranche pour lui substituer la zone sûre réelle, sans quoi
  * l'en-tête porterait sur un écran de bureau une bande vide que rien
  * n'occupe.
+ *
+ * ## Ce qui cède quand la barre est pleine, et dans quel ordre
+ *
+ * Quatre blocs incompressibles côte à côte, et la barre débordait — sans le
+ * dire, puisque `Ecran` coupe au lieu de défiler : sur la révélation,
+ * l'éventail était tranché par le bord droit. Chaque écran le contournait à
+ * sa façon (le tour de jeu efface sa pastille de sortie le temps de viser),
+ * ce qui traitait le symptôme un cas à la fois.
+ *
+ * L'ordre des concessions est donc fixé ici, une bonne fois :
+ *
+ *  1. **La sortie ne cède jamais.** C'est la porte ; une porte à moitié
+ *     peinte ne s'ouvre plus, et 44 px est la cible réglementaire.
+ *  2. **Ce qui est à droite ne cède qu'à la marge.** Ce sont des gestes —
+ *     l'éventail, la pastille de chapitre —, pas du texte. Seule une jauge
+ *     qui se donne une base souple (`flex: '0 1 74px'`) y consent.
+ *  3. **Le titre et son sous-titre cèdent les premiers**, et s'abrègent
+ *     plutôt que de pousser le reste hors de l'écran.
+ *
+ * Le sous-titre se pose SOUS le titre, et non à côté. « Révélation » plus
+ * « manche 2 · tout le monde a joué » sur une ligne réclamaient 305 px là où
+ * il en restait 189 : à côté, l'un des deux aurait été abrégé à chaque fois,
+ * alors qu'empilés les deux tiennent en entier dans la hauteur déjà réservée.
  */
 export function EnTete({
   titre,
+  sousTitre,
   gauche,
   onRetour,
   libelleRetour,
   droite,
   bg,
   fg,
+  sousTitreFg,
   retourBg,
   retourFg,
   hauteur = 104,
   pad = 18,
 }: {
   titre?: ReactNode
+  /** La ligne de contexte sous le titre : « manche 2 · tout le monde a joué ». */
+  sousTitre?: ReactNode
   /** Ce qui remplace le titre à gauche : le compteur de manches, par exemple. */
   gauche?: ReactNode
   onRetour?: () => void
@@ -162,16 +189,24 @@ export function EnTete({
   droite?: ReactNode
   bg?: string
   fg?: string
+  sousTitreFg?: string
   retourBg?: string
   retourFg?: string
   hauteur?: number
   pad?: number
 }) {
   const t = useTheme()
+  const abrege: CSSProperties = {
+    minWidth: 0,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+  }
   return (
     <div
       style={{
         flex: `0 0 auto`,
+        minWidth: 0,
         minHeight: `calc(${SAFE_TOP} + ${Math.max(0, hauteur - BANDEAU_PLANCHE)}px)`,
         background: bg ?? t.panel,
         display: 'flex',
@@ -184,19 +219,44 @@ export function EnTete({
         <Retour onClick={onRetour} bg={retourBg} fg={retourFg} libelle={libelleRetour} />
       )}
       {gauche}
-      {titre && (
+      {(titre || sousTitre) && (
         <div
           style={{
-            font: `700 21px/1 ${TITRE}`,
-            color: fg ?? t.ink,
-            whiteSpace: 'nowrap',
-            flex: '0 0 auto',
+            // Le bloc qui cède : il prend la place qui reste, et la rend quand
+            // il n'y en a plus assez pour tout le monde.
+            flex: '1 1 auto',
+            minWidth: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 3,
           }}
         >
-          {titre}
+          {titre && (
+            <div style={{ font: `700 21px/1 ${TITRE}`, color: fg ?? t.ink, ...abrege }}>
+              {titre}
+            </div>
+          )}
+          {sousTitre && (
+            <div style={{ font: `500 11px/1.2 ${TEXTE}`, color: sousTitreFg ?? t.ink2, ...abrege }}>
+              {sousTitre}
+            </div>
+          )}
         </div>
       )}
-      {droite && <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 9 }}>{droite}</div>}
+      {droite && (
+        <div
+          style={{
+            marginLeft: 'auto',
+            minWidth: 0,
+            flex: '0 1 auto',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 9,
+          }}
+        >
+          {droite}
+        </div>
+      )}
     </div>
   )
 }

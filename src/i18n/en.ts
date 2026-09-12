@@ -191,6 +191,8 @@ export const en: Catalogue = {
   'jeu.tag.coequipier': 'teammate',
 
   'jeu.bandeau.frappe': 'Your strike lands on this wall',
+  'jeu.ricochet.aussi': 'Ricochet — also hits {nom}',
+  'jeu.ricochet.aussi.moi': 'Ricochet — also hits your wall',
   'jeu.viser.aria': 'Aim at {nom}’s wall — {briques} standing',
 
   'jeu.pied.cibler': 'Touch a wall to aim',
@@ -201,8 +203,10 @@ export const en: Catalogue = {
   'jeu.pied.spectateur': 'You are watching this sudden-death round.',
 
   'jeu.main.titre': 'Your hand — pick a card',
-  'jeu.main.verrou_un': 'Your hand — {cartes} has been locked since last round',
-  'jeu.main.verrou_autre': 'Your hand — {cartes} have been locked since last round',
+  'jeu.main.double_un': 'Your hand — one more card',
+  'jeu.main.double_autre': 'Your hand — Last wall: you play {n} cards',
+  'jeu.main.interdit_un': 'Your hand — {cartes} is locked this round',
+  'jeu.main.interdit_autre': 'Your hand — {cartes} are locked this round',
 
   'jeu.choix.frapper': 'You strike {cible}',
   'jeu.choix.bloquer': 'You block',
@@ -228,6 +232,7 @@ export const en: Catalogue = {
   'jeu.manche.retour': 'From round {n}, the base rules are back, locks included.',
   'jeu.manche.compris': 'Got it, let’s play',
   'jeu.manche.bandeau': 'Round card · for everyone',
+  'jeu.manche.bandeau.pour': 'Round card · {nom}',
 
   /* ------------------------------------------------------------- le salon */
 
