@@ -1,4 +1,4 @@
-import { Fragment, useId, type CSSProperties, type ReactNode } from 'react'
+import { Fragment, useEffect, useId, useState, type CSSProperties, type ReactNode } from 'react'
 import { TEXTE, TITRE } from '../theme'
 import { useT, type Cle, type LanguePref } from '../i18n'
 import { Icone } from '../ui/Icone'
@@ -49,6 +49,8 @@ export function Reglages({
   onPref,
   languePref,
   onLanguePref,
+  nomDefaut,
+  onNomDefaut,
   onCartesManche,
   onRetour,
 }: {
@@ -56,6 +58,9 @@ export function Reglages({
   onPref: (p: ThemePref) => void
   languePref: LanguePref
   onLanguePref: (p: LanguePref) => void
+  /** Le nom mémorisé, celui qui pré-remplit « Nouvelle partie ». */
+  nomDefaut: string
+  onNomDefaut: (n: string) => void
   onCartesManche: () => void
   onRetour: () => void
 }) {
@@ -111,14 +116,22 @@ export function Reglages({
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: DANS_SECTION }}>
           <EnTeteSection>{tr('reglages.jeu.titre')}</EnTeteSection>
-          <Panneau radius={16} pad="14px 16px" gap={3} onClick={onCartesManche}>
-            <span style={{ font: `700 17px/1 ${TITRE}`, color: t.ink }}>
-              {tr('reglages.jeu.cartesManche.titre')}
-            </span>
-            <Texte size={12} weight={400}>
-              {tr('reglages.jeu.cartesManche.detail')}
-            </Texte>
-          </Panneau>
+          <ChampNom valeur={nomDefaut} onValider={onNomDefaut} />
+          {/*
+           * Une ligne de navigation, pas une carte.
+           *
+           * « Cartes de manche » avait le même arrondi et le même fond que les
+           * options cliquables, sans contrôle ni chevron : une fausse
+           * affordance devant un texte explicatif, alors que le réglage réel
+           * est ailleurs — à la création de la partie. Elle mène maintenant
+           * là où elle prétendait mener : la section des règles qui montre les
+           * neuf cartes.
+           */}
+          <LigneNav
+            libelle={tr('reglages.jeu.cartesManche.titre')}
+            detail={tr('reglages.jeu.cartesManche.detail')}
+            onClick={onCartesManche}
+          />
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: DANS_SECTION }}>
@@ -141,6 +154,105 @@ export function Reglages({
         </Texte>
       </Corps>
     </Ecran>
+  )
+}
+
+/**
+ * Le nom par défaut.
+ *
+ * Il se sauvegarde à la perte de focus : pas de bouton « Enregistrer » à
+ * pousser pour trois lettres, et pas une écriture dans le stockage à chaque
+ * frappe. La frappe reste locale — sans cela, un `value` piloté depuis le
+ * parent replacerait le curseur à chaque lettre.
+ */
+function ChampNom({
+  valeur,
+  onValider,
+}: {
+  valeur: string
+  onValider: (n: string) => void
+}) {
+  const t = useTheme()
+  const tr = useT()
+  const [saisie, setSaisie] = useState(valeur)
+
+  /* Le nom change par en haut quand on efface ses données : le champ suit. */
+  useEffect(() => setSaisie(valeur), [valeur])
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+      <input
+        value={saisie}
+        onChange={(e) => setSaisie(e.target.value)}
+        onBlur={() => onValider(saisie.trim())}
+        maxLength={14}
+        placeholder={tr('creation.nom.exemple')}
+        aria-label={tr('reglages.jeu.nom.aria')}
+        style={{
+          height: 56,
+          borderRadius: RAYON,
+          background: t.panel,
+          boxShadow: `0 3px 0 ${t.edge}`,
+          border: '2px solid transparent',
+          padding: '0 14px',
+          font: `700 18px/1 ${TITRE}`,
+          color: t.ink,
+          width: '100%',
+        }}
+      />
+      <Texte size={12} weight={400} style={{ lineHeight: LIGNE }}>
+        {tr('reglages.jeu.nom.detail')}
+      </Texte>
+    </div>
+  )
+}
+
+/**
+ * Une ligne qui mène ailleurs : un libellé, une précision, un chevron.
+ *
+ * Visuellement distincte des cartes de choix — pas d'anneau à gauche, un
+ * chevron à droite — parce qu'elle ne fait pas la même chose : elle ne retient
+ * rien, elle ouvre un autre écran.
+ */
+function LigneNav({
+  libelle,
+  detail,
+  onClick,
+}: {
+  libelle: string
+  detail: string
+  onClick: () => void
+}) {
+  const t = useTheme()
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      style={{
+        background: t.panel,
+        borderRadius: RAYON,
+        boxShadow: `0 3px 0 ${t.edge}`,
+        border: 'none',
+        minHeight: 56,
+        padding: '12px 14px',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 12,
+        textAlign: 'left',
+        cursor: 'pointer',
+        WebkitTapHighlightColor: 'transparent',
+      }}
+    >
+      <span style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 3 }}>
+        <span style={{ font: `700 16px/1.25 ${TITRE}`, color: t.ink }}>{libelle}</span>
+        <span
+          style={{ font: `400 12px/${LIGNE} ${TEXTE}`, color: t.ink2, textWrap: 'pretty' }}
+        >
+          {detail}
+        </span>
+      </span>
+      <Icone nom="chevron" size={18} color={t.ink2} />
+    </button>
   )
 }
 

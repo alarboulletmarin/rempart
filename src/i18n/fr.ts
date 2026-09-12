@@ -94,9 +94,12 @@ export const fr = {
   'reglages.langue.nom.fr': 'français',
   'reglages.langue.nom.en': 'anglais',
   'reglages.jeu.titre': 'Le jeu',
-  'reglages.jeu.cartesManche.titre': 'Cartes de manche',
+  'reglages.jeu.nom.titre': 'Nom par défaut',
+  'reglages.jeu.nom.aria': 'Ton nom par défaut',
+  'reglages.jeu.nom.detail': 'Pré-rempli quand tu crées ou rejoins une partie.',
+  'reglages.jeu.cartesManche.titre': 'Voir les neuf cartes',
   'reglages.jeu.cartesManche.detail':
-    'Les neuf cartes des manches 3, 6 et 9. Elles s’activent à la création de la partie.',
+    'Celles des manches 3, 6 et 9. Elles s’activent à la création de la partie.',
   'reglages.garde.titre': 'Ce que l’app garde',
   'reglages.garde.quoi': 'Ton palmarès, ton thème et ta langue, sur cet appareil uniquement.',
   'reglages.garde.rien':

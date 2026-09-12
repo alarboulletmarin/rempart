@@ -4,6 +4,7 @@ import type { Choice, Format } from './game/types'
 import type { ChapitreId } from './game/content'
 import { Session, type Avis, type VueSession } from './net/session'
 import { compterCarte, enregistrerPartie } from './store/palmares'
+import { ecrireNom, lireNom } from './store/preferences'
 import { Accueil } from './screens/Accueil'
 import { Creation } from './screens/Creation'
 import { Fin } from './screens/Fin'
@@ -94,7 +95,18 @@ export function App() {
   const [places, setPlaces] = useState(4)
   const [format, setFormat] = useState<Format>('chacun')
   const [cartesManche, setCartesManche] = useState(true)
-  const [monNom, setMonNom] = useState('')
+  /*
+   * Le nom, mémorisé d'une partie à l'autre.
+   *
+   * Il se retapait à chaque partie, sur un écran où c'est la première chose
+   * qu'on rencontre. Il se règle donc aussi dans Réglages, et ce qui y est
+   * écrit pré-remplit « Nouvelle partie » et « Rejoindre ».
+   *
+   * Ce qu'on tape à la création n'est PAS enregistré au passage : jouer une
+   * fois sous un autre nom est exactement le cas où on ne veut pas que l'app
+   * s'en souvienne. Seul le champ des réglages écrit sur le disque.
+   */
+  const [monNom, setMonNom] = useState(lireNom)
   /**
    * Le dernier code essayé.
    *
@@ -386,6 +398,11 @@ export function App() {
             onPref={setPref}
             languePref={languePref}
             onLanguePref={setLanguePref}
+            nomDefaut={monNom}
+            onNomDefaut={(n) => {
+              setMonNom(n)
+              ecrireNom(n)
+            }}
             onCartesManche={() => setVue({ v: 'cartes-manche' })}
             onRetour={() => setVue({ v: 'accueil' })}
           />

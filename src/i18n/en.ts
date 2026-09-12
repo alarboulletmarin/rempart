@@ -73,9 +73,12 @@ export const en: Catalogue = {
   'reglages.langue.nom.fr': 'French',
   'reglages.langue.nom.en': 'English',
   'reglages.jeu.titre': 'The game',
-  'reglages.jeu.cartesManche.titre': 'Round cards',
+  'reglages.jeu.nom.titre': 'Default name',
+  'reglages.jeu.nom.aria': 'Your default name',
+  'reglages.jeu.nom.detail': 'Pre-filled when you create or join a game.',
+  'reglages.jeu.cartesManche.titre': 'See the nine cards',
   'reglages.jeu.cartesManche.detail':
-    'The nine cards of rounds 3, 6 and 9. You switch them on when you create the game.',
+    'The ones from rounds 3, 6 and 9. You switch them on when you create the game.',
   'reglages.garde.titre': 'What the app keeps',
   'reglages.garde.quoi': 'Your record, your theme and your language, on this device only.',
   'reglages.garde.rien':

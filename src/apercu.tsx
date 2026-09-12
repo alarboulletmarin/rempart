@@ -792,6 +792,8 @@ function Galerie() {
             onPref={noop}
             languePref="systeme"
             onLanguePref={noop}
+            nomDefaut="Léa"
+            onNomDefaut={noop}
             onCartesManche={noop}
             onRetour={noop}
           />
@@ -949,6 +951,8 @@ function Galerie() {
             onPref={noop}
             languePref="systeme"
             onLanguePref={noop}
+            nomDefaut="Léa"
+            onNomDefaut={noop}
             onCartesManche={noop}
             onRetour={noop}
           />
