@@ -1,6 +1,7 @@
 import type { CSSProperties, ReactNode } from 'react'
 import { R, TEXTE, TITRE } from '../theme'
 import type { Slot } from '../game/types'
+import { useT, type Cle } from '../i18n'
 import { DUREE, anime, useMouvement } from './mouvement'
 import { useTheme } from './theme'
 
@@ -12,13 +13,17 @@ import { useTheme } from './theme'
  * quatre formes restent distinctes en niveaux de gris.
  */
 const SHAPES = [
-  { radius: '50%', clip: 'none', nom: 'Cercle' },
-  { radius: '3px', clip: 'none', nom: 'Carré' },
-  { radius: '0', clip: 'polygon(50% 0, 100% 100%, 0 100%)', nom: 'Triangle' },
-  { radius: '0', clip: 'polygon(50% 0, 100% 38%, 82% 100%, 18% 100%, 0 38%)', nom: 'Pentagone' },
+  { radius: '50%', clip: 'none' },
+  { radius: '3px', clip: 'none' },
+  { radius: '0', clip: 'polygon(50% 0, 100% 100%, 0 100%)' },
+  { radius: '0', clip: 'polygon(50% 0, 100% 38%, 82% 100%, 18% 100%, 0 38%)' },
 ] as const
 
-export const shapeName = (ci: number) => SHAPES[ci].nom
+/** Le nom d'une forme, dans la langue de qui lit. */
+export function useShapeName(): (ci: number) => string {
+  const tr = useT()
+  return (ci) => tr(`forme.${Math.min(3, Math.max(0, ci))}` as Cle)
+}
 
 export function Forme({ ci, size = 20, color }: { ci: number; size?: number; color?: string }) {
   const t = useTheme()
@@ -149,6 +154,7 @@ export function Mur({
 
 /** Le compte de briques, dit en toutes lettres pour les lecteurs d'écran. */
 export function MurAccessible({ nom, wall }: { nom: string; wall: Slot[] }) {
+  const tr = useT()
   const debout = wall.filter((s) => s !== 'broken').length
   return (
     <span
@@ -161,7 +167,7 @@ export function MurAccessible({ nom, wall }: { nom: string; wall: Slot[] }) {
         whiteSpace: 'nowrap',
       }}
     >
-      {`Mur de ${nom} : ${debout} brique${debout > 1 ? 's' : ''} sur ${wall.length}.`}
+      {tr.n('mur.aria', debout, { nom, total: wall.length })}
     </span>
   )
 }

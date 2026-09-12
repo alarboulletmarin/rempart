@@ -61,6 +61,17 @@ export const fr = {
   'commun.retour': 'Retour',
   'commun.manche': 'Manche {n}',
 
+  /* Le mur, dit en toutes lettres pour les lecteurs d'écran. */
+  'mur.aria_un': 'Mur de {nom} : {n} brique sur {total}.',
+  'mur.aria_autre': 'Mur de {nom} : {n} briques sur {total}.',
+
+  /* Les quatre formes d'identité. Elles portent l'information autant que la
+     couleur, donc elles se nomment. */
+  'forme.0': 'Cercle',
+  'forme.1': 'Carré',
+  'forme.2': 'Triangle',
+  'forme.3': 'Pentagone',
+
   /* ------------------------------------------------------------- réglages */
 
   'reglages.titre': 'Réglages',
@@ -181,4 +192,68 @@ export const fr = {
   'etiquette.murPlein': 'mur plein',
   'etiquette.touche': 'touché',
   'etiquette.rien': '',
+
+  /* --------------------------------------------------------- le tour de jeu */
+
+  'jeu.etat.choisie': 'choisie',
+  'jeu.etat.jouable': 'jouable',
+  'jeu.etat.interdite': 'interdite',
+  'jeu.carte.aria': '{carte} — {etat}',
+  'jeu.verrou.rien': 'rien joué',
+  'jeu.verrou.carte': '{carte} · interdite',
+
+  'jeu.entete.pause': 'en pause',
+  'jeu.entete.cible': '{carte} · choisis une cible',
+  'jeu.entete.ontJoue': '{n} / {total} ont joué',
+  'jeu.entete.equipes': 'Équipes · score commun',
+  'jeu.entete.mortSubite': 'Mort subite',
+  'jeu.entete.carteCommune': 'carte commune',
+
+  'jeu.tag.absent': 'absent',
+  'jeu.tag.cibler': 'cibler',
+  'jeu.tag.toi': 'toi',
+  'jeu.tag.aJoue': 'a joué',
+  'jeu.tag.choisit': 'choisit…',
+  'jeu.tag.coequipier': 'coéquipier',
+
+  'jeu.bandeau.frappe': 'Ta frappe part sur ce mur',
+  'jeu.viser.aria': 'Viser le mur de {nom} — {briques} debout',
+
+  'jeu.pied.cibler': 'Touche un mur pour cibler',
+  'jeu.pied.continuer': 'Touche une carte pour continuer',
+  'jeu.pied.tousJoue': 'Tout le monde a joué',
+  'jeu.pied.attendUn': 'On attend {nom}…',
+  'jeu.pied.attendPlusieurs': 'On attend {n} joueurs…',
+  'jeu.pied.spectateur': 'Tu regardes cette manche de mort subite.',
+
+  'jeu.main.titre': 'Ta main — choisis une carte',
+  'jeu.main.verrou_un': 'Ta main — {cartes} est interdite depuis la manche passée',
+  'jeu.main.verrou_autre': 'Ta main — {cartes} sont interdites depuis la manche passée',
+
+  'jeu.choix.frapper': 'Tu frappes {cible}',
+  'jeu.choix.bloquer': 'Tu bloques',
+  'jeu.choix.bloquer.pour': 'Tu bloques pour {cible}',
+  'jeu.choix.reparer': 'Tu répares',
+  'jeu.choix.reparer.pour': 'Tu répares pour {cible}',
+  'jeu.choix.pieger': 'Tu pièges',
+  'jeu.choix.pieger.pour': 'Tu pièges pour {cible}',
+  'jeu.choix.changer': '{choix} — touche une autre carte ou un autre mur pour changer',
+
+  'jeu.conseil.cibles_un': 'Une seule cible possible.',
+  'jeu.conseil.cibles_autre': '{n} cibles possibles.',
+  /* « il ne peut pas » supposait un genre que le nom d'un joueur ne dit pas :
+     la phrase se dit maintenant sans pronom personnel. */
+  'jeu.conseil.bloqueur': '{nom} vient de bloquer : {carte} lui est interdit cette manche.',
+  'jeu.conseil.murBas': 'Le mur le plus bas est celui de {nom}.',
+  'jeu.equipes.aide':
+    'En équipes, {bloquer} et {reparer} peuvent viser ton coéquipier. {frapper} ne vise que l’équipe d’en face.',
+
+  'jeu.equipes.vous': 'Vous',
+  'jeu.equipes.eux': 'Eux',
+  'jeu.equipes.tienne': 'ton équipe',
+
+  'jeu.manche.surtitre': 'Pour tout le monde · cette manche seulement',
+  'jeu.manche.retour': 'À la manche {n}, on revient aux règles de base, verrous compris.',
+  'jeu.manche.compris': 'Compris, je joue',
+  'jeu.manche.bandeau': 'Carte de manche · pour tout le monde',
 } as const

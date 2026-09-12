@@ -3,7 +3,7 @@ import { SAFE_TOP, TEXTE, TITRE } from '../theme'
 import { NIVEAUX_BOT, NIVEAU_DEFAUT, NOM_NIVEAU, type NiveauBot } from '../game/bot'
 import { MAX_SIEGES } from '../net/room'
 import type { VueSession } from '../net/session'
-import { Etiquette, Forme, Panneau, Scribble, Texte, shapeName, usePanneauEncre } from '../ui/atoms'
+import { Etiquette, Forme, Panneau, Scribble, Texte, usePanneauEncre, useShapeName } from '../ui/atoms'
 import { BoutonConversation, FeuilleDiscussion, useSalle } from '../ui/discussion'
 import { Ecran } from '../ui/shell'
 import { useTheme } from '../ui/theme'
@@ -50,6 +50,7 @@ export function Salon({
 }) {
   const t = useTheme()
   const encre = usePanneauEncre()
+  const nomForme = useShapeName()
   const [copie, setCopie] = useState(false)
 
   /*
@@ -308,7 +309,7 @@ export function Salon({
                     onClick={() => libre && onIdentite(ci)}
                     disabled={!libre}
                     aria-pressed={amoi}
-                    aria-label={`${shapeName(ci)} — ${amoi ? 'à moi' : pris ? 'pris' : 'libre'}`}
+                    aria-label={`${nomForme(ci)} — ${amoi ? 'à moi' : pris ? 'pris' : 'libre'}`}
                     style={{
                       flex: 1,
                       height: 70,

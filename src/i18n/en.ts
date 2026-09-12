@@ -44,6 +44,14 @@ export const en: Catalogue = {
   'commun.retour': 'Back',
   'commun.manche': 'Round {n}',
 
+  'mur.aria_un': '{nom}’s wall: {n} brick out of {total}.',
+  'mur.aria_autre': '{nom}’s wall: {n} bricks out of {total}.',
+
+  'forme.0': 'Circle',
+  'forme.1': 'Square',
+  'forme.2': 'Triangle',
+  'forme.3': 'Pentagon',
+
   /* ------------------------------------------------------------- réglages */
 
   'reglages.titre': 'Settings',
@@ -154,4 +162,66 @@ export const en: Catalogue = {
   'etiquette.murPlein': 'wall full',
   'etiquette.touche': 'struck',
   'etiquette.rien': '',
+
+  /* --------------------------------------------------------- le tour de jeu */
+
+  'jeu.etat.choisie': 'chosen',
+  'jeu.etat.jouable': 'playable',
+  'jeu.etat.interdite': 'locked',
+  'jeu.carte.aria': '{carte} — {etat}',
+  'jeu.verrou.rien': 'played nothing',
+  'jeu.verrou.carte': '{carte} · locked',
+
+  'jeu.entete.pause': 'paused',
+  'jeu.entete.cible': '{carte} · pick a target',
+  'jeu.entete.ontJoue': '{n} / {total} have played',
+  'jeu.entete.equipes': 'Teams · shared score',
+  'jeu.entete.mortSubite': 'Sudden death',
+  'jeu.entete.carteCommune': 'shared card',
+
+  'jeu.tag.absent': 'away',
+  'jeu.tag.cibler': 'target',
+  'jeu.tag.toi': 'you',
+  'jeu.tag.aJoue': 'played',
+  'jeu.tag.choisit': 'choosing…',
+  'jeu.tag.coequipier': 'teammate',
+
+  'jeu.bandeau.frappe': 'Your strike lands on this wall',
+  'jeu.viser.aria': 'Aim at {nom}’s wall — {briques} standing',
+
+  'jeu.pied.cibler': 'Touch a wall to aim',
+  'jeu.pied.continuer': 'Touch a card to go on',
+  'jeu.pied.tousJoue': 'Everyone has played',
+  'jeu.pied.attendUn': 'Waiting for {nom}…',
+  'jeu.pied.attendPlusieurs': 'Waiting for {n} players…',
+  'jeu.pied.spectateur': 'You are watching this sudden-death round.',
+
+  'jeu.main.titre': 'Your hand — pick a card',
+  'jeu.main.verrou_un': 'Your hand — {cartes} has been locked since last round',
+  'jeu.main.verrou_autre': 'Your hand — {cartes} have been locked since last round',
+
+  'jeu.choix.frapper': 'You strike {cible}',
+  'jeu.choix.bloquer': 'You block',
+  'jeu.choix.bloquer.pour': 'You block for {cible}',
+  'jeu.choix.reparer': 'You repair',
+  'jeu.choix.reparer.pour': 'You repair for {cible}',
+  'jeu.choix.pieger': 'You set a trap',
+  'jeu.choix.pieger.pour': 'You set a trap for {cible}',
+  'jeu.choix.changer': '{choix} — touch another card or another wall to change',
+
+  'jeu.conseil.cibles_un': 'Only one target possible.',
+  'jeu.conseil.cibles_autre': '{n} possible targets.',
+  'jeu.conseil.bloqueur': '{nom} just blocked: {carte} is locked for them this round.',
+  'jeu.conseil.murBas': 'The lowest wall is {nom}’s.',
+  'jeu.equipes.aide':
+    'In teams, {bloquer} and {reparer} can target your teammate. {frapper} only hits the other side.',
+
+  'jeu.equipes.vous': 'You two',
+  'jeu.equipes.eux': 'Them',
+  'jeu.equipes.tienne': 'your team',
+
+  'jeu.manche.surtitre': 'For everyone · this round only',
+  'jeu.manche.retour': 'From round {n}, the base rules are back, locks included.',
+  'jeu.manche.compris': 'Got it, let’s play',
+  'jeu.manche.bandeau': 'Round card · for everyone',
 }

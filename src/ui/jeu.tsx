@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { R, TEXTE, TITRE } from '../theme'
-import { CARD_LABEL, type CardKey, type Player, type Slot } from '../game/types'
+import type { CardKey, Player, Slot } from '../game/types'
+import { useT } from '../i18n'
 import { Pictogramme } from './Pictogramme'
 import { Etiquette, Forme, Mur, MurAccessible, Pastille } from './atoms'
 import { DUREE, anime, useMouvement } from './mouvement'
@@ -41,6 +42,7 @@ export function CarteMain({
   fremis?: boolean
 }) {
   const t = useTheme()
+  const tr = useT()
   const bouge = useMouvement()
   const choisie = etat === 'choisie'
   const interdite = etat === 'interdite'
@@ -55,7 +57,10 @@ export function CarteMain({
       onClick={interdite ? undefined : onClick}
       disabled={interdite}
       aria-pressed={choisie}
-      aria-label={`${CARD_LABEL[card]} — ${etat}`}
+      aria-label={tr('jeu.carte.aria', {
+        carte: tr(`carte.${card}` as const),
+        etat: tr(`jeu.etat.${etat}` as const),
+      })}
       style={{
         flex: 1,
         minWidth: 0,
@@ -77,7 +82,9 @@ export function CarteMain({
       }}
     >
       <Pictogramme card={card} size={40} color={pictoColor} />
-      <span style={{ font: `700 13px/1 ${TITRE}`, color: fg }}>{CARD_LABEL[card]}</span>
+      <span style={{ font: `700 13px/1 ${TITRE}`, color: fg }}>
+        {tr(`carte.${card}` as const)}
+      </span>
       <span
         style={{
           font: `500 9px/1.2 ${TEXTE}`,
@@ -85,7 +92,7 @@ export function CarteMain({
           textAlign: 'center',
         }}
       >
-        {etat}
+        {tr(`jeu.etat.${etat}` as const)}
       </span>
     </button>
   )
@@ -141,11 +148,14 @@ export function Verrou({
   petit?: boolean
 }) {
   const t = useTheme()
+  const tr = useT()
   const pad = petit ? '3px 8px' : '4px 9px'
   if (locked.length === 0) {
     return (
       <Pastille bg={chipBg} style={{ padding: pad }}>
-        <span style={{ font: `500 10px/1 ${TEXTE}`, color: t.ink2 }}>rien joué</span>
+        <span style={{ font: `500 10px/1 ${TEXTE}`, color: t.ink2 }}>
+          {tr('jeu.verrou.rien')}
+        </span>
       </Pastille>
     )
   }
@@ -155,7 +165,7 @@ export function Verrou({
         <Pastille key={k} bg={chipBg} style={{ padding: pad }}>
           <Pictogramme card={k} size={18} color={t.ink2} />
           <span style={{ font: `500 10px/1 ${TEXTE}`, color: t.ink2 }}>
-            {CARD_LABEL[k]} · interdite
+            {tr('jeu.verrou.carte', { carte: tr(`carte.${k}` as const) })}
           </span>
         </Pastille>
       ))}
@@ -314,13 +324,14 @@ export function BandeauCible({ card, texte }: { card: CardKey; texte: string }) 
 export function BandeauManche({
   nom,
   detail,
-  surtitre = 'Carte de manche · pour tout le monde',
+  surtitre,
 }: {
   nom: string
   detail: string
   surtitre?: string
 }) {
   const t = useTheme()
+  const tr = useT()
   return (
     <div
       style={{
@@ -334,7 +345,7 @@ export function BandeauManche({
       }}
     >
       <Etiquette size={10} color={t.ochreInk}>
-        {surtitre}
+        {surtitre ?? tr('jeu.manche.bandeau')}
       </Etiquette>
       <div style={{ font: `700 19px/1.1 ${TITRE}`, color: '#2E2418' }}>{nom}</div>
       <div style={{ font: `500 12px/1.35 ${TEXTE}`, color: t.ochreInk }}>{detail}</div>
