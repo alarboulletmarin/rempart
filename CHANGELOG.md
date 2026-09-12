@@ -6,6 +6,72 @@ publication.
 
 ## Non publié
 
+### Changé : un code qu'on peut dicter, et scanner
+
+`V6DBC39U` se dictait mal, se lisait mal au soleil et se retapait faux.
+L'alphabet écartait déjà I, O, 0 et 1 ; restaient B contre 8, G contre 6, S
+contre 5, Z contre 2, L contre 1 et U contre V.
+
+- **Les deux membres de chaque paire partent**, plutôt qu'un seul qu'on
+  rattraperait à la saisie : corriger O → 0 ne dit rien de 6 contre G. Vingt-deux
+  symboles, aucune confusion possible. Le nouvel alphabet est un sous-ensemble
+  de l'ancien, donc une version déjà installée accepte toujours les codes de
+  celle-ci.
+- **Le salon affiche un QR** sous le code. Le téléphone qui le scanne s'ouvre
+  directement sur « Rejoindre », code rempli. Autour d'une table — et une partie
+  de quatre minutes se joue surtout là — c'est plus rapide et plus sûr que de
+  dicter huit caractères.
+- **Le code se touche pour le copier.** C'est la première chose qu'on vise quand
+  on veut le donner, et il ne répondait pas.
+
+### Ajouté : ce qui se passe quand ça se passe mal
+
+Quatre situations existaient sans exister à l'écran.
+
+- **La connexion qui lâche** ne disait rien : les cartes répondaient, la manche
+  ne se résolvait jamais, on tapait dans le vide en croyant jouer. Un bandeau
+  persistant et non modal dit l'état **et ce qui vient ensuite** — « ton mur
+  reste en place, si l'hôte ne revient pas quelqu'un d'autre arbitrera ». Quand
+  ça revient, il le dit avant de disparaître.
+- **L'hôte parti** n'a pas la même conséquence selon le moment, et le bandeau ne
+  raconte pas la même chose : en partie, un autre arbitre prend la suite ; au
+  salon, la partie n'existe plus.
+- **Un code refusé** menait à un écran d'attente sans issue, et revenir en
+  arrière effaçait les huit caractères qu'on venait de taper. Le code se garde,
+  et « Essayer un autre code » ramène où il faut.
+- **Le format Équipes** changeait le nombre de joueurs dans le dos de qui le
+  choisissait. Il dit maintenant pourquoi il n'est pas disponible.
+
+Et l'attente d'un joueur porte sa durée passé vingt secondes — pas avant :
+mettre un chronomètre sous le nez de quelqu'un qui réfléchit, c'est lui prendre
+le jeu.
+
+### Corrigé : le thème sombre, et ce que dit chaque couleur
+
+Le thème sombre n'avait jamais été parcouru en entier. Mesuré sur les sept
+écrans, deux textes passaient sous le seuil de lisibilité : « Retour » sur la
+bande ocre (du brun sur du brun) et « prêt » en vert. Les deux sont corrigés,
+et deux tests gardent désormais l'alignement des couleurs système.
+
+**Chaque accent n'a plus qu'un seul métier.** La terre cuite se retrouvait sur
+« −1 brique » mais aussi sur « piège déclenché » et « 1 frappe annulée » — sur
+un dégât, et sur deux défenses qui avaient parfaitement tenu. Désormais : terre
+cuite quand une brique tombe, vert quand ce qui visait la ligne n'est pas passé,
+ocre pour ce qui concerne toute la table, et rien du tout pour un simple choix.
+
+La zone sûre du bas vaut maintenant pour toute l'app : elle se posait écran par
+écran, donc elle manquait sur huit d'entre eux, et « Ouvrir le salon », « J'ai
+compris » et la main de cartes passaient sous l'indicateur d'accueil d'iOS.
+
+### Changé : chaque chose dite une fois
+
+- La rangée de dix points doublait « Manche 4/10 », juste à côté.
+- « Touche une carte pour continuer » doublait « Ta main — choisis une carte »,
+  écrit trois centimètres plus haut, dans un bloc que la main n'avait pas.
+- Le badge « CHOISI » doublait le carton foncé qui disait déjà le choix. Une
+  coche discrète le remplace, et les groupes de réglage sont enfin de vrais
+  boutons radio.
+
 ### Ajouté : la partie se raconte à la fin
 
 Quarante à cinquante pour cent de l'écran de fin restait vide — un classement
