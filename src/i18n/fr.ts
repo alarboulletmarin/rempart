@@ -359,7 +359,6 @@ export const fr = {
   'creation.nom.aria': 'Ton nom dans la partie',
   'creation.nom.exemple': 'Léa',
   'creation.joueurs.titre': 'Nombre de joueurs',
-  'creation.choisi': 'choisi',
   'creation.format.titre': 'Format',
   'creation.format.chacun.titre': 'Chacun pour soi',
   'creation.format.chacun.detail':

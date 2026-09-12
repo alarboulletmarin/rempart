@@ -1,6 +1,7 @@
 import { TEXTE, TITRE } from '../theme'
 import type { Format } from '../game/types'
 import { useT } from '../i18n'
+import { Icone } from '../ui/Icone'
 import { Bouton, Etiquette, Texte } from '../ui/atoms'
 import { Corps, Ecran, EnTete } from '../ui/shell'
 import { useTheme } from '../ui/theme'
@@ -62,8 +63,17 @@ export function Creation({
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <Etiquette>{tr('creation.joueurs.titre')}</Etiquette>
-          <div style={{ display: 'flex', gap: 10 }}>
+          <Etiquette id="titre-joueurs">{tr('creation.joueurs.titre')}</Etiquette>
+          {/*
+           * Un vrai groupe de boutons radio.
+           *
+           * L'état « choisi » s'écrivait en toutes lettres sous le chiffre,
+           * en plus du carton foncé qui le disait déjà — deux fois la même
+           * chose, et un mot de plus à lire sur chacune des trois pastilles.
+           * `aria-checked` le dit maintenant à qui ne voit pas l'écran, et une
+           * coche discrète à qui le voit.
+           */}
+          <div style={{ display: 'flex', gap: 10 }} role="radiogroup" aria-labelledby="titre-joueurs">
             {[2, 3, 4].map((n) => {
               const choisi = n === places
               // Le mode équipes demande quatre murs.
@@ -72,9 +82,10 @@ export function Creation({
                 <button
                   key={n}
                   type="button"
+                  role="radio"
+                  aria-checked={choisi}
                   onClick={() => possible && onPlaces(n)}
-                  aria-pressed={choisi}
-                  disabled={!possible}
+                  aria-disabled={!possible}
                   style={{
                     flex: 1,
                     height: 72,
@@ -95,11 +106,7 @@ export function Creation({
                   <span style={{ font: `700 27px/1 ${TITRE}`, color: choisi ? t.selFg : t.ink2 }}>
                     {n}
                   </span>
-                  {choisi && (
-                    <Etiquette size={9} color={t.ink2} style={{ letterSpacing: '0.1em' }}>
-                      {tr('creation.choisi')}
-                    </Etiquette>
-                  )}
+                  {choisi && <Icone nom="coche" size={13} color={t.ochre} />}
                 </button>
               )
             })}
@@ -107,7 +114,12 @@ export function Creation({
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <Etiquette>{tr('creation.format.titre')}</Etiquette>
+          <Etiquette id="titre-format">{tr('creation.format.titre')}</Etiquette>
+          <div
+            role="radiogroup"
+            aria-labelledby="titre-format"
+            style={{ display: 'flex', flexDirection: 'column', gap: 10 }}
+          >
           <OptionFormat
             titre={tr('creation.format.chacun.titre')}
             detail={tr('creation.format.chacun.detail')}
@@ -123,6 +135,7 @@ export function Creation({
               onPlaces(4)
             }}
           />
+          </div>
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -188,12 +201,12 @@ function OptionFormat({
   onClick: () => void
 }) {
   const t = useTheme()
-  const tr = useT()
   return (
     <button
       type="button"
+      role="radio"
+      aria-checked={choisi}
       onClick={onClick}
-      aria-pressed={choisi}
       style={{
         borderRadius: 16,
         background: choisi ? t.selBg : t.panel,
@@ -221,9 +234,9 @@ function OptionFormat({
         />
         <span style={{ font: `700 16px/1 ${TITRE}`, color: choisi ? t.selFg : t.ink }}>{titre}</span>
         {choisi && (
-          <Etiquette size={9} color={t.ink2} style={{ letterSpacing: '0.1em', marginLeft: 'auto' }}>
-            {tr('creation.choisi')}
-          </Etiquette>
+          <span style={{ marginLeft: 'auto', display: 'flex' }}>
+            <Icone nom="coche" size={15} color={t.ochre} />
+          </span>
         )}
       </span>
       <Texte size={13} weight={400} color={choisi ? t.table : t.ink2} style={{ lineHeight: 1.4 }}>

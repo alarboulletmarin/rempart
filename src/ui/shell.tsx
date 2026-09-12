@@ -175,23 +175,3 @@ export function CompteurManche({ round, total = 10 }: { round: number; total?: n
     </div>
   )
 }
-
-/** Les dix pastilles de manche, une par manche jouée. */
-export function Jauge({ round, total = 10 }: { round: number; total?: number }) {
-  const t = useTheme()
-  return (
-    <div style={{ display: 'flex', gap: 5 }} aria-hidden="true">
-      {Array.from({ length: total }, (_, i) => (
-        <div
-          key={i}
-          style={{
-            width: 9,
-            height: 9,
-            borderRadius: '50%',
-            background: i < round ? t.wood : t.name === 'etabli' ? '#E0CEAD' : t.edge,
-          }}
-        />
-      ))}
-    </div>
-  )
-}

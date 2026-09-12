@@ -19,6 +19,8 @@ export type NomIcone =
   | 'reaction'
   /** La croix qui referme une feuille. */
   | 'fermer'
+  /** La coche d'un choix retenu. */
+  | 'coche'
   /* Les six réactions. Dessinées et non empruntées à une police d'emoji : un
      emoji ne se rend pas pareil d'un téléphone à l'autre, il n'a pas la
      matière du reste du jeu, et il ne dit rien à qui ne le voit pas. Chacune
@@ -90,6 +92,10 @@ export function Icone({
         <circle cx={16} cy={10.5} r={1.35} fill={c} />
       </>
     ),
+
+    /* La coche d'un réglage retenu : la même que « bien joué », sans son
+       emphase — elle confirme, elle ne félicite pas. */
+    coche: <path d="M5 12.5 L9.8 17.5 L19 7" {...trait} strokeWidth={w * 1.25} />,
 
     /* La croix : deux traits, à la même épaisseur que le reste. */
     fermer: (

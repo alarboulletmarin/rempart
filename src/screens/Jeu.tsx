@@ -23,7 +23,7 @@ import { Bulles, Eventail } from '../ui/discussion'
 import { BandeauCible, BandeauManche, LigneJoueur, Main, type EtatCarte } from '../ui/jeu'
 import { DUREE, anime, useMouvement } from '../ui/mouvement'
 import { Pictogramme } from '../ui/Pictogramme'
-import { CompteurManche, Corps, Ecran, EnTete, Jauge } from '../ui/shell'
+import { CompteurManche, Corps, Ecran, EnTete } from '../ui/shell'
 import { useTheme } from '../ui/theme'
 import { FeuilleDeconnexion } from './Deconnexion'
 
@@ -198,9 +198,9 @@ export function Jeu({
     <Etiquette size={11} style={{ letterSpacing: '0.06em' }}>
       {tr('jeu.entete.equipes')}
     </Etiquette>
-  ) : (
-    <Jauge round={state.round} />
-  )
+  ) : // « Manche 4/10 » est déjà à gauche : les dix points disaient la même
+  // chose une seconde fois, et prenaient la largeur qui manque à droite.
+  null
 
   /* --------------------------------------------------- lignes de mur */
 
@@ -293,11 +293,10 @@ export function Jeu({
           ? tr('jeu.pied.attendUn', { nom: attendus[0].name })
           : tr('jeu.pied.attendPlusieurs', { n: attendus.length })}
     </BarrePied>
-  ) : (
-    <BarrePied ton="creux" hauteur={cadre.pied}>
-      {tr('jeu.pied.continuer')}
-    </BarrePied>
-  )
+  ) : // « Ta main — choisis une carte » est écrit juste au-dessus des cartes :
+  // « Touche une carte pour continuer » le répétait dans un grand bloc, et
+  // c'est cinquante-six pixels que la main n'avait pas.
+  null
 
   // En temps normal la carte interdite se lit sur la carte elle-même, donc le
   // libellé reste court. Sur une manche à carte commune, le joueur a une règle

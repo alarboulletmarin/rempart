@@ -327,15 +327,19 @@ export function Etiquette({
   color,
   size = 11,
   style,
+  id,
 }: {
   children: ReactNode
   color?: string
   size?: number
   style?: CSSProperties
+  /** Pour qu'un groupe de boutons radio puisse nommer son titre de section. */
+  id?: string
 }) {
   const t = useTheme()
   return (
     <div
+      id={id}
       style={{
         font: `600 ${size}px/1 ${TEXTE}`,
         letterSpacing: '0.12em',

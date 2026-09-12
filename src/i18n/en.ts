@@ -326,7 +326,6 @@ export const en: Catalogue = {
   'creation.nom.aria': 'Your name in the game',
   'creation.nom.exemple': 'Lea',
   'creation.joueurs.titre': 'Number of players',
-  'creation.choisi': 'chosen',
   'creation.format.titre': 'Format',
   'creation.format.chacun.titre': 'Every wall for itself',
   'creation.format.chacun.detail':
