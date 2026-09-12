@@ -3,6 +3,8 @@ import { TEXTE, TITRE } from '../theme'
 import {
   bricks,
   choicesRequired,
+  doubleCardPlayer,
+  forbiddenCards,
   hasPlayed,
   legalCards,
   playersToAct,
@@ -237,6 +239,10 @@ export function Jeu({
 
   const deconnecte = state.players.find((p) => !p.connected)
 
+  /** Qui joue deux cartes cette manche, sous « Dernier mur ». */
+  const doubleurId = doubleCardPlayer(state)
+  const doubleur = state.players.find((p) => p.id === doubleurId)
+
   const bandeauDe = (p: Player) => {
     // Le mur visé porte un bandeau qui nomme l'action : sans lui, on ne sait
     // pas si la ligne mise en avant est la cible ou soi-même.
@@ -276,7 +282,17 @@ export function Jeu({
         moi={p.id === moi}
         bulles={<Bulles de={p.id} />}
         nu={nu}
-        verrou={!deconnecte}
+        /*
+         * La pastille se tait pendant une pause, et en mort subite.
+         *
+         * En pause, le plateau est en retrait et rien n'est à jouer. En mort
+         * subite, le verrou ne s'applique plus du tout (Frapper est imposé à
+         * tout le monde) : peindre « Interdit : Bloquer, Réparer et Piéger »
+         * sur chaque ligne répéterait trois fois ce que l'en-tête dit une.
+         */
+        interdites={
+          deconnecte || state.phase === 'mort-subite' ? undefined : forbiddenCards(state, p.id)
+        }
         tag={tag}
         tagColor={couleur}
         tagDiscret={discret}
@@ -319,16 +335,36 @@ export function Jeu({
   // c'est cinquante-six pixels que la main n'avait pas.
   null
 
-  // En temps normal la carte interdite se lit sur la carte elle-même, donc le
-  // libellé reste court. Sur une manche à carte commune, le joueur a une règle
-  // de plus à tenir en tête : on lui rappelle son verrou en toutes lettres.
-  const libelleMain = envoye
-    ? phraseChoix(state, choix, moi, tr)
-    : state.activeRoundCard && me.locked.length > 0
-      ? tr.n('jeu.main.verrou', me.locked.length, {
-          cartes: tr.liste(me.locked.map((k) => tr(`carte.${k}` as const))),
-        })
-      : tr('jeu.main.titre')
+  /*
+   * En temps normal la carte interdite se lit sur la carte elle-même, donc le
+   * libellé reste court. Sur une manche à carte commune, le joueur a une règle
+   * de plus à tenir en tête : on lui rappelle en toutes lettres ce qui ne part
+   * pas — et, sous « Dernier mur », qu'il en doit deux et non une.
+   *
+   * `mesInterdites` et non `me.locked` : sous « Mémoire courte » la phrase
+   * annonçait un verrou levé, et c'est justement la seule manche où elle
+   * s'affichait, puisqu'elle demande une carte de manche.
+   */
+  const mesInterdites = forbiddenCards(state, moi)
+  /*
+   * Le choix complet se dit dès qu'il l'est, sans attendre l'aller-retour.
+   *
+   * `envoye` ne bascule qu'une fois la partie au courant ; d'ici là il reste
+   * une image où la main est faite mais où l'écran demandait encore de
+   * choisir. Sous « Dernier mur » cette image annonçait « encore une carte »
+   * alors qu'il n'en restait aucune.
+   */
+  const restant = requis - choix.length
+  const libelleMain =
+    envoye || restant <= 0
+      ? phraseChoix(state, choix, moi, tr)
+      : requis > 1
+        ? tr.n('jeu.main.double', restant, { n: restant })
+        : state.activeRoundCard && mesInterdites.length > 0
+          ? tr.n('jeu.main.interdit', mesInterdites.length, {
+              cartes: tr.liste(mesInterdites.map((k) => tr(`carte.${k}` as const))),
+            })
+          : tr('jeu.main.titre')
 
   /* ------------------------------------------------- carte de manche */
 
@@ -349,13 +385,18 @@ export function Jeu({
     <Ecran>
       <EnTete
         /*
-         * La sortie s'efface le temps de choisir une cible.
+         * Le temps de choisir une cible, la barre appartient à l'action.
          *
-         * Le bandeau « Frapper · choisis une cible » fait à lui seul 212 px :
-         * avec le compteur de manches, la barre est pleine, et la pastille la
-         * ferait déborder. Ce n'est pas un piège — ce geste-là s'annule en
-         * touchant une autre carte — et la barre change déjà entièrement à cet
-         * instant, donc la pastille ne disparaît pas toute seule sous les yeux.
+         * « Frapper · choisis une cible » fait à lui seul 212 px ; avec le
+         * compteur de manches il ne reste rien, et la sortie s'effaçait déjà
+         * pour lui faire place. Ce n'était pas assez : l'éventail restait, et
+         * ses 38 px partaient hors de l'écran — coupés sans bruit, puisque
+         * `Ecran` ne défile pas. Il s'efface donc lui aussi.
+         *
+         * Rien ne se perd : le geste s'annule en touchant une autre carte, et
+         * les deux reviennent dès que la cible est choisie. C'est d'ailleurs
+         * la règle que l'éventail suit déjà partout ailleurs — il ne s'ouvre
+         * jamais de lui-même pendant un choix de carte.
          */
         onRetour={carteEnCours ? undefined : onDemanderQuitter}
         libelleRetour={tr('commun.quitter')}
@@ -373,7 +414,7 @@ export function Jeu({
             {droite}
             {/* Un doigt, dans la barre du haut : le jeu ne s'interrompt pas, et
                 la feuille de conversation ne s'ouvre jamais en partie. */}
-            <Eventail />
+            {!carteEnCours && <Eventail />}
           </>
         }
         hauteur={state.activeRoundCard ? 98 : 104}
@@ -384,6 +425,18 @@ export function Jeu({
           <BandeauManche
             nom={tr(`manche.${state.activeRoundCard.id}.nom`)}
             detail={tr(`manche.${state.activeRoundCard.id}.detail`)}
+            /*
+             * « Dernier mur » ne change la manche que d'une seule personne, et
+             * son détail la désignait par une périphrase — « le joueur qui a le
+             * moins de briques » — qu'il fallait résoudre soi-même en comptant
+             * quatre murs, et qui reste ambiguë à égalité (le moteur départage
+             * alors par la place). Le surtitre la nomme.
+             */
+            surtitre={
+              doubleur
+                ? tr('jeu.manche.bandeau.pour', { nom: doubleur.name })
+                : undefined
+            }
           />
         )}
 
@@ -521,11 +574,24 @@ function phraseChoix(state: GameState, choix: Choice[], moi: PlayerId, tr: T): s
   return tr('jeu.choix.changer', { choix: parts.join(', ') })
 }
 
-/** Une ligne de conseil qui s'appuie sur les verrous visibles à l'écran. */
+/**
+ * Une ligne de conseil qui s'appuie sur les contraintes visibles à l'écran.
+ *
+ * Elle lit la même source que les pastilles (`forbiddenCards`), sans quoi elle
+ * conseillait de frapper un joueur « qui ne peut pas bloquer » alors que
+ * « Mémoire courte » venait de lui rendre la carte.
+ *
+ * Sous « Mur nu », Bloquer ne bloque plus personne : le conseil ne porte donc
+ * plus sur les bloqueurs mais sur le mur le plus bas, seule information qui
+ * garde un sens cette manche-là.
+ */
 function conseilCible(state: GameState, cibles: PlayerId[], tr: T): string {
-  const bloqueurs = state.players.filter(
-    (p) => cibles.includes(p.id) && p.locked.includes('bloquer'),
-  )
+  const bloqueurs =
+    state.activeRoundCard?.id === 'mur-nu'
+      ? []
+      : state.players.filter(
+          (p) => cibles.includes(p.id) && forbiddenCards(state, p.id).includes('bloquer'),
+        )
   if (bloqueurs.length === 1) {
     // Sans pronom personnel : le nom d'un joueur ne dit pas son genre, et
     // « il ne peut pas » se trompait sur une personne sur deux.

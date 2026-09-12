@@ -164,8 +164,9 @@ export function Main({
  *
  * **L'absence de contrainte se dit aussi.** Une ligne sans pastille se lit
  * comme une ligne dont on ne sait rien ; « Tout est jouable » est une
- * information, et c'en est une lourde en manche 1 ou après une carte
- * « Mémoire courte ».
+ * information, et c'en est une lourde en manche 1 ou sous une carte
+ * « Mémoire courte », qui lève le verrou de toute la table le temps d'une
+ * manche.
  *
  * Le pictogramme de la carte double le mot : en niveaux de gris, sur un écran
  * au soleil ou pour qui distingue mal les couleurs, la forme reste.
@@ -231,7 +232,7 @@ export function LigneJoueur({
   chant = 5,
   pad = 13,
   gap = 10,
-  verrou = true,
+  interdites,
   nu = false,
   bandeau,
   dessous,
@@ -260,7 +261,19 @@ export function LigneJoueur({
   chant?: number
   pad?: number | string
   gap?: number
-  verrou?: boolean
+  /**
+   * Ce que ce joueur ne peut pas jouer CETTE manche — `forbiddenCards`, et
+   * jamais `player.locked`.
+   *
+   * La ligne reçoit la liste déjà calculée plutôt que de la déduire du champ
+   * brut : le verrou n'est qu'une des raisons d'interdire une carte, la carte
+   * de manche en est une autre, et seul le moteur sait les additionner. Une
+   * liste vide dit « Tout est jouable » — c'est une information, pas une
+   * absence. Absente, la pastille ne se peint pas du tout : c'est le cas de
+   * la révélation, où les verrous de la manche à venir ne sont pas encore
+   * posés.
+   */
+  interdites?: CardKey[]
   /**
    * Sans panneau : le mur nu, posé dans un panneau qui l'englobe déjà.
    *
@@ -314,7 +327,7 @@ export function LigneJoueur({
         WebkitTapHighlightColor: 'transparent',
       }}
     >
-      <LigneAccessible nom={player.name} wall={w} locked={verrou ? player.locked : undefined} />
+      <LigneAccessible nom={player.name} wall={w} locked={interdites} />
       {bulles}
       <div style={{ display: 'flex', alignItems: 'center', gap: 9, flexWrap: 'nowrap' }}>
         <Forme ci={player.ci} size={nu ? 17 : 20} />
@@ -339,7 +352,7 @@ export function LigneJoueur({
         >
           {player.name}
         </span>
-        {verrou && <Contrainte locked={player.locked} chipBg={chipBg} petit={nu} />}
+        {interdites && <Contrainte locked={interdites} chipBg={chipBg} petit={nu} />}
         {compte}
         {tag &&
           (tagDiscret ? (

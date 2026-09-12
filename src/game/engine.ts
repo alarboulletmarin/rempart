@@ -242,6 +242,25 @@ export function isLocked(state: GameState, id: PlayerId, card: CardKey): boolean
 }
 
 /**
+ * Les cartes que ce joueur ne peut PAS jouer cette manche — le complément de
+ * `legalCards`, dans l'ordre de la main.
+ *
+ * C'est ce que l'écran doit peindre, et jamais `player.locked`. Les deux se
+ * confondaient tant qu'aucune carte de manche ne s'en mêlait, et l'écran
+ * lisait donc le champ brut. Sous « Mémoire courte » il annonçait un verrou
+ * que le moteur venait de lever — la pastille disait « Interdit : Bloquer »
+ * au-dessus d'une carte Bloquer marquée « jouable ». Sous « Trêve » il disait
+ * « Tout est jouable » alors que Frapper ne partait pour personne.
+ *
+ * `player.locked` reste ce que la manche passée a posé ; ce qui s'applique
+ * vraiment cette manche-ci se demande ici.
+ */
+export function forbiddenCards(state: GameState, id: PlayerId): CardKey[] {
+  const legal = legalCards(state, id)
+  return CARD_KEYS.filter((k) => !legal.includes(k))
+}
+
+/**
  * Les murs que ce joueur peut viser avec cette carte.
  * Frapper ne vise jamais son camp ; en équipes, Bloquer et Réparer peuvent
  * viser le coéquipier.
