@@ -145,6 +145,8 @@ export function direEtiquette(t: T, e: EtiquetteManche): string {
     case 'briquesGagnees':
       return t.n(`etiquette.${e.motif}` as const, e.n)
     default:
-      return t(`etiquette.${e.motif}` as const)
+      // Le nombre passe aussi aux motifs sans pluriel : « retourné −1 » le
+      // porte sans accorder quoi que ce soit.
+      return t(`etiquette.${e.motif}` as const, { n: e.n })
   }
 }

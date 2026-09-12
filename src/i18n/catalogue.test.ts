@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest'
+import type { MotifEtiquette } from '../game/types'
 import { en } from './en'
 import { fr } from './fr'
 import type { Cle } from './fr.types'
+import { direEtiquette, traducteur } from './index'
 
 /**
  * Ce que le typage ne peut pas vérifier tout seul.
@@ -54,5 +56,39 @@ describe('le catalogue', () => {
       (c) => fr[c] === en[c] && fr[c].length > 24 && !gabarit(fr[c]),
     )
     expect(identiques).toEqual([])
+  })
+})
+
+describe('les étiquettes de révélation', () => {
+  const MOTIFS: MotifEtiquette[] = [
+    'absent',
+    'retourne',
+    'piegeDeclenche',
+    'frappesAnnulees',
+    'annule',
+    'briquesPerdues',
+    'briquesGagnees',
+    'murPlein',
+    'touche',
+    'rien',
+  ]
+
+  it('ne laisse jamais un paramètre à l’écran', () => {
+    // « retourné −{n} » s'est affiché tel quel : le motif porte un nombre
+    // sans pour autant s'accorder, et le nombre ne lui était pas passé.
+    for (const t of [traducteur('fr'), traducteur('en')]) {
+      for (const motif of MOTIFS) {
+        for (const n of [0, 1, 2]) {
+          expect(direEtiquette(t, { motif, n })).not.toMatch(/\{\w+\}/)
+        }
+      }
+    }
+  })
+
+  it('dit le nombre quand le motif en porte un', () => {
+    const fr = traducteur('fr')
+    expect(direEtiquette(fr, { motif: 'retourne', n: 2 })).toBe('retourné −2')
+    expect(direEtiquette(fr, { motif: 'briquesPerdues', n: 1 })).toBe('−1 brique')
+    expect(direEtiquette(fr, { motif: 'frappesAnnulees', n: 2 })).toBe('2 frappes annulées')
   })
 })
