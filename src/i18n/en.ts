@@ -591,6 +591,14 @@ export const en: Catalogue = {
   'fin.quitter': 'Leave',
   'fin.hoteRelance': 'The host can start another game with the same players.',
 
+  'fin.tombe': 'wall down · round {n}',
+  'fin.recap.titre': 'The ten rounds',
+  'fin.recap.aria': 'What each player played, round by round',
+  'fin.recap.manche': 'Round {n}',
+  'fin.recap.cellule': '{carte}',
+  'fin.recap.vide': 'played nothing',
+  'fin.recap.legende': 'One row per player, one column per round. The drawing is the card played.',
+
   'fin.resume.departage.moi':
     'Three sudden-death rounds and not one wall gave way. You win on the tiebreak.',
   'fin.resume.departage.autre':

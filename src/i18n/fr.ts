@@ -626,6 +626,15 @@ export const fr = {
   'fin.quitter': 'Quitter',
   'fin.hoteRelance': 'L’hôte peut relancer une partie avec les mêmes joueurs.',
 
+  'fin.tombe': 'mur tombé · manche {n}',
+  'fin.recap.titre': 'Les dix manches',
+  'fin.recap.aria': 'Ce que chaque joueur a joué, manche par manche',
+  'fin.recap.manche': 'Manche {n}',
+  'fin.recap.cellule': '{carte}',
+  'fin.recap.vide': 'rien joué',
+  'fin.recap.legende':
+    'Une ligne par joueur, une colonne par manche. Le dessin est la carte jouée.',
+
   'fin.resume.departage.moi':
     'Trois manches de mort subite sans qu’aucun mur ne cède. Tu gagnes au départage.',
   'fin.resume.departage.autre':

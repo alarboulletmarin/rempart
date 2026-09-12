@@ -14,7 +14,7 @@ import './global.css'
 import { TITRE } from './theme'
 import { createGame, resolveRound } from './game/engine'
 import { roundCardById } from './game/roundCards'
-import type { Choice, GameState, PlayerId, Slot } from './game/types'
+import type { CardKey, Choice, GameState, PlayerId, Slot } from './game/types'
 import { LangueScope, type Langue } from './i18n'
 import { ThemeScope } from './ui/theme'
 import type { VueSession } from './net/session'
@@ -231,13 +231,24 @@ function revelationBlocage(): GameState {
 
 function finDePartie(seats = SEATS): GameState {
   const s = base({ round: 10, phase: 'fin' }, seats)
+  const murs = ['IIIBB', 'IIIII', 'BBBBB', 'IIBBB']
+  /* Dix manches jouées, pour que le récapitulatif ait quelque chose à montrer. */
+  const cartes: CardKey[] = ['frapper', 'bloquer', 'reparer', 'pieger']
+  const history = Array.from({ length: 10 }, (_, m) => ({
+    round: m + 1,
+    joue: Object.fromEntries(
+      s.players.map((p, i) => [p.id, m === 6 && i === 1 ? [] : [cartes[(m + i) % 4]]]),
+    ),
+    // Le troisième mur tombe à la septième manche : l'état que l'écran de fin
+    // doit savoir dire.
+    briques: Object.fromEntries(
+      s.players.map((p, i) => [p.id, i === 2 ? Math.max(0, 5 - m) : Math.max(1, 5 - (m % 4))]),
+    ),
+  }))
   return {
     ...s,
-    players: s.players.map((p, i) => ({
-      ...p,
-      wall: mur(['IIIBB', 'IIIII', 'IBBBB', 'IIBBB'][i]),
-      locked: [],
-    })),
+    history,
+    players: s.players.map((p, i) => ({ ...p, wall: mur(murs[i]), locked: [] })),
   }
 }
 

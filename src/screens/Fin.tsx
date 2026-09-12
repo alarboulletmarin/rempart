@@ -1,6 +1,7 @@
 import { SAFE_TOP, TEXTE, TITRE } from '../theme'
 import { bricks, standings, trancheeAuxPoints } from '../game/engine'
 import { WALL_SIZE, type GameState, type PlayerId } from '../game/types'
+import { Pictogramme } from '../ui/Pictogramme'
 import { useT, type T } from '../i18n'
 import { ordinal } from '../i18n/format'
 import { Bouton, BoutonCreux, Etiquette, Forme, Mur, Panneau, Scribble, Texte, usePanneauEncre } from '../ui/atoms'
@@ -44,17 +45,35 @@ export function Fin({
 
   return (
     <Ecran>
+      {/*
+       * Le contenu se centre quand il est plus court que l'écran, et défile
+       * quand il est plus long.
+       *
+       * Il s'étirait : le bloc de titre restait collé en haut, les boutons
+       * collés en bas, et quarante pour cent de la hauteur se vidait au
+       * milieu. `margin: auto` sur l'enfant fait les deux à la fois, là où un
+       * `justify-content: center` sur un conteneur qui défile rend le haut du
+       * contenu inatteignable dès qu'il déborde.
+       */}
       <div
         style={{
           flex: 1,
           minHeight: 0,
-          padding: `calc(${SAFE_TOP} + 20px) 20px 20px 20px`,
+          padding: `calc(${SAFE_TOP} + 20px) 20px calc(20px + env(safe-area-inset-bottom, 0px)) 20px`,
           display: 'flex',
           flexDirection: 'column',
-          gap: 16,
           overflowY: 'auto',
         }}
       >
+        <div
+          style={{
+            margin: 'auto 0',
+            width: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 16,
+          }}
+        >
         {/*
          * La décoration a sa colonne, le texte a la sienne.
          *
@@ -122,7 +141,9 @@ export function Fin({
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {rows.map((r) => (
+          {rows.map((r) => {
+            const tombe = r.bricks === 0 ? tombeA(state, r.player.id) : null
+            return (
             <Panneau key={r.player.id} radius={16} pad="12px 13px" gap={8}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <span style={{ font: `700 13px/1 ${TITRE}`, color: t.ink2, width: 24 }}>
@@ -139,12 +160,23 @@ export function Fin({
                   </Etiquette>
                 )}
               </div>
+              {/* Un mur à zéro n'est pas une ligne en moins : le joueur a
+                  continué de jouer, il pouvait remonter, et la manche où son
+                  mur est tombé fait partie de l'histoire de la partie. */}
+              {tombe !== null && (
+                <span style={{ font: `500 11px/1 ${TEXTE}`, color: t.ink2 }}>
+                  {tr('fin.tombe', { n: tombe })}
+                </span>
+              )}
               <Mur wall={r.player.wall} ci={r.player.ci} height={26} gap={5} radius={6} chant={4} />
             </Panneau>
-          ))}
+            )
+          })}
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 'auto' }}>
+        <Recapitulatif state={state} />
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {peutRejouer && (
             <Bouton onClick={onRejouer} height={64} size={20}>
               {tr('fin.rejouer')}
@@ -159,10 +191,139 @@ export function Fin({
               {tr('fin.hoteRelance')}
             </Texte>
           )}
+          </div>
         </div>
       </div>
     </Ecran>
   )
+}
+
+/**
+ * Le récapitulatif des dix manches.
+ *
+ * Une ligne par joueur, une colonne par manche, le dessin de la carte jouée.
+ * C'est le contenu qui donne envie de relancer — « tu as bloqué trois fois de
+ * suite » —, et il était déjà en mémoire côté client : la partie vient de se
+ * jouer sur cet appareil.
+ *
+ * Un vrai tableau, et non une grille de `div` : les en-têtes de ligne et de
+ * colonne portent alors l'association pour les lecteurs d'écran sans qu'on ait
+ * à la réécrire dans chaque cellule.
+ */
+function Recapitulatif({ state }: { state: GameState }) {
+  const t = useTheme()
+  const tr = useT()
+  const manches = state.history ?? []
+  if (manches.length === 0) return null
+
+  return (
+    <Panneau radius={16} pad="13px 12px" gap={9}>
+      <Etiquette size={10} style={{ letterSpacing: '0.1em', padding: '0 2px' }}>
+        {tr('fin.recap.titre')}
+      </Etiquette>
+      <table
+        style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' }}
+        aria-label={tr('fin.recap.aria')}
+      >
+        <thead>
+          <tr>
+            {/* La colonne des joueurs : la forme suffit à les distinguer, et
+                le nom entier mangerait la moitié de la largeur. */}
+            <th style={{ width: 26 }}>
+              <span style={SR}>{tr('salon.joueurs.titre')}</span>
+            </th>
+            {manches.map((m) => (
+              <th
+                key={m.round}
+                scope="col"
+                style={{
+                  font: `600 9px/1 ${TEXTE}`,
+                  color: t.ink3,
+                  fontWeight: 600,
+                  paddingBottom: 5,
+                }}
+              >
+                <span aria-hidden="true">{m.round}</span>
+                <span style={SR}>{tr('fin.recap.manche', { n: m.round })}</span>
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {state.players.map((p) => (
+            <tr key={p.id}>
+              <th scope="row" style={{ textAlign: 'left' }}>
+                <Forme ci={p.ci} size={15} />
+                <span style={SR}>{p.name}</span>
+              </th>
+              {manches.map((m) => {
+                const cartes = m.joue[p.id] ?? []
+                return (
+                  <td key={m.round} style={{ padding: '2px 0', textAlign: 'center' }}>
+                    {cartes.length > 0 ? (
+                      <span
+                        style={{ display: 'inline-flex', justifyContent: 'center', gap: 1 }}
+                        title={cartes.map((c) => tr(`carte.${c}` as const)).join(' + ')}
+                      >
+                        {cartes.map((c, i) => (
+                          <Pictogramme key={i} card={c} size={cartes.length > 1 ? 14 : 19} color={t.ink2} />
+                        ))}
+                        <span style={SR}>
+                          {cartes.map((c) => tr(`carte.${c}` as const)).join(' + ')}
+                        </span>
+                      </span>
+                    ) : (
+                      <>
+                        {/* Une manche sans carte — un joueur parti — est un
+                            creux, pas un vide : la colonne garde sa place. */}
+                        <span
+                          aria-hidden="true"
+                          style={{
+                            display: 'inline-block',
+                            width: 7,
+                            height: 7,
+                            borderRadius: '50%',
+                            background: t.off,
+                            boxShadow: `inset 0 0 0 1px ${t.offEdge}`,
+                          }}
+                        />
+                        <span style={SR}>{tr('fin.recap.vide')}</span>
+                      </>
+                    )}
+                  </td>
+                )
+              })}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <Texte size={10} style={{ padding: '0 2px', lineHeight: 1.4 }}>
+        {tr('fin.recap.legende')}
+      </Texte>
+    </Panneau>
+  )
+}
+
+/** Hors champ visuel, présent pour qui écoute. */
+const SR = {
+  position: 'absolute',
+  width: 1,
+  height: 1,
+  overflow: 'hidden',
+  clip: 'rect(0 0 0 0)',
+  whiteSpace: 'nowrap',
+} as const
+
+/**
+ * La manche où ce mur est tombé à zéro pour la première fois.
+ *
+ * Tombé, et non « éliminé » : le jeu ne sort personne, un mur à zéro peut
+ * remonter et gagner. Mais la manche où il a cédé dit quelque chose de la
+ * partie que le classement final tait.
+ */
+function tombeA(state: GameState, id: PlayerId): number | null {
+  const manche = (state.history ?? []).find((m) => m.briques[id] === 0)
+  return manche?.round ?? null
 }
 
 /**
