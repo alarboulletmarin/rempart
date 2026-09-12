@@ -55,6 +55,20 @@ export function Fin({
           overflowY: 'auto',
         }}
       >
+        {/*
+         * La décoration a sa colonne, le texte a la sienne.
+         *
+         * Le gribouillage de victoire était posé en absolu au coin du panneau,
+         * donc au-dessus du titre : il mangeait la dernière lettre de
+         * « Truelle gagne » — et davantage avec un nom plus long, ou en
+         * anglais. Il descend d'un cran, à côté du résumé, dans une colonne qui
+         * lui est réservée : le titre retrouve toute la largeur du panneau, et
+         * aucune longueur de nom ne peut plus passer sous l'étoile.
+         *
+         * Une colonne réservée plutôt qu'un empilement explicite : mettre de
+         * l'ocre plein derrière de la craie aurait rendu le titre illisible
+         * autrement.
+         */}
         <div
           style={{
             background: encre.bg,
@@ -64,16 +78,9 @@ export function Fin({
             display: 'flex',
             flexDirection: 'column',
             gap: 12,
-            position: 'relative',
             overflow: 'hidden',
           }}
         >
-          <Scribble
-            nom="burst"
-            width={104}
-            height={104}
-            style={{ position: 'absolute', right: 8, top: 6, pointerEvents: 'none' }}
-          />
           <Etiquette size={11} color={encre.sub} style={{ letterSpacing: '0.14em' }}>
             {state.mortSubite > 0
               ? tr.n('fin.mortSubite', state.mortSubite)
@@ -81,32 +88,37 @@ export function Fin({
           </Etiquette>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             {gagnants[0] && <Forme ci={gagnants[0].player.ci} size={34} />}
-            <h1 style={{ font: `700 36px/1 ${TITRE}`, color: encre.fg, margin: 0 }}>{titre}</h1>
-          </div>
-          <div
-            style={{
-              font: `500 14px/1.45 ${TEXTE}`,
-              color: encre.detail,
-              maxWidth: 250,
-              textWrap: 'pretty',
-            }}
-          >
-            {resume(tr, state, jaiGagne, gagnants[0]?.bricks ?? 0)}
-          </div>
-          {/* Une partie décidée par la règle du départage doit le dire :
-              sinon le classement à l'écran a l'air de se contredire. */}
-          {trancheeAuxPoints(state) && (
-            <div
+            <h1
               style={{
-                font: `500 12px/1.4 ${TEXTE}`,
-                color: encre.sub,
-                maxWidth: 250,
+                font: `700 36px/1.05 ${TITRE}`,
+                color: encre.fg,
+                margin: 0,
+                minWidth: 0,
                 textWrap: 'pretty',
               }}
             >
-              {tr('fin.departage')}
+              {titre}
+            </h1>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+            <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <div
+                style={{ font: `500 14px/1.45 ${TEXTE}`, color: encre.detail, textWrap: 'pretty' }}
+              >
+                {resume(tr, state, jaiGagne, gagnants[0]?.bricks ?? 0)}
+              </div>
+              {/* Une partie décidée par la règle du départage doit le dire :
+                  sinon le classement à l'écran a l'air de se contredire. */}
+              {trancheeAuxPoints(state) && (
+                <div
+                  style={{ font: `500 12px/1.4 ${TEXTE}`, color: encre.sub, textWrap: 'pretty' }}
+                >
+                  {tr('fin.departage')}
+                </div>
+              )}
             </div>
-          )}
+            <Scribble nom="burst" width={72} height={72} style={{ marginTop: -8 }} />
+          </div>
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>

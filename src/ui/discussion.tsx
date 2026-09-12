@@ -128,10 +128,19 @@ export function Bulles({ de }: { de: string }) {
   const nom = salle.auteurs.find((a) => a.id === de)?.nom ?? ''
 
   return (
+    /*
+     * Les bulles se posent en BAS de la ligne, au-dessus du mur.
+     *
+     * Elles sortaient du haut, donc du jeton — et couvraient au passage le nom
+     * du joueur et sa contrainte, c'est-à-dire tout ce que cette ligne sert à
+     * lire. Le mur est un aplat sans texte : une réaction peut y passer sans
+     * rien masquer, et elle sort toujours du bon côté de l'écran puisqu'elle
+     * reste alignée sur le jeton.
+     */
     <div
       role="status"
       aria-live="polite"
-      style={{ position: 'absolute', left: 10, top: 2, pointerEvents: 'none', zIndex: 4 }}
+      style={{ position: 'absolute', left: 10, bottom: 6, pointerEvents: 'none', zIndex: 4 }}
     >
       {miennes.map((m, i) => {
         const reaction = estReaction(m.texte)

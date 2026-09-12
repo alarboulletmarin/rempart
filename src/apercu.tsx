@@ -229,8 +229,8 @@ function revelationBlocage(): GameState {
   return resolveRound(s)
 }
 
-function finDePartie(): GameState {
-  const s = base({ round: 10, phase: 'fin' })
+function finDePartie(seats = SEATS): GameState {
+  const s = base({ round: 10, phase: 'fin' }, seats)
   return {
     ...s,
     players: s.players.map((p, i) => ({
@@ -506,11 +506,49 @@ function Galerie() {
         <Cadre titre="08 · Révélation (piège retourné)">
           <Revelation state={revelationPiege()} moi={MOI} onSuivant={noop} />
         </Cadre>
+        {/* Une réaction en vol : c'est le seul moment où une forme claire
+            passe au-dessus d'une ligne de joueur, donc le seul où l'on peut
+            vérifier qu'elle ne couvre ni un nom ni une contrainte. */}
+        <Cadre titre="05 quinquies · Jeu · une réaction en vol">
+          <AvecSalle>
+            <Jeu
+              state={base()}
+              moi={MOI}
+              joues={[]}
+              absentsDepuis={SANS_ABSENT}
+              onJouer={noop}
+              onSuite={noop}
+              onQuitter={noop}
+            />
+          </AvecSalle>
+        </Cadre>
         <Cadre titre="08 bis · Révélation (un blocage annule deux frappes)">
           <Revelation state={revelationBlocage()} moi={MOI} onSuivant={noop} />
         </Cadre>
         <Cadre titre="11 · Fin de partie">
           <Fin state={finDePartie()} moi={MOI} peutRejouer onRejouer={noop} onPalmares={noop} onQuitter={noop} />
+        </Cadre>
+        {/* Le cas qui faisait déborder le titre : le nom le plus long que le
+            jeu accepte, dans les deux langues, avec la décoration à côté. */}
+        <Cadre titre="11 bis · Fin · nom le plus long">
+          <Fin
+            state={finDePartie(SEATS_LONGS)}
+            moi={MOI}
+            peutRejouer
+            onRejouer={noop}
+            onPalmares={noop}
+            onQuitter={noop}
+          />
+        </Cadre>
+        <Cadre titre="11 ter · Fin · nom le plus long · anglais" langue="en">
+          <Fin
+            state={finDePartie(SEATS_LONGS)}
+            moi={MOI}
+            peutRejouer
+            onRejouer={noop}
+            onPalmares={noop}
+            onQuitter={noop}
+          />
         </Cadre>
         <Cadre titre="11 bis · Palmarès">
           <Palmares onRetour={noop} />

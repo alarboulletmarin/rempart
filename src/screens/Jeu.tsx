@@ -178,7 +178,9 @@ export function Jeu({
     <>
       <span
         style={{
-          width: 74,
+          // La jauge cède sa largeur avant le compte : « 3 / 4 ont joué » est
+          // la phrase, la barre n'en est que le double.
+          flex: '0 1 74px',
           height: 8,
           borderRadius: 4,
           background: t.off,

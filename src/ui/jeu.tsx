@@ -69,7 +69,6 @@ export function CarteMain({
         etat: tr(`jeu.etat.${etat}` as const),
       })}
       style={{
-        position: 'relative',
         flex: 1,
         minWidth: 0,
         height,
@@ -89,29 +88,32 @@ export function CarteMain({
           : undefined,
       }}
     >
-      {/* Le cadenas se pose au coin plutôt que devant le libellé : en ligne,
-          il poussait « interdit ce tour » sur deux lignes et se perdait à
-          11 px. Au coin il a la place d'être lu, et il double la matière plus
-          pâle du carton — l'état ne tient donc pas au seul ton. */}
-      {interdite && (
-        <Icone
-          nom="cadenas"
-          size={14}
-          color={t.ink3}
-          style={{ position: 'absolute', top: 8, right: 8 }}
-        />
-      )}
       <Pictogramme card={card} size={40} color={pictoColor} />
       <span style={{ font: `700 13px/1 ${TITRE}`, color: fg }}>
         {tr(`carte.${card}` as const)}
       </span>
+      {/*
+       * Le cadenas se pose AU-DESSUS du libellé, dans le flux.
+       *
+       * En ligne devant « interdit ce tour », il poussait le libellé sur deux
+       * lignes ; posé en absolu au coin de la carte, il venait mordre le
+       * pictogramme sur un écran de 320 px. Empilé, il ne peut rien
+       * rencontrer : la carte a de la hauteur à revendre, c'est sa largeur qui
+       * manque. Il double la matière plus pâle du carton — l'état ne tient
+       * donc pas au seul ton du papier.
+       */}
       <span
         style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: 3,
           font: `500 9px/1.2 ${TEXTE}`,
           color: choisie ? t.selFg : t.ink2,
           textAlign: 'center',
         }}
       >
+        {interdite && <Icone nom="cadenas" size={13} color={t.ink3} />}
         {tr(interdite ? 'jeu.carte.interdite' : (`jeu.etat.${etat}` as const))}
       </span>
     </button>
@@ -346,7 +348,7 @@ export function LigneJoueur({
                 marginLeft: 'auto',
                 font: `500 10px/1 ${TEXTE}`,
                 color: t.ink3,
-                flex: '0 1 auto',
+                flex: '0 100 auto',
                 minWidth: 0,
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
@@ -363,7 +365,7 @@ export function LigneJoueur({
               style={{
                 marginLeft: 'auto',
                 letterSpacing: '0.08em',
-                flex: '0 1 auto',
+                flex: '0 100 auto',
                 minWidth: 0,
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',

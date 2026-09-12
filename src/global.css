@@ -24,6 +24,17 @@ body {
   -webkit-tap-highlight-color: transparent;
   /* Pas de rebond élastique : le plateau ne bouge pas sous le doigt. */
   overscroll-behavior: none;
+  /*
+   * Pas d'agrandissement automatique du texte.
+   *
+   * Safari mobile gonfle le texte de sa propre initiative sur les pages qu'il
+   * juge non prévues pour le téléphone — ici, cela décalait des blocs mesurés
+   * au pixel sans que personne ne l'ait demandé. Ce réglage ne touche PAS au
+   * zoom du lecteur ni à la taille de police du système : il ne coupe que
+   * l'heuristique du navigateur.
+   */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 #root {
@@ -182,22 +193,31 @@ input:focus-visible,
   }
 }
 
-/* La bulle sort de son auteur : elle monte, grandit et s'estompe. */
+/*
+ * La bulle sort de son auteur : elle monte, grandit et s'estompe.
+ *
+ * Sa course est courte, et c'est volontaire : elle part du bas de la ligne,
+ * au-dessus du mur, et ne monte que de dix-huit pixels. Elle montait de
+ * quarante depuis le haut de la ligne, ce qui la faisait passer pile sur le
+ * nom du joueur et sur sa contrainte — les deux seules choses que cet écran
+ * sert à lire. Le mur, lui, est un aplat : une bulle par-dessus ne cache rien
+ * qui s'écrive.
+ */
 @keyframes rempart-bulle {
   0% {
-    transform: translateY(8px) scale(0.6);
+    transform: translateY(6px) scale(0.6);
     opacity: 0;
   }
-  14% {
-    transform: translateY(2px) scale(1);
+  16% {
+    transform: translateY(0) scale(1);
     opacity: 1;
   }
-  60% {
-    transform: translateY(-20px) scale(1.08);
+  62% {
+    transform: translateY(-10px) scale(1.06);
     opacity: 1;
   }
   100% {
-    transform: translateY(-40px) scale(1.16);
+    transform: translateY(-18px) scale(1.12);
     opacity: 0;
   }
 }
