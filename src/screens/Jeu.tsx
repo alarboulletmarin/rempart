@@ -203,12 +203,15 @@ export function Jeu({
   /* --------------------------------------------------- lignes de mur */
 
   const monEquipe = me.team
-  const tagDe = (p: Player): { tag?: string; couleur?: string } => {
+  const tagDe = (p: Player): { tag?: string; couleur?: string; discret?: boolean } => {
     if (!p.connected) return { tag: tr('jeu.tag.absent') }
     if (carteEnCours && cibles.includes(p.id) && p.id !== moi)
       return { tag: tr('jeu.tag.cibler'), couleur: t.clayText }
     if (p.id === moi) return { tag: tr('jeu.tag.toi') }
-    if (envoye) return { tag: tr(aJoue(p.id) ? 'jeu.tag.aJoue' : 'jeu.tag.choisit') }
+    // Qui a joué et qui choisit encore : utile, mais jamais au point de peser
+    // plus que la contrainte affichée juste à côté.
+    if (envoye)
+      return { tag: tr(aJoue(p.id) ? 'jeu.tag.aJoue' : 'jeu.tag.choisit'), discret: true }
     // En équipes, savoir qui est de son côté vaut d'être dit en permanence :
     // c'est ce qui distingue un mur qu'on répare d'un mur qu'on casse.
     if (monEquipe !== null && p.team === monEquipe) return { tag: tr('jeu.tag.coequipier') }
@@ -247,7 +250,7 @@ export function Jeu({
             : GEOMETRIE.neutre
 
   const ligne = (p: Player, nu = false) => {
-    const { tag, couleur } = tagDe(p)
+    const { tag, couleur, discret } = tagDe(p)
     const ciblable = !!carteEnCours && cibles.includes(p.id)
     return (
       <LigneJoueur
@@ -259,6 +262,7 @@ export function Jeu({
         verrou={!deconnecte}
         tag={tag}
         tagColor={couleur}
+        tagDiscret={discret}
         hauteurMur={nu ? GEOMETRIE.equipes.mur : cadre.mur}
         bandeau={bandeauDe(p)}
         onClick={ciblable ? () => choisirCible(p.id) : undefined}

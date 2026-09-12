@@ -1,6 +1,6 @@
 import type { CSSProperties, ReactNode } from 'react'
 import { R, TEXTE, TITRE } from '../theme'
-import type { Slot } from '../game/types'
+import type { CardKey, Slot } from '../game/types'
 import { useT, type Cle } from '../i18n'
 import { DUREE, anime, useMouvement } from './mouvement'
 import { useTheme } from './theme'
@@ -152,10 +152,35 @@ export function Mur({
   )
 }
 
-/** Le compte de briques, dit en toutes lettres pour les lecteurs d'écran. */
-export function MurAccessible({ nom, wall }: { nom: string; wall: Slot[] }) {
+/**
+ * Ce que dit une ligne de joueur à qui ne voit pas l'écran : son mur, et sa
+ * contrainte de la manche.
+ *
+ * Les deux dans la même phrase et sous le même nom. Séparés, la pastille de
+ * contrainte s'annonçait « Interdit : Frapper » sans dire de qui — trois fois
+ * de suite, sur trois lignes, sans moyen de les rattacher à quelqu'un.
+ */
+export function LigneAccessible({
+  nom,
+  wall,
+  locked,
+}: {
+  nom: string
+  wall: Slot[]
+  /** Absente quand la ligne ne montre pas de contrainte (la révélation). */
+  locked?: CardKey[]
+}) {
   const tr = useT()
   const debout = wall.filter((s) => s !== 'broken').length
+  const mur = tr.n('mur.aria', debout, { nom, total: wall.length })
+  const contrainte = !locked
+    ? ''
+    : locked.length === 0
+      ? tr('jeu.contrainte.aria.libre', { nom })
+      : tr('jeu.contrainte.aria.interdit', {
+          nom,
+          cartes: tr.liste(locked.map((k) => tr(`carte.${k}` as const))),
+        })
   return (
     <span
       style={{
@@ -167,7 +192,7 @@ export function MurAccessible({ nom, wall }: { nom: string; wall: Slot[] }) {
         whiteSpace: 'nowrap',
       }}
     >
-      {tr.n('mur.aria', debout, { nom, total: wall.length })}
+      {contrainte ? `${mur} ${contrainte}` : mur}
     </span>
   )
 }
@@ -265,15 +290,19 @@ export function Pastille({
   bg,
   fg,
   style,
+  'aria-hidden': ariaHidden,
 }: {
   children: ReactNode
   bg?: string
   fg?: string
   style?: CSSProperties
+  /** La pastille double une phrase déjà dite ailleurs pour les lecteurs d'écran. */
+  'aria-hidden'?: boolean | 'true' | 'false'
 }) {
   const t = useTheme()
   return (
     <span
+      aria-hidden={ariaHidden}
       style={{
         background: bg ?? t.panel2,
         color: fg ?? t.ink2,

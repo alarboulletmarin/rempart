@@ -41,13 +41,29 @@ const SEATS = [
 
 const MOI: PlayerId = 'a'
 
+/**
+ * Les noms les plus longs que le jeu accepte (quatorze caractères, la limite
+ * des deux champs de saisie).
+ *
+ * Ils ne sont pas là pour faire joli : c'est le cas qui fait déborder les
+ * lignes de joueur et le titre de l'écran de fin, et le seul moyen de vérifier
+ * qu'une décoration n'empiète pas sur un texte est de lui donner sa largeur
+ * maximale — dans les deux langues, puisqu'elles n'ont pas la même.
+ */
+const SEATS_LONGS = [
+  { id: 'a', name: 'Bartholomée', ci: 0 as const },
+  { id: 'b', name: 'Anne-Charlott', ci: 1 as const },
+  { id: 'c', name: 'Maximilienne', ci: 2 as const },
+  { id: 'd', name: 'Jean-Baptiste', ci: 3 as const },
+]
+
 /** Reprend les codes de mur de la planche : I intact, B cassée, R réparée. */
 function mur(code: string): Slot[] {
   return code.split('').map((c) => (c === 'B' ? 'broken' : c === 'R' ? 'repaired' : 'intact'))
 }
 
-function base(over: Partial<GameState> = {}): GameState {
-  const g = createGame(SEATS, { format: 'chacun', roundCards: true }, 7)
+function base(over: Partial<GameState> = {}, seats = SEATS): GameState {
+  const g = createGame(seats, { format: 'chacun', roundCards: true }, 7)
   return {
     ...g,
     round: 4,
@@ -381,6 +397,42 @@ function Galerie() {
         </Cadre>
         <Cadre titre="05 · Jeu · état neutre">
           <Jeu state={base()} moi={MOI} joues={[]} absentsDepuis={SANS_ABSENT} onJouer={noop} onSuite={noop} onQuitter={noop} />
+        </Cadre>
+        {/* Manche 1 : personne n'a encore joué, donc personne n'a de
+            contrainte. C'est l'état que la ligne doit dire en toutes lettres
+            plutôt que de laisser un vide. */}
+        <Cadre titre="05 bis · Jeu · manche 1, aucune contrainte">
+          <Jeu
+            state={base({ round: 1, players: base().players.map((p) => ({ ...p, locked: [] })) })}
+            moi={MOI}
+            joues={[]}
+            absentsDepuis={SANS_ABSENT}
+            onJouer={noop}
+            onSuite={noop}
+            onQuitter={noop}
+          />
+        </Cadre>
+        <Cadre titre="05 ter · Jeu · noms les plus longs">
+          <Jeu
+            state={base({ choices: { a: [{ card: 'frapper', target: 'b' }] } }, SEATS_LONGS)}
+            moi={MOI}
+            joues={['a', 'b']}
+            absentsDepuis={SANS_ABSENT}
+            onJouer={noop}
+            onSuite={noop}
+            onQuitter={noop}
+          />
+        </Cadre>
+        <Cadre titre="05 quater · Jeu · noms les plus longs · anglais" langue="en">
+          <Jeu
+            state={base({ choices: { a: [{ card: 'frapper', target: 'b' }] } }, SEATS_LONGS)}
+            moi={MOI}
+            joues={['a', 'b']}
+            absentsDepuis={SANS_ABSENT}
+            onJouer={noop}
+            onSuite={noop}
+            onQuitter={noop}
+          />
         </Cadre>
         <Cadre titre="06 · Jeu · carte choisie, choix de la cible">
           <Jeu

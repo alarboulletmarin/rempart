@@ -199,8 +199,11 @@ export const fr = {
   'jeu.etat.jouable': 'jouable',
   'jeu.etat.interdite': 'interdite',
   'jeu.carte.aria': '{carte} — {etat}',
-  'jeu.verrou.rien': 'rien joué',
-  'jeu.verrou.carte': '{carte} · interdite',
+  'jeu.contrainte.interdit': 'Interdit : {cartes}',
+  'jeu.contrainte.libre': 'Tout est jouable',
+  'jeu.contrainte.aria.interdit': 'Interdit pour {nom} : {cartes}.',
+  'jeu.contrainte.aria.libre': 'Tout est jouable pour {nom}.',
+  'jeu.carte.interdite': 'interdit ce tour',
 
   'jeu.entete.pause': 'en pause',
   'jeu.entete.cible': '{carte} · choisis une cible',
@@ -213,7 +216,7 @@ export const fr = {
   'jeu.tag.cibler': 'cibler',
   'jeu.tag.toi': 'toi',
   'jeu.tag.aJoue': 'a joué',
-  'jeu.tag.choisit': 'choisit…',
+  'jeu.tag.choisit': 'en train de choisir',
   'jeu.tag.coequipier': 'coéquipier',
 
   'jeu.bandeau.frappe': 'Ta frappe part sur ce mur',

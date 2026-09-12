@@ -169,8 +169,11 @@ export const en: Catalogue = {
   'jeu.etat.jouable': 'playable',
   'jeu.etat.interdite': 'locked',
   'jeu.carte.aria': '{carte} — {etat}',
-  'jeu.verrou.rien': 'played nothing',
-  'jeu.verrou.carte': '{carte} · locked',
+  'jeu.contrainte.interdit': 'Locked: {cartes}',
+  'jeu.contrainte.libre': 'Everything is playable',
+  'jeu.contrainte.aria.interdit': 'Locked for {nom}: {cartes}.',
+  'jeu.contrainte.aria.libre': 'Everything is playable for {nom}.',
+  'jeu.carte.interdite': 'locked this round',
 
   'jeu.entete.pause': 'paused',
   'jeu.entete.cible': '{carte} · pick a target',
@@ -183,7 +186,7 @@ export const en: Catalogue = {
   'jeu.tag.cibler': 'target',
   'jeu.tag.toi': 'you',
   'jeu.tag.aJoue': 'played',
-  'jeu.tag.choisit': 'choosing…',
+  'jeu.tag.choisit': 'still choosing',
   'jeu.tag.coequipier': 'teammate',
 
   'jeu.bandeau.frappe': 'Your strike lands on this wall',
