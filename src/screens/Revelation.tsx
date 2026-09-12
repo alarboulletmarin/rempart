@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { TEXTE, TITRE } from '../theme'
 import { chute, narrate, playedLabel } from '../game/narrate'
+import type { Narration } from '../game/narrate'
 import type { GameState, PlayerId } from '../game/types'
 import { direEtiquette, useT } from '../i18n'
 import { Etiquette, Pastille, usePanneauEncre } from '../ui/atoms'
@@ -64,11 +65,16 @@ export function Revelation({
   const tout = devoiles >= total
   const monDelta = outcome.outcomes.find((o) => o.playerId === moi)?.delta ?? 0
 
-  const tonFond =
-    recit.tone === 'clay' ? t.clayText : recit.tone === 'green' ? t.green : t.selBg
-  const tonChant =
-    recit.tone === 'clay' ? t.clayTextEdge : recit.tone === 'green' ? t.greenEdge : t.selEdge
-  const tonTexte = recit.tone === 'ink' ? t.selFg : t.panel
+  /*
+   * Le bandeau se pose sous la DERNIÈRE ligne dont il parle.
+   *
+   * Il vivait en bas de page, à quatre lignes des deux cartes qu'il
+   * expliquait : « Le piège de Nour a retourné ta frappe » obligeait à
+   * remonter des yeux pour savoir de quoi il s'agissait. Quand la manche n'a
+   * produit aucun fait — personne n'a rien fait passer — il n'y a personne
+   * sous qui se ranger, et il reprend sa place à la suite de tout le monde.
+   */
+  const sousQui = [...outcome.revealOrder].reverse().find((id) => recit.concerne.includes(id))
 
   return (
     <Ecran>
@@ -94,17 +100,30 @@ export function Revelation({
           </>
         }
       />
-      <Corps pad="14px 14px 8px 14px" gap={11}>
+      <Corps
+        pad="14px 14px calc(8px + env(safe-area-inset-bottom, 0px)) 14px"
+        gap={11}
+      >
         <div
           style={{
             flex: 1,
             minHeight: 0,
             display: 'flex',
             flexDirection: 'column',
-            gap: 11,
             overflowY: 'auto',
           }}
         >
+          {/* Centré tant que la manche tient dans la hauteur, défilant sinon :
+              le contenu se collait en haut et laissait le bas se vider. */}
+          <div
+            style={{
+              margin: 'auto 0',
+              width: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 11,
+            }}
+          >
           {outcome.revealOrder.map((id, i) => {
             const p = state.players.find((x) => x.id === id)
             if (!p) return null
@@ -115,8 +134,8 @@ export function Revelation({
             const debout = (w: typeof p.wall) => w.filter((s) => s !== 'broken').length
 
             return (
+              <Fragment key={id}>
               <LigneJoueur
-                key={id}
                 player={p}
                 // Tant que la carte n'est pas retournée, le mur est celui
                 // d'avant : la ligne ne dit pas ce qu'elle n'a pas encore
@@ -190,31 +209,16 @@ export function Revelation({
                   </div>
                 }
               />
+                {tout && sousQui === id && <Recit recit={recit} />}
+              </Fragment>
             )
           })}
-        </div>
-
-        <div
-          style={{
-            marginTop: 'auto',
-            background: tonFond,
-            borderRadius: 18,
-            padding: 15,
-            boxShadow: `0 4px 0 ${tonChant}`,
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 5,
-            visibility: tout ? 'visible' : 'hidden',
-          }}
-        >
-          <div style={{ font: `700 19px/1.15 ${TITRE}`, color: tonTexte, textWrap: 'pretty' }}>
-            {recit.headline}
-          </div>
-          <div style={{ font: `500 13px/1.4 ${TEXTE}`, color: tonTexte, textWrap: 'pretty' }}>
-            {recit.detail}
+          {tout && !sousQui && <Recit recit={recit} />}
           </div>
         </div>
 
+        {/* Le geste de sortie ne défile pas : il est toujours là, à la même
+            place, que la manche tienne dans la hauteur ou non. */}
         {tout ? (
           <button
             type="button"
@@ -252,6 +256,42 @@ export function Revelation({
         )}
       </Corps>
     </Ecran>
+  )
+}
+
+/**
+ * Le récit de la manche : ce qui vient de se passer, en une phrase.
+ *
+ * Il se pose sous les lignes dont il parle (voir `Narration.concerne`), et non
+ * en bas de l'écran : le bandeau expliquait deux cartes qui se trouvaient
+ * quatre lignes plus haut.
+ */
+function Recit({ recit }: { recit: Narration }) {
+  const t = useTheme()
+  const fond = recit.tone === 'clay' ? t.clayText : recit.tone === 'green' ? t.green : t.selBg
+  const chant =
+    recit.tone === 'clay' ? t.clayTextEdge : recit.tone === 'green' ? t.greenEdge : t.selEdge
+  const encre = recit.tone === 'ink' ? t.selFg : t.panel
+  return (
+    <div
+      role="status"
+      style={{
+        background: fond,
+        borderRadius: 18,
+        padding: 15,
+        boxShadow: `0 4px 0 ${chant}`,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 5,
+      }}
+    >
+      <div style={{ font: `700 19px/1.15 ${TITRE}`, color: encre, textWrap: 'pretty' }}>
+        {recit.headline}
+      </div>
+      <div style={{ font: `500 13px/1.4 ${TEXTE}`, color: encre, textWrap: 'pretty' }}>
+        {recit.detail}
+      </div>
+    </div>
   )
 }
 

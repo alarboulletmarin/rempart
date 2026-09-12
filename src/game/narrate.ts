@@ -18,6 +18,16 @@ export interface Narration {
   detail: string
   /** La matière du panneau : terre cuite pour un dégât, vert atelier pour une défense. */
   tone: Tone
+  /**
+   * Les joueurs dont ce récit parle.
+   *
+   * L'écran s'en sert pour poser le bandeau **sous leurs cartes** plutôt qu'en
+   * bas de page : « Le piège de Nour a retourné ta frappe » se lisait à quatre
+   * lignes des deux cartes concernées, et il fallait remonter des yeux pour
+   * savoir de quoi il parlait. Vide quand la manche n'a rien produit : le
+   * bandeau reprend alors sa place à la suite de tout le monde.
+   */
+  concerne: PlayerId[]
 }
 
 /**
@@ -64,6 +74,7 @@ export function narrate(
         t.n(`recit.retourne.detail.${vue}` as const, retour.amount, params) +
         (vue === 'moiAuteur' ? verrou(retour.from) : ''),
       tone: 'clay',
+      concerne: [retour.from, retour.to],
     }
   }
 
@@ -81,6 +92,7 @@ export function narrate(
         carte: t('carte.bloquer'),
       }),
       tone: 'green',
+      concerne: [qui],
     }
   }
 
@@ -105,6 +117,7 @@ export function narrate(
           nom: nom(e.to),
         }) + verrou(e.from),
       tone: 'clay',
+      concerne: [e.from, e.to],
     }
   }
 
@@ -123,11 +136,21 @@ export function narrate(
             ? t('recit.repare.titre.equipe.pourMoi', params)
             : t('recit.repare.titre.equipe.autres', params)
         : t(`recit.repare.titre.seul.${moi(e.who) ? 'moi' : 'autre'}` as const, params)
-    return { headline: titre, detail: t.n('recit.repare.detail', e.amount), tone: 'green' }
+    return {
+      headline: titre,
+      detail: t.n('recit.repare.detail', e.amount),
+      tone: 'green',
+      concerne: e.by === e.who ? [e.who] : [e.by, e.who],
+    }
   }
 
   // 5 · Personne n'a rien fait passer.
-  return { headline: t('recit.rien.titre'), detail: t('recit.rien.detail'), tone: 'ink' }
+  return {
+    headline: t('recit.rien.titre'),
+    detail: t('recit.rien.detail'),
+    tone: 'ink',
+    concerne: [],
+  }
 }
 
 /** La ligne « Frapper sur Nour » affichée sur chaque joueur à la révélation. */

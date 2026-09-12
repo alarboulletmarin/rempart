@@ -167,3 +167,25 @@ describe('le récit dans les deux langues', () => {
     expect(narrate(deux, deux.lastOutcome!, 'a', en).detail).toContain('are locked')
   })
 })
+
+describe('le récit dit de qui il parle', () => {
+  it('nomme l’attaquant et le piégeur quand un piège se retourne', () => {
+    let s = neuve()
+    s = submitChoice(s, 'a', [{ card: 'frapper', target: 'c' }])
+    s = submitChoice(s, 'b', [{ card: 'bloquer' }])
+    s = submitChoice(s, 'c', [{ card: 'pieger' }])
+    const apres = resolveRound(s)
+    // C'est ce qui permet à l'écran de poser le bandeau sous leurs cartes.
+    expect(narrate(apres, apres.lastOutcome!, 'a', fr).concerne.sort()).toEqual(['a', 'c'])
+  })
+
+  it('ne nomme personne quand rien n’est tombé', () => {
+    let s = neuve()
+    s = submitChoice(s, 'a', [{ card: 'bloquer' }])
+    s = submitChoice(s, 'b', [{ card: 'bloquer' }])
+    s = submitChoice(s, 'c', [{ card: 'bloquer' }])
+    const apres = resolveRound(s)
+    const r = narrate(apres, apres.lastOutcome!, 'a', fr)
+    expect(r.concerne).toEqual([])
+  })
+})
