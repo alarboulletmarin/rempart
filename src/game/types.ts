@@ -104,6 +104,34 @@ export type RoundEvent =
   /** Un joueur déconnecté n'a pas joué cette manche. */
   | { t: 'absent'; who: PlayerId }
 
+/**
+ * Le sort d'un joueur sur sa ligne de révélation, dit en MOTIF et non en
+ * phrase.
+ *
+ * Le moteur tourne chez l'arbitre, et son résultat part sur le réseau vers des
+ * téléphones qui ne sont pas forcément dans sa langue : une étiquette écrite
+ * ici arriverait en français sur un écran anglais. Le motif voyage, la phrase
+ * se fabrique chez qui lit — c'est la même règle que pour les avis de
+ * connexion.
+ */
+export type MotifEtiquette =
+  | 'absent'
+  | 'retourne'
+  | 'piegeDeclenche'
+  | 'frappesAnnulees'
+  | 'annule'
+  | 'briquesPerdues'
+  | 'briquesGagnees'
+  | 'murPlein'
+  | 'touche'
+  | 'rien'
+
+export interface EtiquetteManche {
+  motif: MotifEtiquette
+  /** Le nombre que porte le motif : des briques, des frappes. */
+  n: number
+}
+
 /** Ce qui est arrivé à un joueur pendant la résolution, pour l'écran de révélation. */
 export interface PlayerOutcome {
   playerId: PlayerId
@@ -119,8 +147,8 @@ export interface PlayerOutcome {
    * `ui/mouvement.ts`).
    */
   wallBefore: Slot[]
-  /** L'étiquette qui résume son sort : « annulé », « retourné −1 », « +1 brique »… */
-  tag: string
+  /** Le motif qui résume son sort : « annulé », « retourné −1 », « +1 brique »… */
+  tag: EtiquetteManche
   /** L'étiquette est-elle marquante (terre cuite pleine) ou discrète ? */
   hot: boolean
   /** Variation de briques sur la manche, pour l'animation et le récit. */

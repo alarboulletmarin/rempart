@@ -74,4 +74,84 @@ export const en: Catalogue = {
   'reglages.garde.horsLigne':
     'Once the app is installed it works offline. Multiplayer, though, needs a connection.',
   'reglages.pied': 'Rempart · 2–4 players · 10 rounds · 4 minutes',
+
+  /* ------------------------------------------------ le récit de la manche */
+
+  'recit.retourne.titre.moiAuteur': '{piegeur}’s trap sent your strike back.',
+  'recit.retourne.titre.moiPiegeur': 'Your trap sent {auteur}’s strike back.',
+  'recit.retourne.titre.autres': '{piegeur}’s trap sent {auteur}’s strike back.',
+  'recit.retourne.detail.moiAuteur_un': 'You lose one brick, {piegeur} lost nothing.',
+  'recit.retourne.detail.moiAuteur_autre': 'You lose {n} bricks, {piegeur} lost nothing.',
+  'recit.retourne.detail.moiPiegeur_un': '{auteur} loses one brick and you lost nothing.',
+  'recit.retourne.detail.moiPiegeur_autre': '{auteur} loses {n} bricks and you lost nothing.',
+  'recit.retourne.detail.autres_un': '{auteur} loses one brick and {piegeur} lost nothing.',
+  'recit.retourne.detail.autres_autre': '{auteur} loses {n} bricks and {piegeur} lost nothing.',
+
+  'recit.bloc.titre.tout.moi': 'You stopped the lot in one block.',
+  'recit.bloc.titre.tout.autre': '{nom} stopped the lot in one block.',
+  'recit.bloc.titre.une.moi': 'You blocked the strike.',
+  'recit.bloc.titre.une.autre': '{nom} blocked the strike.',
+  'recit.bloc.detail.moi_un':
+    'The strike is cancelled. You are wide open now: {carte} is locked for you next round.',
+  'recit.bloc.detail.moi_autre':
+    '{n} strikes cancelled. You are wide open now: {carte} is locked for you next round.',
+  'recit.bloc.detail.autre_un':
+    'The strike is cancelled. {nom} is wide open now: {carte} is locked for them next round.',
+  'recit.bloc.detail.autre_autre':
+    '{n} strikes cancelled. {nom} is wide open now: {carte} is locked for them next round.',
+
+  'recit.frappe.titre.surMoi_un': '{nom} broke your brick.',
+  'recit.frappe.titre.surMoi_autre': '{nom} broke your bricks.',
+  'recit.frappe.titre.parMoi': 'You struck {cible}.',
+  'recit.frappe.titre.autres': '{nom} struck {cible}.',
+  'recit.frappe.detail.moi_un': 'You lose one brick.',
+  'recit.frappe.detail.moi_autre': 'You lose {n} bricks.',
+  'recit.frappe.detail.autre_un': '{nom} loses one brick.',
+  'recit.frappe.detail.autre_autre': '{nom} loses {n} bricks.',
+
+  'recit.repare.titre.equipe.parMoi': 'You repaired {cible}’s wall.',
+  'recit.repare.titre.equipe.pourMoi': '{nom} repaired your team’s wall.',
+  'recit.repare.titre.equipe.autres': '{nom} repaired {cible}’s wall.',
+  'recit.repare.titre.seul.moi': 'You built your wall back up.',
+  'recit.repare.titre.seul.autre': '{nom} built their wall back up.',
+  'recit.repare.detail_un': '+{n} brick, and nobody struck this round.',
+  'recit.repare.detail_autre': '+{n} bricks, and nobody struck this round.',
+
+  'recit.rien.titre': 'Nothing fell.',
+  'recit.rien.detail':
+    'No strike landed. The locks change all the same: three choices next round.',
+
+  'recit.verrou.moi_un': '— and {cartes} is locked for you next round.',
+  'recit.verrou.moi_autre': '— and {cartes} are locked for you next round.',
+  'recit.verrou.autre_un': '— {cartes} is locked for {nom} next round.',
+  'recit.verrou.autre_autre': '— {cartes} are locked for {nom} next round.',
+
+  'recit.joue.sur': '{carte} on {cible}',
+  'recit.joue.rien': 'did not play',
+
+  /* ---------------------------------------------------------- révélation */
+
+  'revelation.titre': 'Reveal',
+  'revelation.mortSubite': 'sudden death · round {n}',
+  'revelation.tousJoue': 'round {n} · everyone has played',
+  'revelation.cascade': 'turning the cards over one by one',
+  'revelation.dosCache': 'Card still face down.',
+  'revelation.suivant': 'Next round',
+  'revelation.classement': 'See the standings',
+  'revelation.toi': 'you',
+  'revelation.absent': 'away',
+
+  'etiquette.absent': 'away',
+  'etiquette.retourne': 'sent back −{n}',
+  'etiquette.piegeDeclenche': 'trap sprung',
+  'etiquette.frappesAnnulees_un': '{n} strike cancelled',
+  'etiquette.frappesAnnulees_autre': '{n} strikes cancelled',
+  'etiquette.annule': 'cancelled',
+  'etiquette.briquesPerdues_un': '−{n} brick',
+  'etiquette.briquesPerdues_autre': '−{n} bricks',
+  'etiquette.briquesGagnees_un': '+{n} brick',
+  'etiquette.briquesGagnees_autre': '+{n} bricks',
+  'etiquette.murPlein': 'wall full',
+  'etiquette.touche': 'struck',
+  'etiquette.rien': '',
 }

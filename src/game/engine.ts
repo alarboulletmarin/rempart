@@ -27,6 +27,8 @@ import {
   type RoundEvent,
   type RoundOutcome,
   type Slot,
+  type EtiquetteManche,
+  type MotifEtiquette,
 } from './types'
 import { ROUND_CARDS } from './roundCards'
 
@@ -430,35 +432,41 @@ export function resolveRound(state: GameState): GameState {
   return { ...state, players, phase: 'revelation', lastOutcome: outcome }
 }
 
-/** L'étiquette qui résume le sort d'un joueur, sur sa ligne de révélation. */
+/**
+ * Le motif qui résume le sort d'un joueur, sur sa ligne de révélation.
+ *
+ * Un motif et un nombre, jamais une phrase : ce résultat part de l'arbitre
+ * vers les autres téléphones, qui ne lisent pas forcément la même langue que
+ * lui. C'est l'écran qui met des mots dessus, dans la sienne.
+ */
 function tagFor(
   id: PlayerId,
   events: RoundEvent[],
   delta: number,
   connected: boolean,
-): { tag: string; hot: boolean } {
-  if (!connected) return { tag: 'absent', hot: false }
+): { tag: EtiquetteManche; hot: boolean } {
+  const etiquette = (motif: MotifEtiquette, n = 0, hot = false) => ({ tag: { motif, n }, hot })
+
+  if (!connected) return etiquette('absent')
 
   const reflectedOnMe = events.find((e) => e.t === 'retournee' && e.from === id)
   if (reflectedOnMe && reflectedOnMe.t === 'retournee') {
-    return { tag: `retourné −${reflectedOnMe.amount}`, hot: true }
+    return etiquette('retourne', reflectedOnMe.amount, true)
   }
   if (events.some((e) => e.t === 'retournee' && e.to === id)) {
-    return { tag: 'piège déclenché', hot: true }
+    return etiquette('piegeDeclenche', 0, true)
   }
 
   const cancelled = events.filter((e) => e.t === 'annulee' && e.to === id).length
-  if (cancelled > 0) {
-    return { tag: cancelled === 1 ? '1 frappe annulée' : `${cancelled} frappes annulées`, hot: true }
-  }
-  if (events.some((e) => e.t === 'annulee' && e.from === id)) return { tag: 'annulé', hot: false }
+  if (cancelled > 0) return etiquette('frappesAnnulees', cancelled, true)
+  if (events.some((e) => e.t === 'annulee' && e.from === id)) return etiquette('annule')
 
-  if (delta < 0) return { tag: `−${-delta} brique${-delta > 1 ? 's' : ''}`, hot: true }
-  if (delta > 0) return { tag: `+${delta} brique${delta > 1 ? 's' : ''}`, hot: false }
+  if (delta < 0) return etiquette('briquesPerdues', -delta, true)
+  if (delta > 0) return etiquette('briquesGagnees', delta)
 
-  if (events.some((e) => e.t === 'reparation' && e.who === id)) return { tag: 'mur plein', hot: false }
-  if (events.some((e) => e.t === 'frappe' && e.from === id)) return { tag: 'touché', hot: false }
-  return { tag: '', hot: false }
+  if (events.some((e) => e.t === 'reparation' && e.who === id)) return etiquette('murPlein')
+  if (events.some((e) => e.t === 'frappe' && e.from === id)) return etiquette('touche')
+  return etiquette('rien')
 }
 
 /* --------------------------------------------------------------- fin */

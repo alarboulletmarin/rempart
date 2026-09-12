@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { TEXTE, TITRE } from '../theme'
 import { chute, narrate, playedLabel } from '../game/narrate'
 import type { GameState, PlayerId } from '../game/types'
+import { direEtiquette, useT } from '../i18n'
 import { Etiquette, Pastille, usePanneauEncre } from '../ui/atoms'
 import { Bulles, Eventail } from '../ui/discussion'
 import { LigneJoueur } from '../ui/jeu'
@@ -39,6 +40,7 @@ export function Revelation({
   onSuivant: () => void
 }) {
   const t = useTheme()
+  const tr = useT()
   const encre = usePanneauEncre()
   const bouge = useMouvement()
   const outcome = state.lastOutcome
@@ -58,7 +60,7 @@ export function Revelation({
   }, [bouge, total, state.round, state.mortSubite])
 
   if (!outcome) return null
-  const recit = narrate(state, outcome, moi)
+  const recit = narrate(state, outcome, moi, tr)
   const tout = devoiles >= total
   const monDelta = outcome.outcomes.find((o) => o.playerId === moi)?.delta ?? 0
 
@@ -73,7 +75,7 @@ export function Revelation({
       <EnTete
         bg={encre.bg}
         fg={encre.fg}
-        titre="Révélation"
+        titre={tr('revelation.titre')}
         hauteur={104}
         droite={
           <>
@@ -81,8 +83,8 @@ export function Revelation({
               {/* Pendant la révélation la phase vaut « revelation » : c'est le
                   compteur qui dit qu'on est en mort subite. */}
               {state.mortSubite > 0
-                ? `mort subite · manche ${state.mortSubite}`
-                : `manche ${outcome.round} · tout le monde a joué`}
+                ? tr('revelation.mortSubite', { n: state.mortSubite })
+                : tr('revelation.tousJoue', { n: outcome.round })}
             </span>
             {/* La table propose : quand ton mur vient d'être frappé, l'éventail
                 s'ouvre seul deux secondes. Une proposition, jamais une
@@ -139,7 +141,13 @@ export function Revelation({
                     />
                   ) : undefined
                 }
-                tag={id === moi ? 'toi' : !p.connected ? 'absent' : undefined}
+                tag={
+                  id === moi
+                    ? tr('revelation.toi')
+                    : !p.connected
+                      ? tr('revelation.absent')
+                      : undefined
+                }
                 hauteurMur={30}
                 pad="10px 12px"
                 gap={7}
@@ -164,15 +172,15 @@ export function Revelation({
                           <Pictogramme card={o.played[0].card} size={22} color={t.ink} />
                         )}
                         <span style={{ font: `600 13px/1 ${TEXTE}`, color: t.ink }}>
-                          {playedLabel(state, id, outcome)}
+                          {playedLabel(state, id, outcome, tr)}
                         </span>
-                        {o?.tag && (
+                        {o && o.tag.motif !== 'rien' && (
                           <Pastille
                             bg={o.hot ? t.clayText : t.panel2}
                             fg={o.hot ? t.panel : t.ink2}
                             style={{ marginLeft: 'auto' }}
                           >
-                            {o.tag}
+                            {direEtiquette(tr, o.tag)}
                           </Pastille>
                         )}
                       </>
@@ -223,7 +231,7 @@ export function Revelation({
               cursor: 'pointer',
             }}
           >
-            {state.round >= 10 ? 'Voir le classement' : 'Manche suivante'}
+            {state.round >= 10 ? tr('revelation.classement') : tr('revelation.suivant')}
           </button>
         ) : (
           <div
@@ -238,7 +246,7 @@ export function Revelation({
             }}
           >
             <Etiquette size={11} style={{ letterSpacing: '0.08em' }}>
-              on retourne les cartes une par une
+              {tr('revelation.cascade')}
             </Etiquette>
           </div>
         )}
@@ -255,6 +263,7 @@ export function Revelation({
  */
 function DosDeCarte() {
   const t = useTheme()
+  const tr = useT()
   return (
     <>
       <div style={{ display: 'flex', gap: 5, margin: '0 auto' }} aria-hidden="true">
@@ -274,7 +283,7 @@ function DosDeCarte() {
           clip: 'rect(0 0 0 0)',
         }}
       >
-        Carte encore face cachée.
+        {tr('revelation.dosCache')}
       </span>
     </>
   )

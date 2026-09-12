@@ -16,6 +16,7 @@ import { en } from './en'
 import { fr } from './fr'
 import type { Catalogue, Cle, ClePluriel, Params } from './fr.types'
 import { LANGUES, LOCALE, categoriePluriel, liste, type Langue } from './format'
+import type { EtiquetteManche } from '../game/types'
 
 export type { Langue } from './format'
 export type { Cle, ClePluriel, Params } from './fr.types'
@@ -128,4 +129,22 @@ export function LangueProvider({ langue, children }: { langue: Langue; children:
 export function LangueScope({ langue, children }: { langue: Langue; children: ReactNode }) {
   const t = useMemo(() => traducteur(langue), [langue])
   return <LangueCtx.Provider value={t}>{children}</LangueCtx.Provider>
+}
+
+/**
+ * L'étiquette d'une ligne de révélation, mise en mots.
+ *
+ * Le moteur rend un motif et un nombre ; c'est ici que ça devient une phrase,
+ * chez celui qui regarde l'écran et dans SA langue. Une étiquette écrite par
+ * l'arbitre serait arrivée en français sur un téléphone anglais.
+ */
+export function direEtiquette(t: T, e: EtiquetteManche): string {
+  switch (e.motif) {
+    case 'frappesAnnulees':
+    case 'briquesPerdues':
+    case 'briquesGagnees':
+      return t.n(`etiquette.${e.motif}` as const, e.n)
+    default:
+      return t(`etiquette.${e.motif}` as const)
+  }
 }
