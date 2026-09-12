@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { TEXTE, TITRE } from '../theme'
-import { CARD_LABEL } from '../game/types'
+import { useT } from '../i18n'
+import { dateEtFormat } from '../i18n/dates'
 import {
   classement,
-  dateEtFormat,
   effacer,
   lire,
   repartitionCartes,
@@ -24,6 +24,7 @@ import { useTheme } from '../ui/theme'
  */
 export function Palmares({ onRetour }: { onRetour: () => void }) {
   const t = useTheme()
+  const tr = useT()
   const [data, setData] = useState<PalmaresData>(() => lire())
   const [confirme, setConfirme] = useState(false)
 
@@ -36,35 +37,34 @@ export function Palmares({ onRetour }: { onRetour: () => void }) {
   return (
     <Ecran>
       <EnTete
-        titre="Palmarès"
+        titre={tr('palmares.titre')}
         onRetour={onRetour}
         hauteur={102}
         droite={
-          <span style={{ font: `500 11px/1 ${TEXTE}`, color: t.ink2 }}>sur cet appareil</span>
+          <span style={{ font: `500 11px/1 ${TEXTE}`, color: t.ink2 }}>
+            {tr('palmares.local')}
+          </span>
         }
       />
       <Corps pad={18} gap={14} scroll>
         {vide ? (
           <Panneau radius={16} pad={16} gap={8}>
             <div style={{ font: `700 19px/1.15 ${TITRE}`, color: t.ink }}>
-              Aucune partie jouée pour l’instant.
+              {tr('palmares.vide.titre')}
             </div>
-            <Texte size={14}>
-              Le palmarès se remplit tout seul : parties, victoires, briques sauvées et cartes que tu
-              joues le plus.
-            </Texte>
+            <Texte size={14}>{tr('palmares.vide.detail')}</Texte>
           </Panneau>
         ) : (
           <>
             <div style={{ display: 'flex', gap: 10 }}>
-              <Compteur valeur={tot.parties} libelle="parties" />
-              <Compteur valeur={tot.victoires} libelle="victoires" />
-              <Compteur valeur={tot.briques} libelle="briques sauvées" />
+              <Compteur valeur={tot.parties} libelle={tr('palmares.total.parties')} />
+              <Compteur valeur={tot.victoires} libelle={tr('palmares.total.victoires')} />
+              <Compteur valeur={tot.briques} libelle={tr('palmares.total.briques')} />
             </div>
 
             {joueurs.length > 0 && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                <Etiquette>Victoires</Etiquette>
+                <Etiquette>{tr('palmares.victoires.titre')}</Etiquette>
                 {joueurs.map((j, i) => (
                   <Panneau key={j.nom} radius={16} pad="11px 13px" gap={8}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -72,7 +72,7 @@ export function Palmares({ onRetour }: { onRetour: () => void }) {
                       <span
                         style={{ font: `500 11px/1 ${TEXTE}`, color: t.ink2, marginLeft: 'auto' }}
                       >
-                        {j.line}
+                        {tr.n('palmares.victoires.ligne', j.parties, { v: j.victoires })}
                       </span>
                     </div>
                     <Barre largeur={j.w} couleur={t.pc[(i % 4) as 0]} />
@@ -82,13 +82,13 @@ export function Palmares({ onRetour }: { onRetour: () => void }) {
             )}
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <Etiquette>Cartes que tu joues le plus</Etiquette>
+              <Etiquette>{tr('palmares.cartes.titre')}</Etiquette>
               <Panneau radius={16} pad={13} gap={10}>
                 {cartes.map((c) => (
                   <div key={c.k} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     <Pictogramme card={c.k} size={20} color={t.ink2} />
                     <span style={{ font: `600 13px/1 ${TEXTE}`, color: t.ink, width: 66 }}>
-                      {CARD_LABEL[c.k]}
+                      {tr(`carte.${c.k}` as const)}
                     </span>
                     <div style={{ flex: 1 }}>
                       <Barre largeur={c.w} couleur={t.wood} />
@@ -109,7 +109,7 @@ export function Palmares({ onRetour }: { onRetour: () => void }) {
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <Etiquette>Dernières parties</Etiquette>
+              <Etiquette>{tr('palmares.parties.titre')}</Etiquette>
               {parties.map((p, i) => (
                 <Panneau
                   key={`${p.at}-${i}`}
@@ -121,10 +121,13 @@ export function Palmares({ onRetour }: { onRetour: () => void }) {
                     style={{ display: 'flex', flexDirection: 'column', gap: 3, flex: 1, minWidth: 0 }}
                   >
                     <span style={{ font: `600 13px/1 ${TEXTE}`, color: t.ink }}>
-                      {p.gagnant} · {p.mesBriques} brique{p.mesBriques > 1 ? 's' : ''}
+                      {tr('palmares.partie.ligne', {
+                        gagnant: p.gagnant,
+                        briques: tr.n('brique', p.mesBriques),
+                      })}
                     </span>
                     <span style={{ font: `500 11px/1.3 ${TEXTE}`, color: t.ink2 }}>
-                      {dateEtFormat(p)}
+                      {dateEtFormat(tr, p)}
                     </span>
                   </div>
                   <Pastille
@@ -132,7 +135,7 @@ export function Palmares({ onRetour }: { onRetour: () => void }) {
                     fg={p.gagnee ? '#FCF7EC' : t.ink2}
                     style={{ letterSpacing: '0.06em', textTransform: 'uppercase', padding: '5px 10px' }}
                   >
-                    {p.gagnee ? 'gagnée' : 'perdue'}
+                    {tr(p.gagnee ? 'palmares.gagnee' : 'palmares.perdue')}
                   </Pastille>
                 </Panneau>
               ))}
@@ -149,22 +152,22 @@ export function Palmares({ onRetour }: { onRetour: () => void }) {
                     setConfirme(false)
                   }}
                 >
-                  Tout effacer, vraiment
+                  {tr('palmares.effacer.vraiment')}
                 </Bouton>
                 <Bouton ton="creux" height={50} size={14} onClick={() => setConfirme(false)}>
-                  Annuler
+                  {tr('palmares.annuler')}
                 </Bouton>
               </div>
             ) : (
               <Bouton ton="creux" height={50} size={14} onClick={() => setConfirme(true)}>
-                Effacer le palmarès
+                {tr('palmares.effacer')}
               </Bouton>
             )}
           </>
         )}
 
         <Texte size={12} style={{ textAlign: 'center', marginTop: 'auto', lineHeight: 1.5 }}>
-          Tout est gardé sur l’appareil. Aucun compte, aucun envoi.
+          {tr('palmares.pied')}
         </Texte>
       </Corps>
     </Ecran>

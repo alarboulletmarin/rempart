@@ -530,6 +530,63 @@ export const en: Catalogue = {
     'Rounds 3, 6 and 9: a shared rule appears in a banner. It applies to everyone, for one round only.',
   'rapides.compris': 'Got it',
 
+  /* ----------------------------------------------------------- le palmarès */
+
+  'palmares.titre': 'Record',
+  'palmares.local': 'on this device',
+  'palmares.vide.titre': 'No games played yet.',
+  'palmares.vide.detail':
+    'The record fills itself: games, wins, bricks saved and the cards you play most.',
+  'palmares.total.parties': 'games',
+  'palmares.total.victoires': 'wins',
+  'palmares.total.briques': 'bricks saved',
+  'palmares.victoires.titre': 'Wins',
+  'palmares.victoires.ligne_un': '{v} win · {n} game',
+  'palmares.victoires.ligne_autre': '{v} wins · {n} games',
+  'palmares.cartes.titre': 'The cards you play most',
+  'palmares.parties.titre': 'Recent games',
+  'palmares.partie.ligne': '{gagnant} · {briques}',
+  'palmares.partie.format.chacun': 'Every wall for itself · {n}p',
+  'palmares.partie.format.equipes': 'Teams 2 v 2',
+  'palmares.partie.date': '{date} · {heure} · {format}',
+  'palmares.gagnee': 'won',
+  'palmares.perdue': 'lost',
+  'palmares.effacer': 'Erase the record',
+  'palmares.effacer.vraiment': 'Erase everything, really',
+  'palmares.annuler': 'Cancel',
+  'palmares.pied': 'Everything is kept on the device. No account, nothing sent.',
+
+  /* --------------------------------------------------------- fin de partie */
+
+  'fin.gagne': '{nom} wins',
+  'fin.gagnent': '{noms} win',
+  'fin.mortSubite_un': 'Sudden death · {n} round',
+  'fin.mortSubite_autre': 'Sudden death · {n} rounds',
+  'fin.dixManches': 'Ten rounds · over',
+  'fin.termine': 'Over',
+  'fin.departage':
+    'Sudden death did not separate them in three rounds: the highest wall decides, then the seat at the table.',
+  'fin.toi': 'you',
+  'fin.vainqueur': 'wins',
+  'fin.rejouer': 'Play again with the same people',
+  'fin.palmares': 'Record',
+  'fin.quitter': 'Leave',
+  'fin.hoteRelance': 'The host can start another game with the same players.',
+
+  'fin.resume.departage.moi':
+    'Three sudden-death rounds and not one wall gave way. You win on the tiebreak.',
+  'fin.resume.departage.autre':
+    'Three sudden-death rounds and not one wall gave way. The tiebreak decided.',
+  'fin.resume.intact.moi': 'Wall intact: five bricks standing. Nobody dared aim at you.',
+  'fin.resume.intact.autre':
+    'Wall intact: five bricks standing. The rest of the time, nobody dared aim at it.',
+  'fin.resume.rase_un': 'One wall at zero, and the game came down to {briques}. The tenth round decided.',
+  'fin.resume.rase_autre':
+    '{n} walls at zero, and the game came down to {briques}. The tenth round decided.',
+  'fin.resume.verrou.moi':
+    'You finish on {briques}. The lock made the difference: three choices instead of four, and everyone knew it.',
+  'fin.resume.verrou.autre': '{briques} standing at the tenth. The lock did the rest.',
+
   /* --------------------------------------------------- les cartes de manche */
 
   'manche.double-frappe.nom': 'Double strike',

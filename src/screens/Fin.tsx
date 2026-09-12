@@ -1,6 +1,8 @@
 import { SAFE_TOP, TEXTE, TITRE } from '../theme'
 import { bricks, standings, trancheeAuxPoints } from '../game/engine'
-import type { GameState, PlayerId } from '../game/types'
+import { WALL_SIZE, type GameState, type PlayerId } from '../game/types'
+import { useT, type T } from '../i18n'
+import { ordinal } from '../i18n/format'
 import { Bouton, BoutonCreux, Etiquette, Forme, Mur, Panneau, Scribble, Texte, usePanneauEncre } from '../ui/atoms'
 import { Ecran } from '../ui/shell'
 import { useTheme } from '../ui/theme'
@@ -29,6 +31,7 @@ export function Fin({
   peutRejouer: boolean
 }) {
   const t = useTheme()
+  const tr = useT()
   const encre = usePanneauEncre()
   const rows = standings(state)
   const gagnants = rows.filter((r) => r.winner)
@@ -36,8 +39,8 @@ export function Fin({
   const jaiGagne = gagnants.some((r) => r.player.id === moi)
 
   const titre = equipes
-    ? `${gagnants.map((r) => r.player.name).join(' + ')} gagnent`
-    : `${gagnants[0]?.player.name ?? '—'} gagne`
+    ? tr('fin.gagnent', { noms: gagnants.map((r) => r.player.name).join(' + ') })
+    : tr('fin.gagne', { nom: gagnants[0]?.player.name ?? '—' })
 
   return (
     <Ecran>
@@ -73,10 +76,8 @@ export function Fin({
           />
           <Etiquette size={11} color={encre.sub} style={{ letterSpacing: '0.14em' }}>
             {state.mortSubite > 0
-              ? `Mort subite · ${state.mortSubite} manche${state.mortSubite > 1 ? 's' : ''}`
-              : state.round >= 10
-                ? 'Dix manches · terminé'
-                : 'Terminé'}
+              ? tr.n('fin.mortSubite', state.mortSubite)
+              : tr(state.round >= 10 ? 'fin.dixManches' : 'fin.termine')}
           </Etiquette>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             {gagnants[0] && <Forme ci={gagnants[0].player.ci} size={34} />}
@@ -90,7 +91,7 @@ export function Fin({
               textWrap: 'pretty',
             }}
           >
-            {resume(state, jaiGagne, gagnants[0]?.bricks ?? 0)}
+            {resume(tr, state, jaiGagne, gagnants[0]?.bricks ?? 0)}
           </div>
           {/* Une partie décidée par la règle du départage doit le dire :
               sinon le classement à l'écran a l'air de se contredire. */}
@@ -103,8 +104,7 @@ export function Fin({
                 textWrap: 'pretty',
               }}
             >
-              La mort subite n’a pas départagé en trois manches : c’est le mur le plus haut, puis
-              la place à la table, qui tranchent.
+              {tr('fin.departage')}
             </div>
           )}
         </div>
@@ -114,16 +114,16 @@ export function Fin({
             <Panneau key={r.player.id} radius={16} pad="12px 13px" gap={8}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <span style={{ font: `700 13px/1 ${TITRE}`, color: t.ink2, width: 24 }}>
-                  {rang(r.place)}
+                  {ordinal(r.place, tr.langue)}
                 </span>
                 <Forme ci={r.player.ci} size={19} />
                 <span style={{ font: `700 17px/1 ${TITRE}`, color: t.ink }}>{r.player.name}</span>
                 <span style={{ font: `600 13px/1 ${TEXTE}`, color: t.ink2, marginLeft: 'auto' }}>
-                  {r.bricks} brique{r.bricks > 1 ? 's' : ''}
+                  {tr.n('brique', r.bricks)}
                 </span>
                 {(r.winner || r.player.id === moi) && (
                   <Etiquette size={10} color={t.clayText} style={{ letterSpacing: '0.08em' }}>
-                    {r.player.id === moi ? 'toi' : 'gagne'}
+                    {tr(r.player.id === moi ? 'fin.toi' : 'fin.vainqueur')}
                   </Etiquette>
                 )}
               </div>
@@ -135,16 +135,16 @@ export function Fin({
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 'auto' }}>
           {peutRejouer && (
             <Bouton onClick={onRejouer} height={64} size={20}>
-              Rejouer avec les mêmes
+              {tr('fin.rejouer')}
             </Bouton>
           )}
           <div style={{ display: 'flex', gap: 10 }}>
-            <BoutonCreux onClick={onPalmares}>Palmarès</BoutonCreux>
-            <BoutonCreux onClick={onQuitter}>Quitter</BoutonCreux>
+            <BoutonCreux onClick={onPalmares}>{tr('fin.palmares')}</BoutonCreux>
+            <BoutonCreux onClick={onQuitter}>{tr('fin.quitter')}</BoutonCreux>
           </div>
           {!peutRejouer && (
             <Texte size={11} style={{ textAlign: 'center', lineHeight: 1.5 }}>
-              L’hôte peut relancer une partie avec les mêmes joueurs.
+              {tr('fin.hoteRelance')}
             </Texte>
           )}
         </div>
@@ -153,32 +153,19 @@ export function Fin({
   )
 }
 
-/** Le rang, écrit comme sur la planche : « 1ᵉ », « 2ᵉ »… */
-function rang(place: number): string {
-  return `${place}ᵉ`
-}
-
 /**
  * Une phrase qui explique la victoire par ce qui s'est passé, pas par le score
  * — qui est déjà juste au-dessous.
  */
-function resume(state: GameState, jaiGagne: boolean, briquesGagnant: number): string {
-  const intact = briquesGagnant === 5
+function resume(tr: T, state: GameState, jaiGagne: boolean, briquesGagnant: number): string {
   const rase = state.players.filter((p) => bricks(p) === 0).length
+  const briques = tr.n('brique', briquesGagnant)
   if (trancheeAuxPoints(state)) {
-    return jaiGagne
-      ? 'Trois manches de mort subite sans qu’aucun mur ne cède. Tu gagnes au départage.'
-      : 'Trois manches de mort subite sans qu’aucun mur ne cède. Le départage a tranché.'
+    return tr(jaiGagne ? 'fin.resume.departage.moi' : 'fin.resume.departage.autre')
   }
-  if (intact) {
-    return jaiGagne
-      ? 'Mur intact : cinq briques debout. Personne n’a osé te viser.'
-      : 'Mur intact : cinq briques debout. Le reste du temps, personne n’a osé le viser.'
+  if (briquesGagnant === WALL_SIZE) {
+    return tr(jaiGagne ? 'fin.resume.intact.moi' : 'fin.resume.intact.autre')
   }
-  if (rase > 0) {
-    return `${rase} mur${rase > 1 ? 's' : ''} à zéro, et la partie s’est jouée à ${briquesGagnant} brique${briquesGagnant > 1 ? 's' : ''}. La dixième manche a tranché.`
-  }
-  return jaiGagne
-    ? `Tu finis à ${briquesGagnant} briques. C’est le verrou qui a fait la différence : trois choix au lieu de quatre, et tout le monde le savait.`
-    : `${briquesGagnant} briques debout à la dixième. Le verrou a fait le reste.`
+  if (rase > 0) return tr.n('fin.resume.rase', rase, { briques })
+  return tr(jaiGagne ? 'fin.resume.verrou.moi' : 'fin.resume.verrou.autre', { briques })
 }

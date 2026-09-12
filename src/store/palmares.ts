@@ -97,7 +97,6 @@ export interface LigneJoueurPalmares {
   parties: number
   /** Largeur de la barre, en pourcentage du meilleur score. */
   w: string
-  line: string
 }
 
 /** Le classement des joueurs récurrents, tel qu'il s'affiche. */
@@ -116,11 +115,7 @@ export function classement(p: Palmares): LigneJoueurPalmares[] {
     .sort((a, b) => b.victoires - a.victoires || b.parties - a.parties)
     .slice(0, 4)
   const max = rows.length > 0 ? Math.max(1, ...rows.map((r) => r.victoires)) : 1
-  return rows.map((r) => ({
-    ...r,
-    w: `${Math.round((r.victoires / max) * 100)}%`,
-    line: `${r.victoires} victoire${r.victoires > 1 ? 's' : ''} · ${r.parties} partie${r.parties > 1 ? 's' : ''}`,
-  }))
+  return rows.map((r) => ({ ...r, w: `${Math.round((r.victoires / max) * 100)}%` }))
 }
 
 /** La répartition de mes quatre cartes, en pourcentage. */
@@ -139,31 +134,4 @@ export function totaux(p: Palmares): { parties: number; victoires: number; briqu
     victoires: p.parties.filter((x) => x.gagnee).length,
     briques: p.parties.reduce((n, x) => n + x.mesBriques, 0),
   }
-}
-
-/** « hier soir », « il y a 3 jours » — la date telle qu'on la dit. */
-export function quand(at: number, maintenant = Date.now()): string {
-  const jours = Math.floor((startOfDay(maintenant) - startOfDay(at)) / 86_400_000)
-  const heure = new Date(at).getHours()
-  const moment = heure >= 18 ? 'soir' : heure >= 12 ? 'après-midi' : 'matin'
-  if (jours === 0) return `ce ${moment}`
-  if (jours === 1) return moment === 'matin' ? 'hier matin' : `hier ${moment}`
-  if (jours < 7) return `il y a ${jours} jours`
-  return new Date(at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' })
-}
-
-function startOfDay(ms: number): number {
-  const d = new Date(ms)
-  d.setHours(0, 0, 0, 0)
-  return d.getTime()
-}
-
-/** La ligne datée des « Dernières parties ». */
-export function dateEtFormat(partie: PartieEnregistree): string {
-  const d = new Date(partie.at)
-  const date = d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' })
-  const heure = d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }).replace(':', ' h ')
-  const format =
-    partie.format === 'equipes' ? 'Équipes 2 v 2' : `Chacun pour soi · ${partie.joueurs} j`
-  return `${date} · ${heure} · ${format}`
 }

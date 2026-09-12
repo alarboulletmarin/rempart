@@ -12,7 +12,7 @@
  */
 
 import type { T } from './index'
-import { dateCourte, joursEcoules, momentDuJour } from './format'
+import { dateCourte, heureCourte, joursEcoules, momentDuJour } from './format'
 
 /** « cet après-midi », « hier soir », « il y a 3 jours », puis la date. */
 export function quand(t: T, at: number, maintenant = Date.now()): string {
@@ -22,4 +22,19 @@ export function quand(t: T, at: number, maintenant = Date.now()): string {
   if (jours === 1) return t(`date.hier.${moment}`)
   if (jours < 7) return t('date.ilYaJours', { n: jours })
   return dateCourte(at, t.langue)
+}
+
+/** « 14/03 · 21 h 05 · Chacun pour soi · 4 j » — la ligne datée du palmarès. */
+export function dateEtFormat(
+  t: T,
+  partie: { at: number; format: 'chacun' | 'equipes'; joueurs: number },
+): string {
+  return t('palmares.partie.date', {
+    date: dateCourte(partie.at, t.langue),
+    heure: heureCourte(partie.at, t.langue),
+    format:
+      partie.format === 'equipes'
+        ? t('palmares.partie.format.equipes')
+        : t('palmares.partie.format.chacun', { n: partie.joueurs }),
+  })
 }

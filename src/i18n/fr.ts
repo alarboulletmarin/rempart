@@ -564,6 +564,64 @@ export const fr = {
     'Manches 3, 6 et 9 : une règle commune s’affiche en bandeau. Elle vaut pour tout le monde, une seule manche.',
   'rapides.compris': 'J’ai compris',
 
+  /* ----------------------------------------------------------- le palmarès */
+
+  'palmares.titre': 'Palmarès',
+  'palmares.local': 'sur cet appareil',
+  'palmares.vide.titre': 'Aucune partie jouée pour l’instant.',
+  'palmares.vide.detail':
+    'Le palmarès se remplit tout seul : parties, victoires, briques sauvées et cartes que tu joues le plus.',
+  'palmares.total.parties': 'parties',
+  'palmares.total.victoires': 'victoires',
+  'palmares.total.briques': 'briques sauvées',
+  'palmares.victoires.titre': 'Victoires',
+  'palmares.victoires.ligne_un': '{v} victoire · {n} partie',
+  'palmares.victoires.ligne_autre': '{v} victoires · {n} parties',
+  'palmares.cartes.titre': 'Cartes que tu joues le plus',
+  'palmares.parties.titre': 'Dernières parties',
+  'palmares.partie.ligne': '{gagnant} · {briques}',
+  'palmares.partie.format.chacun': 'Chacun pour soi · {n} j',
+  'palmares.partie.format.equipes': 'Équipes 2 v 2',
+  'palmares.partie.date': '{date} · {heure} · {format}',
+  'palmares.gagnee': 'gagnée',
+  'palmares.perdue': 'perdue',
+  'palmares.effacer': 'Effacer le palmarès',
+  'palmares.effacer.vraiment': 'Tout effacer, vraiment',
+  'palmares.annuler': 'Annuler',
+  'palmares.pied': 'Tout est gardé sur l’appareil. Aucun compte, aucun envoi.',
+
+  /* --------------------------------------------------------- fin de partie */
+
+  'fin.gagne': '{nom} gagne',
+  'fin.gagnent': '{noms} gagnent',
+  'fin.mortSubite_un': 'Mort subite · {n} manche',
+  'fin.mortSubite_autre': 'Mort subite · {n} manches',
+  'fin.dixManches': 'Dix manches · terminé',
+  'fin.termine': 'Terminé',
+  'fin.departage':
+    'La mort subite n’a pas départagé en trois manches : c’est le mur le plus haut, puis la place à la table, qui tranchent.',
+  'fin.toi': 'toi',
+  'fin.vainqueur': 'gagne',
+  'fin.rejouer': 'Rejouer avec les mêmes',
+  'fin.palmares': 'Palmarès',
+  'fin.quitter': 'Quitter',
+  'fin.hoteRelance': 'L’hôte peut relancer une partie avec les mêmes joueurs.',
+
+  'fin.resume.departage.moi':
+    'Trois manches de mort subite sans qu’aucun mur ne cède. Tu gagnes au départage.',
+  'fin.resume.departage.autre':
+    'Trois manches de mort subite sans qu’aucun mur ne cède. Le départage a tranché.',
+  'fin.resume.intact.moi': 'Mur intact : cinq briques debout. Personne n’a osé te viser.',
+  'fin.resume.intact.autre':
+    'Mur intact : cinq briques debout. Le reste du temps, personne n’a osé le viser.',
+  'fin.resume.rase_un':
+    'Un mur à zéro, et la partie s’est jouée à {briques}. La dixième manche a tranché.',
+  'fin.resume.rase_autre':
+    '{n} murs à zéro, et la partie s’est jouée à {briques}. La dixième manche a tranché.',
+  'fin.resume.verrou.moi':
+    'Tu finis à {briques}. C’est le verrou qui a fait la différence : trois choix au lieu de quatre, et tout le monde le savait.',
+  'fin.resume.verrou.autre': '{briques} debout à la dixième. Le verrou a fait le reste.',
+
   /* --------------------------------------------------- les cartes de manche */
 
   'manche.double-frappe.nom': 'Double frappe',
