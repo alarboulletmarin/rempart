@@ -25,6 +25,7 @@ import {
   type PlayerOutcome,
   type RoundCard,
   type RoundEvent,
+  type ManchePassee,
   type RoundOutcome,
   type Slot,
   type EtiquetteManche,
@@ -127,6 +128,7 @@ export function createGame(seats: SeatSpec[], config: GameConfig, seed: number):
     usedRoundCards: [],
     choices: {},
     lastOutcome: null,
+    history: [],
     seed,
     seq: 0,
     mortSubite: 0,
@@ -145,6 +147,9 @@ export function replay(state: GameState, seed: number): GameState {
     usedRoundCards: [],
     choices: {},
     lastOutcome: null,
+    // Une revanche est une autre partie : elle ne garde pas la mémoire de la
+    // précédente, sans quoi l'écran de fin en raconterait vingt.
+    history: [],
     seed,
     seq: 0,
     mortSubite: 0,
@@ -429,7 +434,23 @@ export function resolveRound(state: GameState): GameState {
     : [...players].sort((a, b) => a.seat - b.seat).map((p) => p.id)
 
   const outcome: RoundOutcome = { round: state.round, outcomes, events, revealOrder }
-  return { ...state, players, phase: 'revelation', lastOutcome: outcome }
+
+  // La manche rejoint la mémoire de la partie : c'est elle que l'écran de fin
+  // relit pour raconter les dix manches plutôt que d'afficher un classement
+  // dans le vide.
+  const passee: ManchePassee = {
+    round: state.round,
+    joue: Object.fromEntries(players.map((p) => [p.id, (played.get(p.id) ?? []).map((c) => c.card)])),
+    briques: Object.fromEntries(players.map((p) => [p.id, bricks(p)])),
+  }
+
+  return {
+    ...state,
+    players,
+    phase: 'revelation',
+    lastOutcome: outcome,
+    history: [...(state.history ?? []), passee],
+  }
 }
 
 /**

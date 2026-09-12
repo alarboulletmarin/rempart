@@ -170,6 +170,28 @@ export interface RoundOutcome {
   revealOrder: PlayerId[]
 }
 
+/**
+ * Ce qu'on garde d'une manche une fois qu'elle est passée.
+ *
+ * Le moteur ne gardait que la DERNIÈRE résolution, parce que c'est tout ce
+ * dont la révélation a besoin. L'écran de fin, lui, n'avait alors rien à
+ * raconter d'une partie qui venait pourtant de durer dix manches : il montrait
+ * un classement, et la moitié de sa hauteur restait vide. Ces deux nombres par
+ * joueur et par manche suffisent à redonner la partie entière — quarante
+ * entrées pour une table de quatre, soit quelques centaines d'octets dans
+ * l'état qui voyage.
+ *
+ * Aucune règle ne le lit : c'est une mémoire d'affichage, et le moteur décide
+ * exactement comme avant.
+ */
+export interface ManchePassee {
+  round: number
+  /** La ou les cartes jouées, par joueur. Vide pour un joueur absent. */
+  joue: Record<PlayerId, CardKey[]>
+  /** Les briques encore debout à la fin de la manche, par joueur. */
+  briques: Record<PlayerId, number>
+}
+
 export interface GameState {
   config: GameConfig
   players: Player[]
@@ -184,6 +206,13 @@ export interface GameState {
   choices: Record<PlayerId, Choice[]>
   /** Le résultat de la dernière résolution, affiché à la révélation. */
   lastOutcome: RoundOutcome | null
+  /**
+   * Les manches déjà jouées, dans l'ordre — la mémoire de la partie.
+   *
+   * Optionnelle à la lecture : un état publié par une version plus ancienne
+   * n'en porte pas, et l'écran de fin retombe alors sur le classement seul.
+   */
+  history?: ManchePassee[]
   /** Graine du tirage aléatoire — l'hôte la partage pour que tout le monde tire pareil. */
   seed: number
   /**

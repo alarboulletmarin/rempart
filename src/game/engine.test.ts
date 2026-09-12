@@ -12,6 +12,7 @@ import {
   MORT_SUBITE_MAX,
   possibleTargets,
   readyCount,
+  replay,
   resolveRound,
   score,
   standings,
@@ -20,7 +21,7 @@ import {
   trancheeAuxPoints,
 } from './engine'
 import { roundCardById } from './roundCards'
-import type { Choice, GameState, PlayerId } from './types'
+import { WALL_SIZE, type Choice, type GameState, type PlayerId } from './types'
 
 const SEATS = [
   { id: 'a', name: 'Léa', ci: 0 as const },
@@ -482,5 +483,62 @@ describe('la fin de partie', () => {
     }
     expect(s.round).toBeLessThanOrEqual(10)
     expect(['fin', 'mort-subite']).toContain(s.phase)
+  })
+})
+
+describe('la mémoire de la partie', () => {
+  function troisManches(): GameState {
+    let s = game()
+    for (let i = 0; i < 3; i++) {
+      // On alterne pour ne jamais rejouer une carte verrouillée.
+      const mienne = i % 2 === 0 ? 'frapper' : 'reparer'
+      s = submitChoice(s, 'a', [{ card: mienne, target: 'b' }])
+      s = submitChoice(s, 'b', [{ card: i % 2 === 0 ? 'bloquer' : 'pieger' }])
+      s = submitChoice(s, 'c', [{ card: i % 2 === 0 ? 'reparer' : 'frapper', target: 'a' }])
+      s = submitChoice(s, 'd', [{ card: i % 2 === 0 ? 'pieger' : 'bloquer' }])
+      s = advance(resolveRound(s))
+    }
+    return s
+  }
+
+  it('garde une entrée par manche jouée, dans l’ordre', () => {
+    const s = troisManches()
+    expect(s.history).toHaveLength(3)
+    expect(s.history!.map((m) => m.round)).toEqual([1, 2, 3])
+  })
+
+  it('garde ce que chacun a joué et ce qu’il lui restait', () => {
+    const s = troisManches()
+    const premiere = s.history![0]
+    expect(premiere.joue.a).toEqual(['frapper'])
+    expect(premiere.joue.b).toEqual(['bloquer'])
+    // « b » avait bloqué : son mur est intact au sortir de la manche 1.
+    expect(premiere.briques.b).toBe(WALL_SIZE)
+  })
+
+  it('repart de zéro à la revanche : c’est une autre partie', () => {
+    const s = troisManches()
+    expect(replay(s, 2).history).toEqual([])
+  })
+
+  it('ne change rien à ce que le moteur décide', () => {
+    // La mémoire est un état d'AFFICHAGE. Une manche résolue sur un état qui
+    // n'en porte pas doit donner exactement les mêmes murs, les mêmes verrous
+    // et la même phase.
+    const depart = game()
+    const avec = play(depart, {
+      a: { card: 'frapper', target: 'b' },
+      b: { card: 'bloquer' },
+      c: { card: 'reparer' },
+      d: { card: 'pieger' },
+    })
+    const sans = { ...avec, history: undefined }
+    const r1 = resolveRound(avec)
+    const r2 = resolveRound(sans)
+    expect(r2.players).toEqual(r1.players)
+    expect(r2.phase).toBe(r1.phase)
+    expect(r2.lastOutcome).toEqual(r1.lastOutcome)
+    // Et la mémoire démarre toute seule sur un état qui n'en avait pas.
+    expect(r2.history).toHaveLength(1)
   })
 })
