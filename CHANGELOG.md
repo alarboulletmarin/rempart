@@ -6,6 +6,85 @@ publication.
 
 ## Non publié
 
+### Changé : l’écran Réglages tient sur deux hauteurs d’écran
+
+Neuf cartes empilées à l’identique, dont deux « Comme le téléphone » dans deux
+sections différentes qu’on prenait pour un doublon, quatre-vingt-dix mots de
+confidentialité lus une seule fois, et un pied de page qui répétait l’accroche
+de l’accueil. Trois écrans et demi de défilement ; il en reste un et demi.
+
+- **La langue tient sur une ligne.** Un contrôle segmenté — `Système` ·
+  `Français` · `English` — au lieu de trois cartes plein format avec
+  description : « Français » n’avait pas besoin qu’on précise que le jeu serait
+  en français. Une seule ligne dessous dit ce que les libellés ne disent pas :
+  « Actuellement : français », qui suit la sélection, « Système » compris.
+- **Le thème garde ses cartes descriptives.** « Établi » et « Veillée » sont
+  opaques sans leur explication, « Français » non. Deux natures de choix, deux
+  contrôles — mais le même arrondi, la même encre d’accent et le même
+  interligne.
+- **On voit enfin que ce sont des choix.** L’anneau d’une option non prise
+  était du brun sur du brun en veillée : le seul élément qui portait l’état
+  n’existait visuellement que là où l’état était déjà acquis. Il se voit
+  maintenant dans les deux thèmes et dans les deux états.
+- **Plus d’aplat orange sur l’option retenue.** La terre cuite dit « tu as
+  perdu une brique » en jeu et « Lancer » sur les boutons d’action : trois sens
+  pour une couleur, et deux blocs pleins sur un écran sans aucune action
+  primaire. L’option prise garde son fond et porte un contour, un anneau rempli
+  et une coche dessinée — trois signaux, dont aucun n’est une couleur seule.
+- **Les sections se voient comme des groupes.** Les en-têtes montent au
+  contraste du texte courant, et l’espace qui les précède vaut trois fois celui
+  qui sépare deux cartes. Aucun trait de séparation ajouté : le vide suffit.
+- **Le bloc confidentialité se replie.** La phrase qui répond à la question
+  reste visible ; les deux paragraphes qui la détaillent passent derrière
+  « En savoir plus », fermé par défaut.
+- **Navigation complète au clavier.** De vrais boutons radio dans des groupes :
+  les flèches parcourent les segments de langue et les cartes de thème, `Tab`
+  passe d’un groupe au suivant, et le lecteur d’écran annonce « 2 sur 3 ».
+
+### Ajouté : « Effacer mes données »
+
+La section annonçait ce que l’app garde sans donner aucun moyen de l’effacer.
+Sortir doit coûter aussi peu qu’entrer, sinon la promesse « sans compte, sans
+tracking » n’est tenue qu’à moitié.
+
+- **Ce qui part est listé avant de partir** : palmarès, thème, langue, nom par
+  défaut. « Êtes-vous sûr ? » n’aurait renseigné personne, et il n’y a aucune
+  sauvegarde ailleurs pour rattraper un oui de trop.
+- **Aucun rechargement** : la page rechargée romprait une partie en cours,
+  puisque le lien est direct entre les téléphones. L’app revient simplement à
+  l’état de son premier lancement, et une coche verte le confirme en une ligne.
+- L’identité d’appareil ne part pas : elle ne dit rien de qui joue, elle sert à
+  retrouver son siège après un rechargement, et l’effacer couperait une partie
+  en cours. Elle n’est donc pas annoncée, puisqu’elle n’est pas concernée.
+
+### Ajouté : un nom par défaut, et une section « À propos »
+
+- **Le nom se retapait à chaque partie.** Il se règle maintenant une fois, et
+  pré-remplit « Nouvelle partie » et « Rejoindre ». Il s’enregistre à la perte
+  de focus — pas de bouton « Enregistrer » pour trois lettres. Ce qu’on tape à
+  la création n’est en revanche pas mémorisé au passage : jouer une fois sous un
+  autre nom est exactement le cas où on ne veut pas que l’app s’en souvienne.
+- **« À propos »** remplace le pied de page : le numéro de version, le journal
+  des versions, le code source, et « Installer l’app » — celui-ci visible
+  seulement en navigateur et seulement quand le navigateur propose vraiment
+  l’installation.
+- **« Cartes de manche » mène enfin aux cartes.** C’était une carte au même
+  arrondi et au même fond que les options cliquables, sans contrôle ni chevron :
+  une fausse affordance devant un texte explicatif. C’est devenu « Voir les neuf
+  cartes », une ligne de navigation vers la section des règles correspondante.
+
+### Corrigé : l’écran ne saute plus, et le bas reste atteignable
+
+- **Le changement de langue faisait remonter l’écran tout en haut.** Les boutons
+  radio se retrouvaient empilés au coin supérieur de leur groupe, et le
+  navigateur remontait l’écran pour amener dans le champ de vision celui qui
+  venait de prendre le focus. Chacun se superpose maintenant à son libellé.
+- **La zone sûre du bas était réservée hors du conteneur qui défile** : le
+  dernier élément ne pouvait pas remonter au-dessus de la barre d’outils de
+  Safari.
+- **Le contraste est mesuré, plus jugé à l’œil** : vingt-huit paires de l’écran,
+  dans les deux thèmes, tenues par un test aux deux seuils de WCAG AA.
+
 ### Ajouté : on peut quitter une partie en cours
 
 Il n’y avait aucune sortie. Une fois la partie lancée, le seul « Quitter »
