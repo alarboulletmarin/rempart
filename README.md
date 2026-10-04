@@ -338,3 +338,15 @@ secret des choix, les deux freins de la conversation et une partie complète de
 bout en bout sont couverts par 157 tests — et une partie contre des
 bots, elle, se joue sans réseau du tout ; **l'établissement de la connexion
 entre deux appareils reste à valider sur un réseau ouvert.**
+
+## Licence
+
+Rempart est un logiciel libre, publié sous **GNU Affero General Public License,
+version 3** (AGPL-3.0) — le texte complet est dans [`LICENSE`](LICENSE).
+
+On peut le lire, le modifier, le redistribuer et l'héberger. En retour, toute
+version modifiée, **y compris simplement mise en ligne**, doit proposer ses
+sources sous la même licence à celles et ceux qui y jouent. L'écran Réglages
+porte déjà le lien « Code source » : c'est lui qui remplit cette obligation.
+
+Les dépendances gardent leurs propres licences.
