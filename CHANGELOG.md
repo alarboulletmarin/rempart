@@ -6,6 +6,15 @@ publication.
 
 ## Non publié
 
+### Ajouté : une licence
+
+Le dépôt était public sans licence, donc « tous droits réservés » par défaut :
+on pouvait lire le code, pas s’en servir. Rempart est désormais un logiciel
+libre, sous **AGPL-3.0**. On peut le reprendre, le modifier et l’héberger, à
+condition de publier ses modifications sous la même licence, y compris pour
+une version seulement mise en ligne. Le lien « Code source » des Réglages
+existait déjà ; il devient ce que la licence demande.
+
 ### Changé : l’écran Réglages tient sur deux hauteurs d’écran
 
 Neuf cartes empilées à l’identique, dont deux « Comme le téléphone » dans deux
